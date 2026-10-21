@@ -185,18 +185,18 @@ En apego estricto al **Principio I (Modularidad y Desacoplamiento)** de la Const
 
 ## 6. Índice Maestro de Architectural Decision Records (ADRs)
 
-Para garantizar la gobernanza del diseño y preservar la trazabilidad de las decisiones técnicas fundamentales, se formaliza el siguiente **Índice Maestro de ADRs**. Cada decisión será documentada formalmente en su respectivo archivo individual en la siguiente etapa del proyecto:
+Para garantizar la gobernanza del diseño y preservar la trazabilidad de las decisiones técnicas fundamentales, se formaliza el siguiente **Índice Maestro de ADRs**, cuyos documentos detallados se ubican en la carpeta [`03-adrs/`](03-adrs/):
 
-| ID | Título de la Decisión Arquitectónica | Estado | Módulo / Componente Afectado |
-| :---: | :--- | :---: | :--- |
-| **ADR-001** | **Selección del Estilo Arquitectónico General: Monolito Modular vs Microservicios vs Serverless** | `[PROPUESTO / PENDIENTE]` | Arquitectura Global del Backend (API Core) |
-| **ADR-002** | **Adopción del Patrón Arquitectura Hexagonal (Puertos y Adaptadores) para Módulos Internos** | `[PROPUESTO / PENDIENTE]` | Estructura Interna de Módulos del Backend |
-| **ADR-003** | **Estrategia de Concurrencia e Integridad Transaccional de Inventario: PostgreSQL como Fuente de Verdad y Mecanismo de Locking** | `[PROPUESTO / PENDIENTE]` | Módulo de Reservas & Inventario / PostgreSQL |
-| **ADR-004** | **Estrategia de Idempotencia en Procesamiento de Pagos y Consumo de Webhooks** | `[PROPUESTO / PENDIENTE]` | Módulo de Pagos & Facturación |
-| **ADR-005** | **Mecanismo Criptográfico para Emisión y Validación de Entradas QR: Firma Digital Asimétrica (Ed25519) vs Simétrica (HMAC-SHA256)** | `[PROPUESTO / PENDIENTE]` | Módulo de Tickets / Módulo de Accesos / AFORO Access |
-| **ADR-006** | **Estrategia de Persistencia Local y Operación Fuera de Línea en Terminales de Puerta (AFORO Access)** | `[PROPUESTO / PENDIENTE]` | Cliente AFORO Access (IndexedDB vs SQLite WASM) |
+| ID | Título de la Decisión Arquitectónica | Estado | Documento de Decisión | Módulo / Componente Afectado |
+| :---: | :--- | :---: | :--- | :--- |
+| **ADR-001** | **Selección del Estilo Arquitectónico General: Monolito Modular vs Microservicios vs Serverless** | `[PROPUESTO]` | [`ADR-001-seleccion-estilo-monolito-modular.md`](03-adrs/ADR-001-seleccion-estilo-monolito-modular.md) | Arquitectura Global del Backend (API Core) |
+| **ADR-002** | **Adopción del Patrón Arquitectura Hexagonal (Puertos y Adaptadores) para Módulos Internos** | `[PROPUESTO]` | [`ADR-002-adopcion-arquitectura-hexagonal.md`](03-adrs/ADR-002-adopcion-arquitectura-hexagonal.md) | Estructura Interna de Módulos del Backend |
+| **ADR-003** | **Estrategia de Concurrencia e Integridad Transaccional de Inventario: PostgreSQL como Fuente de Verdad y Mecanismo de Locking** | `[PROPUESTO]` | [`ADR-003-concurrencia-integridad-inventario.md`](03-adrs/ADR-003-concurrencia-integridad-inventario.md) | Módulo de Reservas & Inventario / PostgreSQL |
+| **ADR-004** | **Estrategia de Idempotencia en Procesamiento de Pagos y Consumo de Webhooks** | `[PROPUESTO]` | [`ADR-004-idempotencia-pagos-webhooks.md`](03-adrs/ADR-004-idempotencia-pagos-webhooks.md) | Módulo de Pagos & Facturación |
+| **ADR-005** | **Mecanismo Criptográfico para Emisión y Validación de Entradas QR: Firma Digital Asimétrica (Ed25519) vs Simétrica (HMAC-SHA256)** | `[PROPUESTO]` | [`ADR-005-criptografia-entradas-qr.md`](03-adrs/ADR-005-criptografia-entradas-qr.md) | Módulo de Tickets / Módulo de Accesos / AFORO Access |
+| **ADR-006** | **Estrategia de Persistencia Local y Operación Fuera de Línea en Terminales de Puerta (AFORO Access)** | `[PROPUESTO]` | [`ADR-006-persistencia-operacion-offline-access.md`](03-adrs/ADR-006-persistencia-operacion-offline-access.md) | Cliente AFORO Access (IndexedDB vs SQLite WASM) |
 
-> *Nota*: El presente índice establece la numeración única y oficial de los ADRs del sistema. La redacción detallada de sus documentos individuales (`docs/02-arquitectura-software/adr/ADR-00X-...md`) se realizará de forma controlada tras la aprobación del presente marco conceptual.
+> *Nota*: El presente índice establece la numeración oficial y enlaces directos a los seis ADRs del sistema elaborados en `docs/02-arquitectura-software/03-adrs/`.
 
 ---
 
@@ -204,6 +204,6 @@ Para garantizar la gobernanza del diseño y preservar la trazabilidad de las dec
 
 | Compromiso / Trade-off | Decisión Adoptada | Justificación y Mitigación |
 | :--- | :--- | :--- |
-| **Consistencia Transaccional vs Escalabilidad Distribuida** | Se prioriza la **consistencia ACID en PostgreSQL** (`READ COMMITTED` con `SELECT ... FOR UPDATE` por sector) sobre bases distribuidas multimaestro. | El negocio no tolera sobreventas (`RN-01`). Un pool transaccional de PostgreSQL soporta con holgura la meta de $2500\text{ req/s}$ requerida sin incurrir en la fragilidad de redes distribuidas. |
+| **Consistencia Transaccional vs Escalabilidad Distribuida** | Se prioriza la **consistencia ACID en PostgreSQL** (`READ COMMITTED` con `SELECT ... FOR UPDATE` por sector) sobre bases distribuidas multimaestro. | El negocio no tolera sobreventas (`RN-01`). Un pool transaccional de PostgreSQL con transacciones breves y caché auxiliar está proyectado para satisfacer la meta arquitectónica de concurrencia sin incurrir en la fragilidad de redes distribuidas. |
 | **Disponibilidad Offline en Puertas vs Riesgo de Doble Ingreso Inter-Puerta** | Se prioriza la **disponibilidad local continua (AP)** en molinetes sobre la consistencia global inmediata (Teorema CAP). | Detener el flujo físico de ingreso en recintos genera avalanchas y riesgos de seguridad civil graves. El riesgo de doble ingreso cruzado durante particiones simultáneas se asume operativamente y se mitiga mediante zonificación física y reconciliación forense posterior. |
 | **Selección Visual Local vs Bloqueo Previo de Inventario** | La navegación y el carrito web son estrictamente **locales y no bloqueantes** (`RN-02`). | Previene ataques de denegación de servicio por carritos abandonados. El bloqueo de inventario únicamente opera cuando el asistente inicia la reserva formal. |
