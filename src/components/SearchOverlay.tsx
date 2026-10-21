@@ -23,7 +23,10 @@ export function SearchOverlay() {
     () => (q.trim() ? filterEvents(events, { ...DEFAULT_FILTERS, q }, now).slice(0, 6) : []),
     [q, events, now],
   );
-  const total = useMemo(() => (q.trim() ? filterEvents(events, { ...DEFAULT_FILTERS, q }, now).length : 0), [q, events, now]);
+  const total = useMemo(
+    () => (q.trim() ? filterEvents(events, { ...DEFAULT_FILTERS, q }, now).length : 0),
+    [q, events, now],
+  );
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
@@ -34,7 +37,14 @@ export function SearchOverlay() {
   return (
     <div className="overlay" data-open={searchOpen} aria-hidden={!searchOpen}>
       <div className="overlay__scrim" onClick={close} />
-      <div ref={ref} className="search" role="dialog" aria-modal="true" aria-label="Buscar eventos" tabIndex={-1}>
+      <div
+        ref={ref}
+        className="search"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Buscar eventos"
+        tabIndex={-1}
+      >
         <form onSubmit={submit} className="search__form" role="search">
           <Icon name="search" size={28} />
           <input
@@ -58,8 +68,13 @@ export function SearchOverlay() {
             <>
               <ul className="search__results">
                 {results.map((ev) => (
-                  <li key={ev.id}>
-                    <Link to={`/eventos/${ev.slug}`} className="search__row" onClick={close}>
+                  <li key={ev.id} className="search__item">
+                    <Link
+                      to={`/eventos/${ev.slug}`}
+                      newTab
+                      className="search__row"
+                      onClick={close}
+                    >
                       <span className="search__thumb">
                         <Photo image={ev.image} mode="poster" />
                       </span>
@@ -68,10 +83,33 @@ export function SearchOverlay() {
                         {dateLabel(ev)} · {ev.city} · {genreLabel(ev.genre)} · {ev.artist}
                       </span>
                     </Link>
+                    <div className="search__actions">
+                      <Link
+                        to={`/eventos/${ev.slug}`}
+                        newTab
+                        className="link-btn"
+                        onClick={close}
+                      >
+                        Ver evento ↗
+                      </Link>
+                      <Link
+                        to={`/eventos/${ev.slug}#entradas`}
+                        newTab
+                        className="link-btn"
+                        onClick={close}
+                      >
+                        Ver entradas →
+                      </Link>
+                    </div>
                   </li>
                 ))}
               </ul>
-              <button type="submit" form="" className="btn btn--solid search__all" onClick={submit}>
+              <button
+                type="submit"
+                form=""
+                className="btn btn--solid search__all"
+                onClick={submit}
+              >
                 Ver {total} {total === 1 ? 'resultado' : 'resultados'}
                 <Icon name="arrow-right" size={18} />
               </button>
@@ -87,7 +125,11 @@ export function SearchOverlay() {
             <ul className="chips">
               {GENRES.map((g) => (
                 <li key={g.id}>
-                  <Link to={`/eventos${serializeFilters({ ...DEFAULT_FILTERS, genre: g.id })}`} className="chip" onClick={close}>
+                  <Link
+                    to={`/eventos${serializeFilters({ ...DEFAULT_FILTERS, genre: g.id })}`}
+                    className="chip"
+                    onClick={close}
+                  >
                     {g.label}
                   </Link>
                 </li>

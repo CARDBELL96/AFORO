@@ -48,46 +48,60 @@ function Hero() {
       </div>
 
       <div className="wrap hero__inner">
-        <p className="eyebrow eyebrow--lime hero__eyebrow">El pulso de lo que vivimos</p>
-        <h1 id="hero-h" className="hero__title">
-          <span className="hero__line">LA NOCHE</span>
-          <span className="hero__line hero__line--accent">NO SE CUENTA.</span>
-          <span className="hero__line hero__line--serif">se vive.</span>
-        </h1>
-        <p className="hero__lede">
-          Conciertos, festivales, fiestas y carnavales de todo el Perú, en un solo lugar. Elige tu noche.
-        </p>
-        <div className="hero__cta">
-          <Link to="/eventos" className="btn btn--accent btn--lg">
-            Explorar eventos <Icon name="arrow-right" size={20} />
-          </Link>
-          <Link
-            to={`/eventos${serializeFilters({ ...DEFAULT_FILTERS, when: 'weekend' })}`}
-            className="btn btn--outline btn--lg"
-          >
-            Este fin de semana
-          </Link>
+        <div className="hero__copy">
+          <p className="eyebrow eyebrow--lime hero__eyebrow">El pulso de lo que vivimos</p>
+          <h1 id="hero-h" className="hero__title">
+            <span className="hero__line">LA NOCHE</span>
+            <span className="hero__line hero__line--accent">NO SE CUENTA.</span>
+            <span className="hero__line hero__line--serif">se vive.</span>
+          </h1>
+          <p className="hero__lede">
+            Conciertos, festivales, fiestas y carnavales de todo el Perú, en un solo lugar. Elige tu noche.
+          </p>
+          <div className="hero__cta">
+            <Link to="/eventos" className="btn btn--accent btn--lg">
+              Explorar eventos <Icon name="arrow-right" size={20} />
+            </Link>
+            <Link
+              to={`/eventos${serializeFilters({ ...DEFAULT_FILTERS, when: 'weekend' })}`}
+              className="btn btn--outline btn--lg"
+            >
+              Este fin de semana
+            </Link>
+          </div>
         </div>
-      </div>
 
-      {next && dp ? (
-        <Link to={`/eventos/${next.slug}`} className="hero__next" aria-label={`Próximo evento: ${next.title}`}>
-          <span className="hero__next-label">Próximo</span>
-          <span className="hero__next-date">
-            <b>{dp.day}</b>
-            <span>{dp.month}</span>
-          </span>
-          <span className="hero__next-body">
-            <strong>{next.title}</strong>
-            <small>
-              {next.venue}, {next.city} · {formatTime(next.startsAt)} h
-            </small>
-          </span>
-          <Icon name="arrow-up-right" size={22} />
-        </Link>
-      ) : (
-        <div className="hero__next hero__next--ghost" aria-hidden="true" />
-      )}
+        {next && dp ? (
+          <div className="hero__next" aria-label={`Próximo evento: ${next.title}`}>
+            <Link to={`/eventos/${next.slug}`} newTab className="hero__next-main">
+              <span className="hero__next-label">Próximo en cartelera</span>
+              <span className="hero__next-date">
+                <b>{dp.day}</b>
+                <span>{dp.month}</span>
+              </span>
+              <span className="hero__next-body">
+                <strong>{next.title}</strong>
+                <small>
+                  {next.venue}, {next.city} · {formatTime(next.startsAt)} h
+                </small>
+              </span>
+              <Icon name="arrow-up-right" size={20} />
+            </Link>
+            <div className="hero__next-actions">
+              <Link to={`/eventos/${next.slug}`} newTab className="hero__next-link">
+                <span>Ver evento</span>
+                <Icon name="arrow-up-right" size={13} />
+              </Link>
+              <Link to={`/eventos/${next.slug}#entradas`} newTab className="hero__next-buy">
+                <span>Ver entradas</span>
+                <Icon name="arrow-right" size={13} />
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div className="hero__next hero__next--ghost" aria-hidden="true" />
+        )}
+      </div>
 
       <div className="hero__strip" aria-hidden="true">
         <Marquee

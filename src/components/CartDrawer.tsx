@@ -94,7 +94,7 @@ export function CartDrawer() {
           <ul className="cart-lines">
             {resolved.map(({ line, event, tier }) => (
               <li key={`${line.eventId}:${line.tierId}`} className="cart-line" data-accent={event.accent}>
-                <Link to={`/eventos/${event.slug}`} className="cart-line__thumb" onClick={close} aria-label={`Ver ${event.title}`}>
+                <Link to={`/eventos/${event.slug}`} newTab className="cart-line__thumb" onClick={close} aria-label={`Ver ${event.title}`}>
                   <Photo image={event.image} mode="poster" />
                 </Link>
                 <div className="cart-line__info">
@@ -133,9 +133,11 @@ export function CartDrawer() {
               <span>Subtotal · {count} {count === 1 ? 'entrada' : 'entradas'}</span>
               <strong>{formatPrice(total)}</strong>
             </div>
-            <p className="drawer__fine">Comisiones e impuestos se mostrarán en el pago. Esta versión es una demostración y no cobra nada.</p>
+            <p className="drawer__fine">
+              <strong>MODO DEMO · Sin bloqueo de inventario:</strong> la selección visual en tu carrito no reserva aforo en servidor. El bloqueo temporal (TTL) solo existirá al conectar el backend transaccional.
+            </p>
             <button type="button" className="btn btn--solid btn--block" onClick={() => setNotice(true)}>
-              Continuar al pago <Icon name="arrow-right" size={18} />
+              Emitir pases QR (Demo) <Icon name="arrow-right" size={18} />
             </button>
             <button type="button" className="link-btn link-btn--center" onClick={clearCart}>
               Vaciar carrito
@@ -145,11 +147,10 @@ export function CartDrawer() {
 
         {notice && (
           <div className="drawer__notice" role="alertdialog" aria-labelledby="notice-title" aria-describedby="notice-text">
-            <p className="eyebrow">Versión de demostración</p>
-            <h3 id="notice-title" className="drawer__notice-title">Emite tus pases digitales</h3>
+            <p className="eyebrow">MODO DEMO · ACTIVA_DEMO</p>
+            <h3 id="notice-title" className="drawer__notice-title">Emite tus pases digitales de demostración</h3>
             <p id="notice-text">
-              Esta interfaz muestra cómo será la compra sin pasarela real ni cobro. Puedes convertir tu carrito en pases digitales
-              con código QR dentro de «Mis Entradas» para probar toda la experiencia.
+              Esta versión opera en modo de demostración local sin pasarela de pago ni reserva real de inventario en servidor. Puedes convertir tu carrito en pases digitales simulados (<code>ACTIVA_DEMO</code>) con código QR dentro de «Mis Entradas».
             </p>
             <div className="drawer__notice-actions">
               <button type="button" className="btn btn--solid" onClick={issueDemoPasses} data-autofocus>

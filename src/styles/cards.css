@@ -12,7 +12,7 @@
 .poster__link { display: block; }
 .poster__media { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--stage); border-radius: 3px; border: 1px solid var(--hairline); }
 .poster__media .photo { transition: transform 0.7s var(--ease); }
-.poster__link:hover .poster__media .photo { transform: scale(1.05); }
+.poster:hover .poster__media .photo { transform: scale(1.05); }
 .poster__date {
   position: absolute; left: 12px; top: 12px; display: grid; gap: 2px; padding: 8px 12px 9px;
   background: var(--acc); color: var(--acc-ink); border-radius: 3px; transform: rotate(-3deg);
@@ -20,7 +20,7 @@
 }
 .poster__date b { font-family: var(--font-display); font-weight: 900; font-size: 1.375rem; letter-spacing: -0.04em; line-height: 1; text-transform: uppercase; }
 .poster__date small { font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; opacity: 0.8; }
-.poster__link:hover .poster__date { transform: rotate(0deg); }
+.poster:hover .poster__date { transform: rotate(0deg); }
 [data-accent='cream'] .poster__date { background: var(--cream); color: var(--black); }
 .poster__status {
   position: absolute;
@@ -34,10 +34,14 @@
 .poster__meta b { color: var(--fg); font-weight: 700; }
 .poster__code { margin-left: auto; font-family: var(--font-mono); font-size: 0.68rem; opacity: 0.65; }
 .poster__title { font-family: var(--font-display); font-weight: 900; font-size: clamp(1.45rem, 2.1vw, 1.8rem); letter-spacing: -0.04em; line-height: 0.98; text-wrap: balance; }
+.poster__title-link:hover { color: var(--acc); }
 .poster__artist { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600; color: var(--acc); text-transform: uppercase; }
-.poster__price { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; padding-top: 10px; border-top: 2px solid var(--fg); font-weight: 700; font-size: 0.9375rem; }
-.poster__price svg { transition: transform 0.2s var(--ease); }
-.poster__link:hover .poster__price svg { transform: translate(4px, -2px); }
+.poster__price { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-top: 6px; padding-top: 10px; border-top: 2px solid var(--fg); font-weight: 700; font-size: 0.9375rem; }
+.poster__actions { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 0.68rem; font-weight: 700; text-transform: uppercase; }
+.poster__act { padding: 3px 7px; border: 1px solid var(--hairline-strong); border-radius: 2px; color: var(--fg-2); transition: color 0.16s, border-color 0.16s, background-color 0.16s; }
+.poster__act:hover { color: var(--fg); border-color: var(--fg); }
+.poster__act--buy { display: inline-flex; align-items: center; gap: 3px; background: var(--acc); border-color: var(--acc); color: var(--black); }
+.poster__act--buy:hover { background: var(--lime); border-color: var(--lime); color: var(--black); }
 .poster--skeleton .poster__media { aspect-ratio: 4 / 5; }
 .poster--skeleton .poster__body { padding-top: 16px; }
 
@@ -52,7 +56,6 @@
   .grid:not(.grid--3) .poster__date { padding: 6px 9px 7px; left: 8px; top: 8px; }
   .grid:not(.grid--3) .poster__save { right: 6px; top: 6px; width: 38px; height: 38px; }
   .grid:not(.grid--3) .poster__price { font-size: 0.8125rem; }
-  .grid:not(.grid--3) .poster__price svg { display: none; }
 }
 
 /* ───────── Fila (vista de lista en Explorar) ───────── */
@@ -61,14 +64,20 @@
 .rows li:last-child .rowcard { border-bottom: 1.5px solid var(--line); }
 .rowcard__link { display: grid; grid-template-columns: 112px 140px minmax(0, 1fr) auto; align-items: center; gap: 24px; padding: 16px 64px 16px 0; transition: background-color 0.16s; }
 .rowcard__link:hover { background: rgba(244, 240, 232, 0.05); }
-.rowcard__media { aspect-ratio: 1; overflow: hidden; border-radius: 3px; }
+.rowcard__media { aspect-ratio: 1; overflow: hidden; border-radius: 3px; display: block; }
 .rowcard__date { display: grid; gap: 2px; }
 .rowcard__date b { font-family: var(--font-display); font-weight: 900; font-size: 1.75rem; letter-spacing: -0.04em; line-height: 1; color: var(--acc); text-transform: uppercase; }
 .rowcard__date small { font-family: var(--font-mono); color: var(--fg-2); font-size: 0.78rem; text-transform: uppercase; }
 .rowcard__artist { display: block; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600; color: var(--acc); text-transform: uppercase; margin-bottom: 3px; }
 .rowcard__title { font-family: var(--font-display); font-weight: 900; font-size: clamp(1.4rem, 3vw, 2.25rem); letter-spacing: -0.04em; line-height: 1; }
+.rowcard__title-link:hover { color: var(--acc); }
 .rowcard__meta { margin-top: 6px; color: var(--fg-2); font-size: 0.9375rem; }
-.rowcard__price { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; }
+.rowcard__price { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; font-weight: 700; }
+.rowcard__actions { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+.rowcard__act { padding: 4px 8px; border: 1px solid var(--hairline-strong); border-radius: 2px; color: var(--fg-2); }
+.rowcard__act:hover { color: var(--fg); border-color: var(--fg); }
+.rowcard__act--buy { display: inline-flex; align-items: center; gap: 4px; background: var(--acc); border-color: var(--acc); color: var(--black); }
+.rowcard__act--buy:hover { background: var(--lime); border-color: var(--lime); color: var(--black); }
 .rowcard__save { position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
 .rowcard__save:hover { transform: translateY(-50%) scale(1.08); }
 @media (max-width: 760px) {
@@ -77,5 +86,5 @@
   .rowcard__date { grid-column: 2; grid-auto-flow: column; justify-content: start; align-items: baseline; gap: 10px; }
   .rowcard__date b { font-size: 1.125rem; }
   .rowcard__main { grid-column: 2; }
-  .rowcard__price { grid-column: 2; font-size: 0.9375rem; }
+  .rowcard__price { grid-column: 2; align-items: flex-start; font-size: 0.9375rem; }
 }

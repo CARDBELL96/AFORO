@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { GENRES, type AforoEvent, type GenreId } from '../data/events';
+import { GENRES, type GenreId } from '../data/events';
 import { Link } from '../router';
 import {
   DEFAULT_FILTERS,
@@ -44,7 +44,7 @@ export function PulseCatalogSection({
   externalGenreFilter = 'TODAS',
   onExternalGenreChange,
 }: PulseCatalogSectionProps) {
-  const { eventsState, events, now, reload, openQuickEvent, globalCity, setGlobalCity } = useStore();
+  const { eventsState, events, now, reload, globalCity, setGlobalCity } = useStore();
 
   const [categoryId, setCategoryId] = useState<GenreId | 'TODAS'>(externalGenreFilter);
   const [monthKey, setMonthKey] = useState<string>('TODOS');
@@ -321,7 +321,6 @@ export function PulseCatalogSection({
                     event={event}
                     index={idx}
                     variant={getMosaicVariant(idx)}
-                    onQuickOpen={openQuickEvent}
                   />
                 ))}
               </div>
@@ -360,7 +359,9 @@ export function PulseCatalogSection({
                       <div className="aforo-ledger__main-col">
                         <span className="aforo-ledger__artist">{event.artist}</span>
                         <h3 className="aforo-ledger__title">
-                          <Link to={`/eventos/${event.slug}`}>{event.title}</Link>
+                          <Link to={`/eventos/${event.slug}`} newTab>
+                            {event.title}
+                          </Link>
                         </h3>
                         <span className="aforo-ledger__cat">{genreLabel(event.genre)}</span>
                       </div>
@@ -388,15 +389,19 @@ export function PulseCatalogSection({
                           <strong>{formatPrice(lowest)}</strong>
                         </div>
                         <div className="aforo-ledger__btns">
-                          <button
-                            type="button"
-                            onClick={() => openQuickEvent(event)}
+                          <Link
+                            to={`/eventos/${event.slug}#entradas`}
+                            newTab
                             className="aforo-cta-primary"
                           >
-                            <span>{soldOut ? 'Ficha' : 'Elegir sector'}</span>
-                          </button>
-                          <Link to={`/eventos/${event.slug}`} className="aforo-cta-secondary">
-                            <span>Ver</span>
+                            <span>{soldOut ? 'Ficha y plano' : 'Elegir sector'}</span>
+                          </Link>
+                          <Link
+                            to={`/eventos/${event.slug}`}
+                            newTab
+                            className="aforo-cta-secondary"
+                          >
+                            <span>Ver evento</span>
                           </Link>
                         </div>
                       </div>

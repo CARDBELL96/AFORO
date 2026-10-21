@@ -152,7 +152,9 @@ export function TicketsModal() {
               <div className="aforo-pass-card">
                 <div className="aforo-pass-card__header">
                   <div>
-                    <span className="aforo-badge aforo-badge--lime">PASE DEMOSTRATIVO LOCAL</span>
+                    <span className="aforo-badge aforo-badge--lime">
+                      PASE DEMOSTRATIVO LOCAL · {activeTicket.status}
+                    </span>
                     <p className="aforo-pass-card__id">{activeTicket.ticketId}</p>
                   </div>
                   <div className="aforo-pass-card__brand">AFORO // ACCESS</div>
@@ -227,8 +229,7 @@ export function TicketsModal() {
                     <span className="aforo-mono-tag">TOKEN DE PULSO (OFFLINE DEMO)</span>
                     <code className="aforo-pass-card__hash">{activeTicket.pulseHash}</code>
                     <p>
-                      Este código QR pertenece al entorno de demostración de AFORO Fusion. No es
-                      válido para ingreso físico en recintos reales.
+                      Este código QR pertenece al entorno de demostración local de AFORO Fusion (<code>{activeTicket.status}</code>). No representa una reserva de inventario en servidor ni es válido para ingreso físico en recintos reales.
                     </p>
                     <div className="aforo-pass-card__actions">
                       <span className="aforo-pass-card__price">
@@ -237,6 +238,7 @@ export function TicketsModal() {
                       <div className="aforo-pass-card__links">
                         <Link
                           to={`/eventos/${activeTicket.eventSlug}`}
+                          newTab
                           onClick={onClose}
                           className="aforo-link-reset"
                         >

@@ -1,5 +1,5 @@
-import { useEffect, useState, type MouseEvent } from 'react';
-import { Link } from '../router';
+import { useEffect, useRef, useState, type MouseEvent } from 'react';
+import { Link, useRoute } from '../router';
 import { Icon } from '../components/Icon';
 import { EditorialCard, SaveButton, saleBadgeClass } from '../components/EventCard';
 import { Photo } from '../components/Photo';
@@ -14,17 +14,32 @@ import { useStore } from '../lib/store';
 import { NotFound } from './NotFound';
 
 export function EventDetail({ slug }: { slug: string }) {
-  const { eventsState, events, now, reload, openQuickEvent } = useStore();
+  const { eventsState, events, now, reload } = useStore();
+  const { hash } = useRoute();
   const event = events.find((e) => e.slug === slug);
   useDocumentTitle(event ? `${event.title} — ${event.city} · AFORO` : 'AFORO');
 
   const [selectedTierId, setSelectedTierId] = useState<string>('');
+  const entradasSectionRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!event) return;
     const firstAvailable = event.tiers.find((t) => t.status !== 'sold_out') ?? event.tiers[0];
     setSelectedTierId(firstAvailable ? firstAvailable.id : '');
   }, [event]);
+
+  // Posicionamiento y foco automático en #entradas cuando se abre /eventos/:slug#entradas (FR-009, SC-004)
+  useEffect(() => {
+    if (eventsState.status !== 'ready' || !event || hash !== '#entradas') return;
+    const raf = requestAnimationFrame(() => {
+      const target = document.getElementById('entradas') ?? entradasSectionRef.current;
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        target.focus({ preventScroll: true });
+      }
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [eventsState.status, event, hash]);
 
   if (eventsState.status === 'loading') return <DetailSkeleton />;
   if (eventsState.status === 'error') {
@@ -44,6 +59,8 @@ export function EventDetail({ slug }: { slug: string }) {
   }
 
   const dp = dayParts(event.startsAt);
+  const soldOut = isSoldOut(event);
+  const selectedTier = event.tiers.find((t) => t.id === selectedTierId) ?? event.tiers[0];
   const more = filterEvents(events, DEFAULT_FILTERS, now)
     .filter((e) => e.id !== event.id)
     .sort(
@@ -55,7 +72,7 @@ export function EventDetail({ slug }: { slug: string }) {
 
   return (
     <article className="detail" data-accent={event.accent}>
-      {/* Cabecera a pantalla completa de Claude: póster ilustrado, título gigante, cursiva lima y sello girado */}
+      {/* Cabecera editorial proporcionada con imagen principal, metadatos y acceso directo a #entradas */}
       <header className="detail__hero">
         <div className="detail__media">
           <Photo image={event.image} mode="poster" eager className="detail__img" />
@@ -71,15 +88,34 @@ export function EventDetail({ slug }: { slug: string }) {
                 {event.saleLabel}
               </span>
               <span className="aforo-badge aforo-badge--neutral">{event.code}</span>
+              <span className="aforo-badge aforo-badge--lime">ESCENARIO DEMO</span>
             </div>
           </div>
 
           <div className="detail__titleblock">
             <p className="eyebrow eyebrow--lime">
-              {genreLabel(event.genre)} · {event.city} · {event.artist}
+              {genreLabel(event.genre)} · {event.city} ({event.district}) · {event.artist}
             </p>
             <h1 className="detail__title">{event.title}</h1>
             <p className="detail__kicker">{event.kicker}</p>
+            <div className="detail__hero-actions">
+              <a
+                href="#entradas"
+                className="btn btn--accent"
+                onClick={(e: MouseEvent<HTMLAnchorElement>) => {
+                  e.preventDefault();
+                  const el = document.getElementById('entradas');
+                  el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  el?.focus({ preventScroll: true });
+                }}
+              >
+                {soldOut ? 'Ver plano y sectores' : 'Ir a zonas y entradas'}{' '}
+                <Icon name="arrow-right" size={18} />
+              </a>
+              <span className="detail__hero-meta">
+                {event.venue} · {event.doors}
+              </span>
+            </div>
           </div>
 
           <div className="detail__datebadge" aria-label={`Fecha: ${formatLongDate(event.startsAt)}`}>
@@ -93,50 +129,95 @@ export function EventDetail({ slug }: { slug: string }) {
       <div className="detail__strip" aria-hidden="true">
         <Marquee
           seconds={50}
-          items={[...event.tags.map((t) => t.toUpperCase()), event.city.toUpperCase(), '✺'].flatMap((t) => [t, '✺'])}
+          items={[...event.tags.map((t) => t.toUpperCase()), event.city.toUpperCase(), '✺'].flatMap(
+            (t) => [t, '✺'],
+          )}
         />
       </div>
 
-      {/* Cuerpo del detalle: Columna izquierda (Ficha técnica + Line-up + Plano acústico) y derecha sticky (Talón ticket) */}
-      <div className="wrap detail__grid">
+      {/* Ficha técnica del concierto y recinto en la parte superior del cuerpo */}
+      <div className="wrap detail__facts-wrap">
+        <dl className="facts" aria-label="Información general del concierto y recinto">
+          <div className="facts__item">
+            <dt>Cuándo y Apertura</dt>
+            <dd>
+              {formatLongDate(event.startsAt)}
+              <br />
+              <span>
+                {event.doors} · inicio {formatTime(event.startsAt)} h
+              </span>
+            </dd>
+          </div>
+          <div className="facts__item">
+            <dt>Recinto y Ubicación</dt>
+            <dd>
+              {event.venue} ({event.district}, {event.city})
+              <br />
+              <span>
+                {event.address} · {event.coordinates}
+              </span>
+            </dd>
+          </div>
+          <div className="facts__item">
+            <dt>Edad e Ingreso</dt>
+            <dd>
+              {event.ageRule}
+              <br />
+              <span>Control de acceso con DNI físico · Pases QR en modo DEMO</span>
+            </dd>
+          </div>
+          <div className="facts__item">
+            <dt>Entradas y Estado</dt>
+            <dd>
+              {soldOut ? 'Aforo agotado' : `Desde ${formatPrice(minPrice(event))}`}
+              <br />
+              <span>{event.editorialTag} · Simulación sin bloqueo real de inventario</span>
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      {/* Estación principal de recinto, plano interactivo y selección de entradas (#entradas) */}
+      <div
+        id="entradas"
+        ref={entradasSectionRef}
+        tabIndex={-1}
+        className="wrap detail__grid"
+        aria-label="Estación de recinto, plano de zonas y selección de entradas"
+      >
         <div className="detail__main">
-          <dl className="facts">
-            <div className="facts__item">
-              <dt>Cuándo</dt>
-              <dd>
-                {formatLongDate(event.startsAt)}
-                <br />
-                <span>
-                  {event.doors} · inicio {formatTime(event.startsAt)} h
+          {/* Plano espacial interactivo del recinto sincronizado bidireccionalmente con TicketPicker */}
+          <section className="detail__map-section" aria-labelledby="plano-h">
+            <div className="detail__map-head">
+              <div>
+                <span className="aforo-section__index">
+                  01 // PLANO ESPACIAL & DISTRIBUCIÓN DE SECTORES (DEMO)
                 </span>
-              </dd>
+                <h2 id="plano-h" className="display display--sm">
+                  Ubicación frente al escenario en {event.venue}
+                </h2>
+              </div>
+              {selectedTier && (
+                <div className="detail__active-tier-pill" aria-live="polite">
+                  <span>SECTOR ACTIVO:</span>
+                  <strong>
+                    {selectedTier.name} · {formatPrice(selectedTier.price)}
+                  </strong>
+                </div>
+              )}
             </div>
-            <div className="facts__item">
-              <dt>Dónde</dt>
-              <dd>
-                {event.venue}
-                <br />
-                <span>
-                  {event.address} · {event.coordinates}
-                </span>
-              </dd>
-            </div>
-            <div className="facts__item">
-              <dt>Edad & Ingreso</dt>
-              <dd>{event.ageRule}</dd>
-            </div>
-            <div className="facts__item">
-              <dt>Entradas</dt>
-              <dd>
-                {isSoldOut(event) ? 'Agotadas' : `Desde ${formatPrice(minPrice(event))}`}
-                <br />
-                <span>{event.editorialTag}</span>
-              </dd>
-            </div>
-          </dl>
+            <VenueStageMap
+              event={event}
+              selectedTierId={selectedTierId}
+              onSelectTier={setSelectedTierId}
+            />
+          </section>
 
           <section className="prose" aria-labelledby="sobre-h">
-            <h2 id="sobre-h" className="display display--sm">Sobre el evento</h2>
+            <span className="aforo-section__index">02 // RESEÑA EDITORIAL & ACÚSTICA</span>
+            <h2 id="sobre-h" className="display display--sm">
+              Sobre el concierto
+            </h2>
             {event.description.map((p, i) => (
               <p key={i}>{p}</p>
             ))}
@@ -147,7 +228,10 @@ export function EventDetail({ slug }: { slug: string }) {
           </section>
 
           <section aria-labelledby="lineup-h">
-            <h2 id="lineup-h" className="display display--sm">Line-up</h2>
+            <span className="aforo-section__index">03 // CARTEL Y HORARIOS</span>
+            <h2 id="lineup-h" className="display display--sm">
+              Line-up confirmado
+            </h2>
             <ol className="lineup">
               {event.lineup.map((l) => (
                 <li key={l.name} className={`lineup__row ${l.headliner ? 'is-head' : ''}`}>
@@ -158,32 +242,10 @@ export function EventDetail({ slug }: { slug: string }) {
             </ol>
           </section>
 
-          {/* Plano acústico interactivo del recinto (de Gemini) sincronizado con el talón de entradas */}
-          <section className="detail__map-section" aria-labelledby="plano-h">
-            <div className="detail__map-head">
-              <div>
-                <span className="aforo-section__index">PLANO ESPACIAL & DISTRIBUCIÓN DE SECTORES</span>
-                <h2 id="plano-h" className="display display--sm">Ubicación frente al escenario</h2>
-              </div>
-              <button
-                type="button"
-                onClick={() => openQuickEvent(event)}
-                className="aforo-cta-secondary"
-              >
-                <span>Abrir ficha con simulador QR →</span>
-              </button>
-            </div>
-            <VenueStageMap
-              event={event}
-              selectedTierId={selectedTierId}
-              onSelectTier={setSelectedTierId}
-            />
-          </section>
-
           <Actions slug={event.slug} title={event.title} event={event} />
         </div>
 
-        <aside className="detail__aside" aria-label="Comprar entradas">
+        <aside className="detail__aside" aria-label="Selección y compra de entradas">
           <TicketPicker
             event={event}
             selectedTierId={selectedTierId}
@@ -192,13 +254,15 @@ export function EventDetail({ slug }: { slug: string }) {
         </aside>
       </div>
 
-      {/* Otros conciertos: presentación editorial de Gemini */}
+      {/* Otros conciertos relacionados con enlaces diferenciados en nueva pestaña */}
       {more.length > 0 && (
         <section className="aforo-section detail__more" aria-labelledby="mas-h">
           <div className="wrap">
             <div className="aforo-section__header">
               <div className="aforo-section__header-left">
-                <span className="aforo-section__index">CIRCUITO RELACIONADO · CONTINÚA EXPLORANDO</span>
+                <span className="aforo-section__index">
+                  CIRCUITO RELACIONADO · CONTINÚA EXPLORANDO
+                </span>
                 <h2 id="mas-h" className="aforo-section__title">
                   OTROS CONCIERTOS EN PULSO
                 </h2>
@@ -221,7 +285,6 @@ export function EventDetail({ slug }: { slug: string }) {
                   event={e}
                   index={idx}
                   variant="editorial-wide"
-                  onQuickOpen={openQuickEvent}
                 />
               ))}
             </div>
@@ -296,7 +359,9 @@ function MobileBar({ event }: { event: Parameters<typeof SaveButton>[0]['event']
         className={`btn btn--accent ${soldOut ? 'is-disabled' : ''}`}
         onClick={(e: MouseEvent<HTMLAnchorElement>) => {
           e.preventDefault();
-          document.getElementById('entradas')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          const el = document.getElementById('entradas');
+          el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          el?.focus({ preventScroll: true });
         }}
       >
         Elegir entradas <Icon name="arrow-right" size={18} />
@@ -308,7 +373,9 @@ function MobileBar({ event }: { event: Parameters<typeof SaveButton>[0]['event']
 function DetailSkeleton() {
   return (
     <div className="detail" aria-busy="true">
-      <span className="sr-only" role="status">Cargando evento…</span>
+      <span className="sr-only" role="status">
+        Cargando evento…
+      </span>
       <div className="detail__hero detail__hero--skeleton skeleton" />
       <div className="wrap detail__grid">
         <div className="detail__main">

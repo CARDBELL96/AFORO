@@ -44,15 +44,21 @@ export function saleBadgeClass(sale: AforoEvent['sale']): string {
 
 /**
  * Tarjeta vertical tipo cartel (usada en Explorar `/eventos`).
- * Combina el póster ilustrado con siluetas y sello de fecha inclinado de Claude
- * con las etiquetas de estado y código técnico monoespaciado de Gemini.
+ * Ofrece acciones diferenciadas en nueva pestaña segura:
+ * - Ver evento -> `/eventos/:slug`
+ * - Comprar / Entradas -> `/eventos/:slug#entradas`
  */
 export function PosterCard({ event, eager }: { event: AforoEvent; eager?: boolean }) {
   const dp = dayParts(event.startsAt);
   const soldOut = isSoldOut(event);
   return (
     <article className="poster" data-accent={event.accent}>
-      <Link to={`/eventos/${event.slug}`} className="poster__link">
+      <Link
+        to={`/eventos/${event.slug}`}
+        newTab
+        className="poster__link"
+        aria-label={`Ver evento ${event.title}`}
+      >
         <div className="poster__media">
           <Photo image={event.image} mode="poster" eager={eager} />
           <span className="poster__date">
@@ -64,19 +70,40 @@ export function PosterCard({ event, eager }: { event: AforoEvent; eager?: boolea
           </span>
           {soldOut && <span className="poster__flag">Agotado</span>}
         </div>
-        <div className="poster__body">
-          <p className="poster__meta">
-            <b>{event.city}</b> <span>{genreLabel(event.genre)}</span>
-            <small className="poster__code">{event.code}</small>
-          </p>
-          <h3 className="poster__title">{event.title}</h3>
-          <p className="poster__artist">{event.artist}</p>
-          <p className="poster__price">
-            {priceLine(event)}
-            <Icon name="arrow-right" size={18} />
-          </p>
-        </div>
       </Link>
+      <div className="poster__body">
+        <p className="poster__meta">
+          <b>{event.city}</b> <span>{genreLabel(event.genre)}</span>
+          <small className="poster__code">{event.code}</small>
+        </p>
+        <h3 className="poster__title">
+          <Link to={`/eventos/${event.slug}`} newTab className="poster__title-link">
+            {event.title}
+          </Link>
+        </h3>
+        <p className="poster__artist">{event.artist}</p>
+        <div className="poster__price">
+          <span className="poster__price-label">{priceLine(event)}</span>
+          <span className="poster__actions">
+            <Link
+              to={`/eventos/${event.slug}`}
+              newTab
+              className="poster__act"
+              aria-label={`Ver ficha de ${event.title}`}
+            >
+              Ver evento
+            </Link>
+            <Link
+              to={`/eventos/${event.slug}#entradas`}
+              newTab
+              className="poster__act poster__act--buy"
+              aria-label={`Comprar o ver entradas para ${event.title}`}
+            >
+              {soldOut ? 'Plano' : 'Entradas'} <Icon name="arrow-up-right" size={14} />
+            </Link>
+          </span>
+        </div>
+      </div>
       <SaveButton event={event} className="poster__save" />
     </article>
   );
@@ -85,12 +112,18 @@ export function PosterCard({ event, eager }: { event: AforoEvent; eager?: boolea
 /** Fila horizontal para la vista de lista en Explorar. */
 export function RowCard({ event }: { event: AforoEvent }) {
   const dp = dayParts(event.startsAt);
+  const soldOut = isSoldOut(event);
   return (
     <article className="rowcard" data-accent={event.accent}>
-      <Link to={`/eventos/${event.slug}`} className="rowcard__link">
-        <div className="rowcard__media">
+      <div className="rowcard__link">
+        <Link
+          to={`/eventos/${event.slug}`}
+          newTab
+          className="rowcard__media"
+          aria-label={`Ver evento ${event.title}`}
+        >
           <Photo image={event.image} mode="poster" />
-        </div>
+        </Link>
         <div className="rowcard__date">
           <b>{dateLabel(event)}</b>
           <small>
@@ -99,16 +132,31 @@ export function RowCard({ event }: { event: AforoEvent }) {
         </div>
         <div className="rowcard__main">
           <span className="rowcard__artist">{event.artist}</span>
-          <h3 className="rowcard__title">{event.title}</h3>
+          <h3 className="rowcard__title">
+            <Link to={`/eventos/${event.slug}`} newTab className="rowcard__title-link">
+              {event.title}
+            </Link>
+          </h3>
           <p className="rowcard__meta">
             {event.venue} · {event.city} · {genreLabel(event.genre)}
           </p>
         </div>
-        <p className="rowcard__price">
-          {priceLine(event)}
-          <Icon name="arrow-right" size={18} />
-        </p>
-      </Link>
+        <div className="rowcard__price">
+          <span className="rowcard__price-label">{priceLine(event)}</span>
+          <span className="rowcard__actions">
+            <Link to={`/eventos/${event.slug}`} newTab className="rowcard__act">
+              Ver evento
+            </Link>
+            <Link
+              to={`/eventos/${event.slug}#entradas`}
+              newTab
+              className="rowcard__act rowcard__act--buy"
+            >
+              {soldOut ? 'Ficha y plano' : 'Ver entradas'} <Icon name="arrow-up-right" size={15} />
+            </Link>
+          </span>
+        </div>
+      </div>
       <SaveButton event={event} className="rowcard__save" />
     </article>
   );
@@ -116,14 +164,12 @@ export function RowCard({ event }: { event: AforoEvent }) {
 
 /**
  * Tarjeta editorial horizontal/asimétrica (usada en «Programación en pulso» y «Otros conciertos»).
- * Integra la estructura rica de Gemini (fotografía real, píldoras de sectores, artista en coral,
- * índice grande) con el sello de fecha inclinado y el color de acento por evento de Claude.
+ * Abre en nueva pestaña segura tanto la ficha general (/eventos/:slug) como la sección de entradas (/eventos/:slug#entradas).
  */
 export function EditorialCard({
   event,
   index,
   variant = 'standard',
-  onQuickOpen,
 }: {
   event: AforoEvent;
   index: number;
@@ -176,7 +222,7 @@ export function EditorialCard({
         <p className="aforo-event-card__artist">{event.artist}</p>
 
         <h3 className="aforo-event-card__title">
-          <Link to={`/eventos/${event.slug}`} className="aforo-event-card__title-link">
+          <Link to={`/eventos/${event.slug}`} newTab className="aforo-event-card__title-link">
             {event.title}
           </Link>
         </h3>
@@ -211,18 +257,20 @@ export function EditorialCard({
           </div>
 
           <div className="aforo-event-card__actions">
-            {onQuickOpen && (
-              <button
-                type="button"
-                onClick={() => onQuickOpen(event)}
-                className={`aforo-event-card__cta ${soldOut ? 'aforo-event-card__cta--muted' : ''}`}
-              >
-                <span>{soldOut ? 'Ficha y plano' : 'Plano y entradas'}</span>
-                <Icon name="arrow-right" size={15} />
-              </button>
-            )}
-            <Link to={`/eventos/${event.slug}`} className="aforo-event-card__detail-link">
-              <span>Ver concierto</span>
+            <Link
+              to={`/eventos/${event.slug}#entradas`}
+              newTab
+              className={`aforo-event-card__cta ${soldOut ? 'aforo-event-card__cta--muted' : ''}`}
+            >
+              <span>{soldOut ? 'Ficha y plano' : 'Comprar entradas'}</span>
+              <Icon name="arrow-right" size={15} />
+            </Link>
+            <Link
+              to={`/eventos/${event.slug}`}
+              newTab
+              className="aforo-event-card__detail-link"
+            >
+              <span>Ver el evento</span>
               <Icon name="arrow-up-right" size={15} />
             </Link>
           </div>

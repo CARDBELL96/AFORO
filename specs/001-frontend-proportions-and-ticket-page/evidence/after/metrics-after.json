@@ -1,0 +1,1758 @@
+{
+  "mode": "after",
+  "capturedAt": "2026-10-21T04:54:17.407Z",
+  "environment": {
+    "osPlatform": "win32",
+    "osRelease": "10.0.26300",
+    "cpuModel": "Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz",
+    "nodeVersion": "v22.20.0",
+    "browserProduct": "Chrome/155.0.8059.86",
+    "browserUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36"
+  },
+  "browser": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+  "viewports": {
+    "1366x768": {
+      "zoom_100": {
+        "innerWidth": 1366,
+        "innerHeight": 768,
+        "hero": {
+          "width": 1351,
+          "height": 645.11,
+          "left": 0,
+          "right": 1351,
+          "fontSize": "16px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroTitle": {
+          "width": 865.75,
+          "height": 229.55,
+          "left": 54.63,
+          "right": 920.38,
+          "fontSize": "84.439px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroNext": {
+          "width": 339.51,
+          "height": 147.42,
+          "left": 958.62,
+          "right": 1298.13,
+          "fontSize": "16px",
+          "paddingTop": "12px",
+          "paddingBottom": "12px"
+        },
+        "heroLines": [
+          {
+            "text": "LA NOCHE",
+            "left": 54.63,
+            "right": 920.38,
+            "width": 865.75,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "NO SE CUENTA.",
+            "left": 54.63,
+            "right": 920.38,
+            "width": 865.75,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "se vive.",
+            "left": 54.63,
+            "right": 920.38,
+            "width": 865.75,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          }
+        ],
+        "lowerSections": {
+          "catalogo": {
+            "width": 1351,
+            "height": 6339.45,
+            "left": 0,
+            "right": 1351,
+            "fontSize": "16px",
+            "paddingTop": "88.79px",
+            "paddingBottom": "88.79px"
+          },
+          "catalogoHeader": {
+            "width": 1241.75,
+            "height": 197.77,
+            "left": 54.63,
+            "right": 1296.38,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "29.6px"
+          },
+          "catalogoGrid": {
+            "width": 1241.75,
+            "height": 5729.89,
+            "left": 54.63,
+            "right": 1296.38,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "0px"
+          },
+          "categorias": {
+            "width": 1351,
+            "height": 857.56,
+            "left": 0,
+            "right": 1351,
+            "fontSize": "16px",
+            "paddingTop": "88.79px",
+            "paddingBottom": "88.79px"
+          },
+          "peru": {
+            "width": 1351,
+            "height": 857.56,
+            "left": 0,
+            "right": 1351,
+            "fontSize": "16px",
+            "paddingTop": "88.79px",
+            "paddingBottom": "88.79px"
+          },
+          "closing": {
+            "width": 1351,
+            "height": 759.33,
+            "left": 0,
+            "right": 1351,
+            "fontSize": "16px",
+            "paddingTop": "150.26px",
+            "paddingBottom": "150.26px"
+          }
+        }
+      },
+      "zoom_150": {
+        "innerWidth": 911,
+        "innerHeight": 512,
+        "hero": {
+          "width": 896,
+          "height": 658.42,
+          "left": 0,
+          "right": 896,
+          "fontSize": "16px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroTitle": {
+          "width": 823.13,
+          "height": 152.16,
+          "left": 36.44,
+          "right": 859.56,
+          "fontSize": "55.9725px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroNext": {
+          "width": 420,
+          "height": 138.67,
+          "left": 36.44,
+          "right": 456.44,
+          "fontSize": "16px",
+          "paddingTop": "12px",
+          "paddingBottom": "12px"
+        },
+        "heroLines": [
+          {
+            "text": "LA NOCHE",
+            "left": 36.44,
+            "right": 859.56,
+            "width": 823.13,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "NO SE CUENTA.",
+            "left": 36.44,
+            "right": 859.56,
+            "width": 823.13,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "se vive.",
+            "left": 36.44,
+            "right": 859.56,
+            "width": 823.13,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          }
+        ],
+        "lowerSections": {
+          "catalogo": {
+            "width": 896,
+            "height": 7717.06,
+            "left": 0,
+            "right": 896,
+            "fontSize": "16px",
+            "paddingTop": "59.215px",
+            "paddingBottom": "59.215px"
+          },
+          "catalogoHeader": {
+            "width": 823.13,
+            "height": 211.28,
+            "left": 36.44,
+            "right": 859.56,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "29.6px"
+          },
+          "catalogoGrid": {
+            "width": 823.13,
+            "height": 7109.95,
+            "left": 36.44,
+            "right": 859.56,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "0px"
+          },
+          "categorias": {
+            "width": 896,
+            "height": 798.41,
+            "left": 0,
+            "right": 896,
+            "fontSize": "16px",
+            "paddingTop": "59.215px",
+            "paddingBottom": "59.215px"
+          },
+          "peru": {
+            "width": 896,
+            "height": 798.41,
+            "left": 0,
+            "right": 896,
+            "fontSize": "16px",
+            "paddingTop": "59.215px",
+            "paddingBottom": "59.215px"
+          },
+          "closing": {
+            "width": 896,
+            "height": 530.17,
+            "left": 0,
+            "right": 896,
+            "fontSize": "16px",
+            "paddingTop": "100.21px",
+            "paddingBottom": "100.21px"
+          }
+        }
+      },
+      "zoom_200": {
+        "innerWidth": 683,
+        "innerHeight": 384,
+        "hero": {
+          "width": 668,
+          "height": 601.09,
+          "left": 0,
+          "right": 668,
+          "fontSize": "16px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroTitle": {
+          "width": 613.38,
+          "height": 113.36,
+          "left": 27.31,
+          "right": 640.69,
+          "fontSize": "41.7095px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroNext": {
+          "width": 420,
+          "height": 138.67,
+          "left": 27.31,
+          "right": 447.31,
+          "fontSize": "16px",
+          "paddingTop": "12px",
+          "paddingBottom": "12px"
+        },
+        "heroLines": [
+          {
+            "text": "LA NOCHE",
+            "left": 27.31,
+            "right": 640.69,
+            "width": 613.38,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "NO SE CUENTA.",
+            "left": 27.31,
+            "right": 640.69,
+            "width": 613.38,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "se vive.",
+            "left": 27.31,
+            "right": 640.69,
+            "width": 613.38,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          }
+        ],
+        "lowerSections": {
+          "catalogo": {
+            "width": 668,
+            "height": 8247.81,
+            "left": 0,
+            "right": 668,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "catalogoHeader": {
+            "width": 613.38,
+            "height": 255.34,
+            "left": 27.31,
+            "right": 640.69,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "29.6px"
+          },
+          "catalogoGrid": {
+            "width": 613.38,
+            "height": 7550.91,
+            "left": 27.31,
+            "right": 640.69,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "0px"
+          },
+          "categorias": {
+            "width": 668,
+            "height": 792,
+            "left": 0,
+            "right": 668,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "peru": {
+            "width": 668,
+            "height": 792,
+            "left": 0,
+            "right": 668,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "closing": {
+            "width": 668,
+            "height": 412.64,
+            "left": 0,
+            "right": 668,
+            "fontSize": "16px",
+            "paddingTop": "75.13px",
+            "paddingBottom": "75.13px"
+          }
+        }
+      }
+    },
+    "1440x900": {
+      "zoom_100": {
+        "innerWidth": 1440,
+        "innerHeight": 900,
+        "hero": {
+          "width": 1425,
+          "height": 756,
+          "left": 0,
+          "right": 1425,
+          "fontSize": "16px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroTitle": {
+          "width": 912,
+          "height": 238.08,
+          "left": 68.5,
+          "right": 980.5,
+          "fontSize": "87.584px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroNext": {
+          "width": 339.51,
+          "height": 147.42,
+          "left": 1018.74,
+          "right": 1358.26,
+          "fontSize": "16px",
+          "paddingTop": "12px",
+          "paddingBottom": "12px"
+        },
+        "heroLines": [
+          {
+            "text": "LA NOCHE",
+            "left": 68.5,
+            "right": 980.5,
+            "width": 912,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "NO SE CUENTA.",
+            "left": 68.5,
+            "right": 980.5,
+            "width": 912,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "se vive.",
+            "left": 68.5,
+            "right": 980.5,
+            "width": 912,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          }
+        ],
+        "lowerSections": {
+          "catalogo": {
+            "width": 1425,
+            "height": 6404.84,
+            "left": 0,
+            "right": 1425,
+            "fontSize": "16px",
+            "paddingTop": "93.6px",
+            "paddingBottom": "93.6px"
+          },
+          "catalogoHeader": {
+            "width": 1288,
+            "height": 197.77,
+            "left": 68.5,
+            "right": 1356.5,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "29.6px"
+          },
+          "catalogoGrid": {
+            "width": 1288,
+            "height": 5785.66,
+            "left": 68.5,
+            "right": 1356.5,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "0px"
+          },
+          "categorias": {
+            "width": 1425,
+            "height": 867.19,
+            "left": 0,
+            "right": 1425,
+            "fontSize": "16px",
+            "paddingTop": "93.6px",
+            "paddingBottom": "93.6px"
+          },
+          "peru": {
+            "width": 1425,
+            "height": 867.19,
+            "left": 0,
+            "right": 1425,
+            "fontSize": "16px",
+            "paddingTop": "93.6px",
+            "paddingBottom": "93.6px"
+          },
+          "closing": {
+            "width": 1425,
+            "height": 794.73,
+            "left": 0,
+            "right": 1425,
+            "fontSize": "16px",
+            "paddingTop": "158.4px",
+            "paddingBottom": "158.4px"
+          }
+        }
+      },
+      "zoom_150": {
+        "innerWidth": 960,
+        "innerHeight": 600,
+        "hero": {
+          "width": 945,
+          "height": 671.92,
+          "left": 0,
+          "right": 945,
+          "fontSize": "16px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroTitle": {
+          "width": 868.22,
+          "height": 160.47,
+          "left": 38.39,
+          "right": 906.61,
+          "fontSize": "59.0389px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroNext": {
+          "width": 420,
+          "height": 138.67,
+          "left": 38.39,
+          "right": 458.39,
+          "fontSize": "16px",
+          "paddingTop": "12px",
+          "paddingBottom": "12px"
+        },
+        "heroLines": [
+          {
+            "text": "LA NOCHE",
+            "left": 38.39,
+            "right": 906.61,
+            "width": 868.22,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "NO SE CUENTA.",
+            "left": 38.39,
+            "right": 906.61,
+            "width": 868.22,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "se vive.",
+            "left": 38.39,
+            "right": 906.61,
+            "width": 868.22,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          }
+        ],
+        "lowerSections": {
+          "catalogo": {
+            "width": 945,
+            "height": 7303.16,
+            "left": 0,
+            "right": 945,
+            "fontSize": "16px",
+            "paddingTop": "62.4px",
+            "paddingBottom": "62.4px"
+          },
+          "catalogoHeader": {
+            "width": 868.22,
+            "height": 213.48,
+            "left": 38.39,
+            "right": 906.61,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "29.6px"
+          },
+          "catalogoGrid": {
+            "width": 868.22,
+            "height": 6687.47,
+            "left": 38.39,
+            "right": 906.61,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "0px"
+          },
+          "categorias": {
+            "width": 945,
+            "height": 804.78,
+            "left": 0,
+            "right": 945,
+            "fontSize": "16px",
+            "paddingTop": "62.4px",
+            "paddingBottom": "62.4px"
+          },
+          "peru": {
+            "width": 945,
+            "height": 804.78,
+            "left": 0,
+            "right": 945,
+            "fontSize": "16px",
+            "paddingTop": "62.4px",
+            "paddingBottom": "62.4px"
+          },
+          "closing": {
+            "width": 945,
+            "height": 555.53,
+            "left": 0,
+            "right": 945,
+            "fontSize": "16px",
+            "paddingTop": "105.6px",
+            "paddingBottom": "105.6px"
+          }
+        }
+      },
+      "zoom_200": {
+        "innerWidth": 720,
+        "innerHeight": 450,
+        "hero": {
+          "width": 705,
+          "height": 608.52,
+          "left": 0,
+          "right": 705,
+          "fontSize": "16px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroTitle": {
+          "width": 647.41,
+          "height": 119.67,
+          "left": 28.8,
+          "right": 676.2,
+          "fontSize": "44.0236px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroNext": {
+          "width": 420,
+          "height": 138.67,
+          "left": 28.8,
+          "right": 448.8,
+          "fontSize": "16px",
+          "paddingTop": "12px",
+          "paddingBottom": "12px"
+        },
+        "heroLines": [
+          {
+            "text": "LA NOCHE",
+            "left": 28.8,
+            "right": 676.2,
+            "width": 647.41,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "NO SE CUENTA.",
+            "left": 28.8,
+            "right": 676.2,
+            "width": 647.41,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "se vive.",
+            "left": 28.8,
+            "right": 676.2,
+            "width": 647.41,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          }
+        ],
+        "lowerSections": {
+          "catalogo": {
+            "width": 705,
+            "height": 8211.03,
+            "left": 0,
+            "right": 705,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "catalogoHeader": {
+            "width": 647.41,
+            "height": 255.34,
+            "left": 28.8,
+            "right": 676.2,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "29.6px"
+          },
+          "catalogoGrid": {
+            "width": 647.41,
+            "height": 7514.13,
+            "left": 28.8,
+            "right": 676.2,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "0px"
+          },
+          "categorias": {
+            "width": 705,
+            "height": 792,
+            "left": 0,
+            "right": 705,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "peru": {
+            "width": 705,
+            "height": 792,
+            "left": 0,
+            "right": 705,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "closing": {
+            "width": 705,
+            "height": 431.16,
+            "left": 0,
+            "right": 705,
+            "fontSize": "16px",
+            "paddingTop": "79.2px",
+            "paddingBottom": "79.2px"
+          }
+        }
+      }
+    },
+    "1920x1080": {
+      "zoom_100": {
+        "innerWidth": 1920,
+        "innerHeight": 1080,
+        "hero": {
+          "width": 1905,
+          "height": 760,
+          "left": 0,
+          "right": 1905,
+          "fontSize": "16px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroTitle": {
+          "width": 912,
+          "height": 238.08,
+          "left": 308.5,
+          "right": 1220.5,
+          "fontSize": "87.584px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroNext": {
+          "width": 339.51,
+          "height": 147.42,
+          "left": 1258.74,
+          "right": 1598.26,
+          "fontSize": "16px",
+          "paddingTop": "12px",
+          "paddingBottom": "12px"
+        },
+        "heroLines": [
+          {
+            "text": "LA NOCHE",
+            "left": 308.5,
+            "right": 1220.5,
+            "width": 912,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "NO SE CUENTA.",
+            "left": 308.5,
+            "right": 1220.5,
+            "width": 912,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "se vive.",
+            "left": 308.5,
+            "right": 1220.5,
+            "width": 912,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          }
+        ],
+        "lowerSections": {
+          "catalogo": {
+            "width": 1905,
+            "height": 6469.75,
+            "left": 0,
+            "right": 1905,
+            "fontSize": "16px",
+            "paddingTop": "96px",
+            "paddingBottom": "96px"
+          },
+          "catalogoHeader": {
+            "width": 1288,
+            "height": 197.77,
+            "left": 308.5,
+            "right": 1596.5,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "29.6px"
+          },
+          "catalogoGrid": {
+            "width": 1288,
+            "height": 5845.75,
+            "left": 308.5,
+            "right": 1596.5,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "0px"
+          },
+          "categorias": {
+            "width": 1905,
+            "height": 872,
+            "left": 0,
+            "right": 1905,
+            "fontSize": "16px",
+            "paddingTop": "96px",
+            "paddingBottom": "96px"
+          },
+          "peru": {
+            "width": 1905,
+            "height": 872,
+            "left": 0,
+            "right": 1905,
+            "fontSize": "16px",
+            "paddingTop": "96px",
+            "paddingBottom": "96px"
+          },
+          "closing": {
+            "width": 1905,
+            "height": 865.67,
+            "left": 0,
+            "right": 1905,
+            "fontSize": "16px",
+            "paddingTop": "160px",
+            "paddingBottom": "160px"
+          }
+        }
+      },
+      "zoom_150": {
+        "innerWidth": 1280,
+        "innerHeight": 720,
+        "hero": {
+          "width": 1265,
+          "height": 604.8,
+          "left": 0,
+          "right": 1265,
+          "fontSize": "16px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroTitle": {
+          "width": 804.23,
+          "height": 214.92,
+          "left": 51.19,
+          "right": 855.42,
+          "fontSize": "79.0585px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroNext": {
+          "width": 323.79,
+          "height": 157.15,
+          "left": 891.92,
+          "right": 1215.71,
+          "fontSize": "16px",
+          "paddingTop": "12px",
+          "paddingBottom": "12px"
+        },
+        "heroLines": [
+          {
+            "text": "LA NOCHE",
+            "left": 51.19,
+            "right": 855.42,
+            "width": 804.23,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "NO SE CUENTA.",
+            "left": 51.19,
+            "right": 855.42,
+            "width": 804.23,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "se vive.",
+            "left": 51.19,
+            "right": 855.42,
+            "width": 804.23,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          }
+        ],
+        "lowerSections": {
+          "catalogo": {
+            "width": 1265,
+            "height": 6289.92,
+            "left": 0,
+            "right": 1265,
+            "fontSize": "16px",
+            "paddingTop": "83.2px",
+            "paddingBottom": "83.2px"
+          },
+          "catalogoHeader": {
+            "width": 1162.63,
+            "height": 197.77,
+            "left": 51.19,
+            "right": 1213.81,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "29.6px"
+          },
+          "catalogoGrid": {
+            "width": 1162.63,
+            "height": 5691.55,
+            "left": 51.19,
+            "right": 1213.81,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "0px"
+          },
+          "categorias": {
+            "width": 1265,
+            "height": 846.38,
+            "left": 0,
+            "right": 1265,
+            "fontSize": "16px",
+            "paddingTop": "83.2px",
+            "paddingBottom": "83.2px"
+          },
+          "peru": {
+            "width": 1265,
+            "height": 846.38,
+            "left": 0,
+            "right": 1265,
+            "fontSize": "16px",
+            "paddingTop": "83.2px",
+            "paddingBottom": "83.2px"
+          },
+          "closing": {
+            "width": 1265,
+            "height": 718.2,
+            "left": 0,
+            "right": 1265,
+            "fontSize": "16px",
+            "paddingTop": "140.8px",
+            "paddingBottom": "140.8px"
+          }
+        }
+      },
+      "zoom_200": {
+        "innerWidth": 960,
+        "innerHeight": 540,
+        "hero": {
+          "width": 945,
+          "height": 671.92,
+          "left": 0,
+          "right": 945,
+          "fontSize": "16px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroTitle": {
+          "width": 868.22,
+          "height": 160.47,
+          "left": 38.39,
+          "right": 906.61,
+          "fontSize": "59.0389px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroNext": {
+          "width": 420,
+          "height": 138.67,
+          "left": 38.39,
+          "right": 458.39,
+          "fontSize": "16px",
+          "paddingTop": "12px",
+          "paddingBottom": "12px"
+        },
+        "heroLines": [
+          {
+            "text": "LA NOCHE",
+            "left": 38.39,
+            "right": 906.61,
+            "width": 868.22,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "NO SE CUENTA.",
+            "left": 38.39,
+            "right": 906.61,
+            "width": 868.22,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "se vive.",
+            "left": 38.39,
+            "right": 906.61,
+            "width": 868.22,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          }
+        ],
+        "lowerSections": {
+          "catalogo": {
+            "width": 945,
+            "height": 7303.16,
+            "left": 0,
+            "right": 945,
+            "fontSize": "16px",
+            "paddingTop": "62.4px",
+            "paddingBottom": "62.4px"
+          },
+          "catalogoHeader": {
+            "width": 868.22,
+            "height": 213.48,
+            "left": 38.39,
+            "right": 906.61,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "29.6px"
+          },
+          "catalogoGrid": {
+            "width": 868.22,
+            "height": 6687.47,
+            "left": 38.39,
+            "right": 906.61,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "0px"
+          },
+          "categorias": {
+            "width": 945,
+            "height": 804.78,
+            "left": 0,
+            "right": 945,
+            "fontSize": "16px",
+            "paddingTop": "62.4px",
+            "paddingBottom": "62.4px"
+          },
+          "peru": {
+            "width": 945,
+            "height": 804.78,
+            "left": 0,
+            "right": 945,
+            "fontSize": "16px",
+            "paddingTop": "62.4px",
+            "paddingBottom": "62.4px"
+          },
+          "closing": {
+            "width": 945,
+            "height": 555.53,
+            "left": 0,
+            "right": 945,
+            "fontSize": "16px",
+            "paddingTop": "105.6px",
+            "paddingBottom": "105.6px"
+          }
+        }
+      }
+    },
+    "768x1024": {
+      "zoom_100": {
+        "innerWidth": 768,
+        "innerHeight": 1024,
+        "hero": {
+          "width": 753,
+          "height": 760,
+          "left": 0,
+          "right": 753,
+          "fontSize": "16px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroTitle": {
+          "width": 691.56,
+          "height": 127.83,
+          "left": 30.72,
+          "right": 722.28,
+          "fontSize": "47.0262px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroNext": {
+          "width": 420,
+          "height": 138.67,
+          "left": 30.72,
+          "right": 450.72,
+          "fontSize": "16px",
+          "paddingTop": "12px",
+          "paddingBottom": "12px"
+        },
+        "heroLines": [
+          {
+            "text": "LA NOCHE",
+            "left": 30.72,
+            "right": 722.28,
+            "width": 691.56,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "NO SE CUENTA.",
+            "left": 30.72,
+            "right": 722.28,
+            "width": 691.56,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "se vive.",
+            "left": 30.72,
+            "right": 722.28,
+            "width": 691.56,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          }
+        ],
+        "lowerSections": {
+          "catalogo": {
+            "width": 753,
+            "height": 8045.27,
+            "left": 0,
+            "right": 753,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "catalogoHeader": {
+            "width": 691.56,
+            "height": 207.77,
+            "left": 30.72,
+            "right": 722.28,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "29.6px"
+          },
+          "catalogoGrid": {
+            "width": 691.56,
+            "height": 7395.94,
+            "left": 30.72,
+            "right": 722.28,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "0px"
+          },
+          "categorias": {
+            "width": 753,
+            "height": 792,
+            "left": 0,
+            "right": 753,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "peru": {
+            "width": 753,
+            "height": 792,
+            "left": 0,
+            "right": 753,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "closing": {
+            "width": 753,
+            "height": 456,
+            "left": 0,
+            "right": 753,
+            "fontSize": "16px",
+            "paddingTop": "84.48px",
+            "paddingBottom": "84.48px"
+          }
+        }
+      },
+      "zoom_150": {
+        "innerWidth": 512,
+        "innerHeight": 683,
+        "hero": {
+          "width": 497,
+          "height": 607.8,
+          "left": 0,
+          "right": 497,
+          "fontSize": "16px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroTitle": {
+          "width": 456.06,
+          "height": 128.06,
+          "left": 20.47,
+          "right": 476.53,
+          "fontSize": "47.104px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroNext": {
+          "width": 420,
+          "height": 138.67,
+          "left": 20.47,
+          "right": 440.47,
+          "fontSize": "16px",
+          "paddingTop": "12px",
+          "paddingBottom": "12px"
+        },
+        "heroLines": [
+          {
+            "text": "LA NOCHE",
+            "left": 20.47,
+            "right": 476.53,
+            "width": 456.06,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "NO SE CUENTA.",
+            "left": 20.47,
+            "right": 476.53,
+            "width": 456.06,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "se vive.",
+            "left": 20.47,
+            "right": 476.53,
+            "width": 456.06,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          }
+        ],
+        "lowerSections": {
+          "catalogo": {
+            "width": 497,
+            "height": 14185.91,
+            "left": 0,
+            "right": 497,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "catalogoHeader": {
+            "width": 456.06,
+            "height": 279.14,
+            "left": 20.47,
+            "right": 476.53,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "29.6px"
+          },
+          "catalogoGrid": {
+            "width": 456.06,
+            "height": 13402.11,
+            "left": 20.47,
+            "right": 476.53,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "0px"
+          },
+          "categorias": {
+            "width": 497,
+            "height": 792,
+            "left": 0,
+            "right": 497,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "peru": {
+            "width": 497,
+            "height": 792,
+            "left": 0,
+            "right": 497,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "closing": {
+            "width": 497,
+            "height": 346.22,
+            "left": 0,
+            "right": 497,
+            "fontSize": "16px",
+            "paddingTop": "64px",
+            "paddingBottom": "64px"
+          }
+        }
+      },
+      "zoom_200": {
+        "innerWidth": 384,
+        "innerHeight": 512,
+        "hero": {
+          "width": 369,
+          "height": 631.75,
+          "left": 0,
+          "right": 369,
+          "fontSize": "16px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroTitle": {
+          "width": 337,
+          "height": 96.02,
+          "left": 16,
+          "right": 353,
+          "fontSize": "35.328px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroNext": {
+          "width": 337,
+          "height": 138.67,
+          "left": 16,
+          "right": 353,
+          "fontSize": "16px",
+          "paddingTop": "12px",
+          "paddingBottom": "12px"
+        },
+        "heroLines": [
+          {
+            "text": "LA NOCHE",
+            "left": 16,
+            "right": 353,
+            "width": 337,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "NO SE CUENTA.",
+            "left": 16,
+            "right": 353,
+            "width": 337,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "se vive.",
+            "left": 16,
+            "right": 353,
+            "width": 337,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          }
+        ],
+        "lowerSections": {
+          "catalogo": {
+            "width": 369,
+            "height": 15321.81,
+            "left": 0,
+            "right": 369,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "catalogoHeader": {
+            "width": 337,
+            "height": 357.8,
+            "left": 16,
+            "right": 353,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "29.6px"
+          },
+          "catalogoGrid": {
+            "width": 337,
+            "height": 14291.98,
+            "left": 16,
+            "right": 353,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "0px"
+          },
+          "categorias": {
+            "width": 369,
+            "height": 792,
+            "left": 0,
+            "right": 369,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "peru": {
+            "width": 369,
+            "height": 792,
+            "left": 0,
+            "right": 369,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "closing": {
+            "width": 369,
+            "height": 452.31,
+            "left": 0,
+            "right": 369,
+            "fontSize": "16px",
+            "paddingTop": "64px",
+            "paddingBottom": "64px"
+          }
+        }
+      }
+    },
+    "390x844": {
+      "zoom_100": {
+        "innerWidth": 390,
+        "innerHeight": 844,
+        "hero": {
+          "width": 390,
+          "height": 708.95,
+          "left": 0,
+          "right": 390,
+          "fontSize": "16px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroTitle": {
+          "width": 358,
+          "height": 97.5,
+          "left": 16,
+          "right": 374,
+          "fontSize": "35.88px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroNext": {
+          "width": 358,
+          "height": 138.67,
+          "left": 16,
+          "right": 374,
+          "fontSize": "16px",
+          "paddingTop": "12px",
+          "paddingBottom": "12px"
+        },
+        "heroLines": [
+          {
+            "text": "LA NOCHE",
+            "left": 16,
+            "right": 374,
+            "width": 358,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "NO SE CUENTA.",
+            "left": 16,
+            "right": 374,
+            "width": 358,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "se vive.",
+            "left": 16,
+            "right": 374,
+            "width": 358,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          }
+        ],
+        "lowerSections": {
+          "catalogo": {
+            "width": 390,
+            "height": 14892.83,
+            "left": 0,
+            "right": 390,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "catalogoHeader": {
+            "width": 358,
+            "height": 357.8,
+            "left": 16,
+            "right": 374,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "29.6px"
+          },
+          "catalogoGrid": {
+            "width": 358,
+            "height": 13863,
+            "left": 16,
+            "right": 374,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "0px"
+          },
+          "categorias": {
+            "width": 390,
+            "height": 792,
+            "left": 0,
+            "right": 390,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "peru": {
+            "width": 390,
+            "height": 792,
+            "left": 0,
+            "right": 390,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "closing": {
+            "width": 390,
+            "height": 411.48,
+            "left": 0,
+            "right": 390,
+            "fontSize": "16px",
+            "paddingTop": "64px",
+            "paddingBottom": "64px"
+          }
+        }
+      },
+      "zoom_150": {
+        "innerWidth": 280,
+        "innerHeight": 607,
+        "hero": {
+          "width": 260,
+          "height": 734.83,
+          "left": 0,
+          "right": 260,
+          "fontSize": "16px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroTitle": {
+          "width": 228,
+          "height": 112.27,
+          "left": 16,
+          "right": 244,
+          "fontSize": "31.2px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroNext": {
+          "width": 228,
+          "height": 203.47,
+          "left": 16,
+          "right": 244,
+          "fontSize": "16px",
+          "paddingTop": "12px",
+          "paddingBottom": "12px"
+        },
+        "heroLines": [
+          {
+            "text": "LA NOCHE",
+            "left": 16,
+            "right": 244,
+            "width": 228,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "NO SE CUENTA.",
+            "left": 16,
+            "right": 244,
+            "width": 228,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "se vive.",
+            "left": 16,
+            "right": 244,
+            "width": 228,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          }
+        ],
+        "lowerSections": {
+          "catalogo": {
+            "width": 260,
+            "height": 16282.11,
+            "left": 0,
+            "right": 260,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "catalogoHeader": {
+            "width": 228,
+            "height": 429.13,
+            "left": 16,
+            "right": 244,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "29.6px"
+          },
+          "catalogoGrid": {
+            "width": 228,
+            "height": 15031.23,
+            "left": 16,
+            "right": 244,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "0px"
+          },
+          "categorias": {
+            "width": 260,
+            "height": 792,
+            "left": 0,
+            "right": 260,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "peru": {
+            "width": 260,
+            "height": 792,
+            "left": 0,
+            "right": 260,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "closing": {
+            "width": 260,
+            "height": 493.14,
+            "left": 0,
+            "right": 260,
+            "fontSize": "16px",
+            "paddingTop": "64px",
+            "paddingBottom": "64px"
+          }
+        }
+      },
+      "zoom_200": {
+        "innerWidth": 280,
+        "innerHeight": 606,
+        "hero": {
+          "width": 195,
+          "height": 871.55,
+          "left": 0,
+          "right": 195,
+          "fontSize": "16px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroTitle": {
+          "width": 184.39,
+          "height": 112.27,
+          "left": 16,
+          "right": 200.39,
+          "fontSize": "31.2px",
+          "paddingTop": "0px",
+          "paddingBottom": "0px"
+        },
+        "heroNext": {
+          "width": 184.39,
+          "height": 297.16,
+          "left": 16,
+          "right": 200.39,
+          "fontSize": "16px",
+          "paddingTop": "12px",
+          "paddingBottom": "12px"
+        },
+        "heroLines": [
+          {
+            "text": "LA NOCHE",
+            "left": 16,
+            "right": 200.39,
+            "width": 184.39,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "NO SE CUENTA.",
+            "left": 16,
+            "right": 200.39,
+            "width": 184.39,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          },
+          {
+            "text": "se vive.",
+            "left": 16,
+            "right": 200.39,
+            "width": 184.39,
+            "clipsRight": false,
+            "scrollWidthExceedsClient": false
+          }
+        ],
+        "lowerSections": {
+          "catalogo": {
+            "width": 195,
+            "height": 16449.83,
+            "left": 0,
+            "right": 195,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "catalogoHeader": {
+            "width": 163,
+            "height": 429.13,
+            "left": 16,
+            "right": 179,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "29.6px"
+          },
+          "catalogoGrid": {
+            "width": 163,
+            "height": 15031.23,
+            "left": 16,
+            "right": 179,
+            "fontSize": "16px",
+            "paddingTop": "0px",
+            "paddingBottom": "0px"
+          },
+          "categorias": {
+            "width": 195,
+            "height": 792,
+            "left": 0,
+            "right": 195,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "peru": {
+            "width": 195,
+            "height": 792,
+            "left": 0,
+            "right": 195,
+            "fontSize": "16px",
+            "paddingTop": "56px",
+            "paddingBottom": "56px"
+          },
+          "closing": {
+            "width": 195,
+            "height": 493.14,
+            "left": 0,
+            "right": 195,
+            "fontSize": "16px",
+            "paddingTop": "64px",
+            "paddingBottom": "64px"
+          }
+        }
+      }
+    }
+  },
+  "performance": {
+    "entradasNavigationAndFocus": {
+      "fromStatusReadyMs": 33.64,
+      "wallClockElapsedMs": 705.42,
+      "inPageTiming": {
+        "isFocused": true,
+        "inView": true,
+        "top": 787.34,
+        "height": 1661.69,
+        "nowMs": 700.5,
+        "domContentLoadedMs": 43.2
+      },
+      "targetThresholdMs": 1000,
+      "passed": true
+    },
+    "animationSmoothness": {
+      "framesSampled": 59,
+      "avgFrameMs": 16.67,
+      "p95FrameMs": 16.7,
+      "estimatedFps": 60
+    },
+    "crossTabSync": {
+      "cartSync": {
+        "key": "aforo.fusion.cart.v1",
+        "storagePropagationMs": 36.2,
+        "reactDomCommitMs": 36.3,
+        "targetThresholdMs": 100,
+        "passed": true
+      },
+      "ticketsSync": {
+        "key": "aforo.fusion.tickets.v1",
+        "storagePropagationMs": 23.5,
+        "reactDomCommitMs": 23.5,
+        "targetThresholdMs": 100,
+        "passed": true
+      }
+    }
+  }
+}

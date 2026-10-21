@@ -7,7 +7,7 @@ import { useStore } from '../lib/store';
 import { Photo } from './Photo';
 
 export function PeruDiscoverySection() {
-  const { events, now, globalCity, setGlobalCity, openQuickEvent } = useStore();
+  const { events, now, globalCity, setGlobalCity } = useStore();
   const pool = upcoming(events, now);
 
   const initialCity =
@@ -160,20 +160,22 @@ export function PeruDiscoverySection() {
                             {dp.weekday} {dp.day} {dp.month} · {formatTime(ev.startsAt)}
                           </span>
                           <h5 className="aforo-peru__mini-title">
-                            <Link to={`/eventos/${ev.slug}`}>{ev.title}</Link>
+                            <Link to={`/eventos/${ev.slug}`} newTab>
+                              {ev.title}
+                            </Link>
                           </h5>
                           <p className="aforo-peru__mini-venue">
                             {ev.artist} · {ev.venue}
                           </p>
                         </div>
                         <div className="aforo-peru__mini-actions">
-                          <button
-                            type="button"
-                            onClick={() => openQuickEvent(ev)}
+                          <Link
+                            to={`/eventos/${ev.slug}#entradas`}
+                            newTab
                             className="aforo-peru__mini-btn"
                           >
-                            Ver sectores →
-                          </button>
+                            Ver entradas →
+                          </Link>
                         </div>
                       </div>
                     );
