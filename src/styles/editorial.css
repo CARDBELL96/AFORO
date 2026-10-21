@@ -1,0 +1,2005 @@
+/* ==========================================================================
+   SISTEMA EDITORIAL FUSIONADO (GEMINI + CLAUDE)
+   - «Programación en pulso» (Mosaico Editorial + Cronograma)
+   - Tarjetas editoriales con sello de fecha inclinado y acento por evento
+   - Plano acústico SVG interactivo
+   - Ventana modal «Ficha Editorial & Plano de Sectores» (<dialog closedby="any">)
+   - Billetera «Mis Entradas» con código QR
+   - Mosaico de categorías y «Descubre el Perú»
+   ========================================================================== */
+
+/* Etiquetas y Badges */
+.aforo-mono-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--acc, var(--orange));
+}
+
+.aforo-mono-muted {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.aforo-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.62rem;
+  font-family: var(--font-mono);
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.1;
+  border: 1px solid transparent;
+}
+
+.aforo-badge--orange {
+  background-color: var(--acc, var(--orange));
+  color: var(--black);
+}
+
+.aforo-badge--lime {
+  background-color: var(--lime);
+  color: var(--black);
+}
+
+.aforo-badge--neutral {
+  background-color: rgba(16, 17, 20, 0.88);
+  color: var(--cream);
+  border-color: var(--hairline-strong);
+}
+
+.aforo-badge--muted {
+  background-color: var(--bg-surface-2);
+  color: var(--text-secondary);
+  border-color: var(--hairline);
+}
+
+/* Botones editoriales cuadrados/técnicos */
+.aforo-cta-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  background-color: var(--acc, var(--orange));
+  color: var(--black);
+  border: 1px solid var(--acc, var(--orange));
+  padding: 0.62rem 1.05rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.16s, border-color 0.16s, color 0.16s;
+}
+
+.aforo-cta-primary:hover:not(:disabled) {
+  background-color: var(--lime);
+  border-color: var(--lime);
+  color: var(--black);
+}
+
+.aforo-cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  background-color: var(--bg-surface-2);
+  color: var(--cream);
+  border: 1px solid var(--hairline-strong);
+  padding: 0.62rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.16s, color 0.16s;
+}
+
+.aforo-cta-secondary:hover {
+  border-color: var(--lime);
+  color: var(--lime);
+}
+
+/* Cabeceras de sección editoriales */
+.aforo-section {
+  padding-block: clamp(3.5rem, 6.5vw, 6rem);
+}
+
+.aforo-categories,
+.aforo-peru-section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 680px;
+}
+
+.aforo-section__header {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  gap: 2rem;
+  align-items: end;
+  padding-bottom: 1.85rem;
+  margin-bottom: 2.25rem;
+  border-bottom: 1px solid var(--hairline-strong);
+}
+
+.aforo-section__index {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--orange);
+  margin-bottom: 0.45rem;
+}
+
+.aforo-section__title {
+  font-family: var(--font-editorial);
+  font-size: clamp(2.5rem, 4.8vw, 4.1rem);
+  font-weight: 900;
+  line-height: 0.94;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.aforo-section__header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.aforo-section__subtitle {
+  font-size: 0.96rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.aforo-link-reset {
+  background: none;
+  border: 0;
+  color: var(--orange);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Barra de herramientas y filtro de «Programación en pulso» */
+.aforo-catalog__toolbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.aforo-catalog__view-switcher {
+  display: inline-flex;
+  border: 1px solid var(--hairline-strong);
+  background-color: var(--bg-surface-1);
+}
+
+.aforo-view-mode-btn {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 0;
+  padding: 0.48rem 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.aforo-view-mode-btn.is-active {
+  background-color: var(--lime);
+  color: var(--bg-deep);
+  font-weight: 700;
+}
+
+.aforo-catalog__explore-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--cream);
+  padding: 0.46rem 0.8rem;
+  border: 1px solid var(--hairline);
+  background: var(--bg-surface-1);
+}
+.aforo-catalog__explore-link:hover {
+  border-color: var(--orange);
+  color: var(--orange);
+}
+
+.aforo-filter-deck {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background-color: var(--bg-surface-1);
+  border: 1px solid var(--hairline-strong);
+  padding: 1.15rem 1.35rem;
+  margin-bottom: 2.25rem;
+}
+
+.aforo-filter-deck__cities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.aforo-city-tab {
+  background-color: var(--bg-deep);
+  color: var(--text-secondary);
+  border: 1px solid var(--hairline);
+  padding: 0.5rem 0.95rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.aforo-city-tab:hover {
+  color: var(--text-primary);
+  border-color: var(--hairline-strong);
+}
+
+.aforo-city-tab.is-active {
+  background-color: var(--orange);
+  color: var(--bg-deep);
+  border-color: var(--orange);
+  font-weight: 700;
+}
+
+.aforo-filter-deck__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.1rem;
+}
+
+.aforo-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.aforo-control-group__label {
+  font-family: var(--font-mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+}
+
+.aforo-control-group__select {
+  background-color: var(--bg-deep);
+  color: var(--text-primary);
+  border: 1px solid var(--hairline);
+  padding: 0.48rem 0.75rem;
+  font-family: var(--font-sans);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.aforo-toggle-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.84rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  margin-top: 0.9rem;
+}
+
+.aforo-reset-btn {
+  margin-left: auto;
+  margin-top: 0.9rem;
+  background-color: transparent;
+  color: var(--orange);
+  border: 1px solid rgba(255, 85, 56, 0.5);
+  padding: 0.45rem 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+/* Mosaico Editorial Asimétrico de Eventos */
+.aforo-catalog__views-stage {
+  position: relative;
+}
+
+.spa-view.inactive {
+  content-visibility: hidden;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+@supports not (content-visibility: hidden) {
+  .spa-view.inactive {
+    display: none;
+  }
+}
+
+.aforo-editorial-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.5rem;
+}
+
+.aforo-event-card {
+  grid-column: span 4;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-surface-1);
+  border: 1px solid var(--hairline);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.aforo-event-card:hover {
+  border-color: var(--acc, var(--hairline-strong));
+  transform: translateY(-2px);
+}
+
+.aforo-event-card--featured-xl {
+  grid-column: span 8;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+}
+
+.aforo-event-card--editorial-wide {
+  grid-column: span 6;
+}
+
+.aforo-event-card--poster-tall {
+  grid-column: span 4;
+}
+
+.aforo-event-card.is-sold-out {
+  opacity: 0.84;
+}
+
+.aforo-event-card__media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background-color: #0d0e11;
+}
+
+.aforo-event-card--featured-xl .aforo-event-card__media {
+  aspect-ratio: auto;
+  min-height: 100%;
+}
+
+/* Tinte de color del evento sobre la fotografía real */
+.aforo-event-card__media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 20%, var(--acc, var(--orange)), transparent 70%);
+  mix-blend-mode: soft-light;
+  opacity: 0.48;
+  pointer-events: none;
+}
+
+.aforo-event-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .aforo-event-card:hover .aforo-event-card__img {
+    transform: scale(1.04);
+  }
+}
+
+.aforo-event-card__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(16, 17, 20, 0.58) 0%,
+    transparent 42%,
+    rgba(16, 17, 20, 0.88) 100%
+  );
+  pointer-events: none;
+}
+
+.aforo-event-card__top-badges {
+  position: absolute;
+  top: 0.85rem;
+  left: 0.85rem;
+  right: 3.6rem;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.aforo-event-card__city-tag {
+  background-color: rgba(16, 17, 20, 0.88);
+  color: var(--text-primary);
+  border: 1px solid var(--hairline-strong);
+  font-family: var(--font-mono);
+  font-size: 0.67rem;
+  font-weight: 600;
+  padding: 0.26rem 0.55rem;
+}
+
+.aforo-event-card__save {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  z-index: 3;
+}
+
+/* Sello de fecha girado de Claude dentro de las tarjetas editoriales */
+.aforo-event-card__date-stamp {
+  position: absolute;
+  left: 0.85rem;
+  bottom: 0.85rem;
+  z-index: 2;
+  display: inline-grid;
+  gap: 1px;
+  padding: 6px 10px 7px;
+  background: var(--acc, var(--orange));
+  color: var(--black);
+  border-radius: 3px;
+  transform: rotate(-2.5deg);
+  transition: transform 0.22s var(--ease);
+}
+.aforo-event-card:hover .aforo-event-card__date-stamp {
+  transform: rotate(0deg);
+}
+.aforo-event-card__date-stamp b {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.15rem;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+.aforo-event-card__date-stamp small {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.aforo-event-card__index-mark {
+  position: absolute;
+  bottom: 0.55rem;
+  right: 0.85rem;
+  z-index: 2;
+  font-family: var(--font-editorial);
+  font-size: 2.35rem;
+  font-weight: 900;
+  line-height: 1;
+  color: rgba(244, 240, 232, 0.25);
+}
+
+.aforo-event-card__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1.35rem;
+  gap: 0.55rem;
+}
+
+.aforo-event-card__meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.aforo-event-card__date {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--lime);
+}
+
+.aforo-event-card__code {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  color: var(--text-secondary);
+}
+
+.aforo-event-card__artist {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--acc, var(--orange));
+  text-transform: uppercase;
+  margin-top: 0.15rem;
+}
+
+.aforo-event-card__title {
+  font-family: var(--font-editorial);
+  font-size: clamp(1.65rem, 2.2vw, 2.15rem);
+  font-weight: 900;
+  line-height: 0.96;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.aforo-event-card__title-link:hover {
+  color: var(--acc, var(--orange));
+}
+
+.aforo-event-card__venue {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.aforo-event-card__venue-icon {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.aforo-event-card__synopsis {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 0.35rem;
+}
+
+.aforo-event-card__zones-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.35rem;
+}
+
+.aforo-zone-chip {
+  background-color: var(--bg-deep);
+  border: 1px solid var(--hairline);
+  padding: 0.2rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  color: var(--text-secondary);
+}
+
+.aforo-zone-chip strong {
+  color: var(--text-primary);
+}
+
+.aforo-zone-chip.is-soldout {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+.aforo-event-card__footer {
+  margin-top: auto;
+  padding-top: 0.95rem;
+  border-top: 1px solid var(--hairline);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.aforo-event-card__pricing {
+  display: flex;
+  flex-direction: column;
+}
+
+.aforo-event-card__price-label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.09em;
+  color: var(--text-secondary);
+}
+
+.aforo-event-card__price-value {
+  font-family: var(--font-editorial);
+  font-size: 1.65rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.aforo-event-card__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.aforo-event-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background-color: var(--bg-surface-2);
+  color: var(--text-primary);
+  border: 1px solid var(--hairline-strong);
+  padding: 0.58rem 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+}
+
+.aforo-event-card__cta:hover {
+  background-color: var(--acc, var(--orange));
+  border-color: var(--acc, var(--orange));
+  color: var(--bg-deep);
+}
+
+.aforo-event-card__detail-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.58rem 0.75rem;
+  border: 1px solid var(--hairline);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.aforo-event-card__detail-link:hover {
+  border-color: var(--cream);
+  color: var(--cream);
+}
+
+/* Cronograma / Taquilla (Ledger View) */
+.aforo-ledger {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--hairline-strong);
+  background-color: var(--bg-surface-1);
+}
+
+.aforo-ledger__row {
+  display: grid;
+  grid-template-columns: 1.1fr 2.1fr 1.6fr 1.2fr 1.5fr;
+  gap: 1.25rem;
+  align-items: center;
+  padding: 1.2rem 1.4rem;
+  border-bottom: 1px solid var(--hairline);
+  transition: background-color 0.16s ease;
+}
+
+.aforo-ledger__row:last-child {
+  border-bottom: 0;
+}
+
+.aforo-ledger__row:hover {
+  background-color: var(--bg-surface-2);
+}
+
+.aforo-ledger__date-col,
+.aforo-ledger__main-col,
+.aforo-ledger__venue-col,
+.aforo-ledger__zones-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+}
+
+.aforo-ledger__idx {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--acc, var(--orange));
+}
+
+.aforo-ledger__date {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--lime);
+}
+
+.aforo-ledger__doors,
+.aforo-ledger__cat,
+.aforo-ledger__coords,
+.aforo-ledger__zones-count {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+}
+
+.aforo-ledger__artist {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--acc, var(--orange));
+  text-transform: uppercase;
+}
+
+.aforo-ledger__title {
+  font-family: var(--font-editorial);
+  font-size: 1.65rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.aforo-ledger__city {
+  font-size: 0.92rem;
+  text-transform: uppercase;
+}
+
+.aforo-ledger__venue {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.aforo-ledger__action-col {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.85rem;
+}
+
+.aforo-ledger__btns {
+  display: inline-flex;
+  gap: 0.45rem;
+}
+
+.aforo-ledger__price-box {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+}
+
+.aforo-ledger__price-box span {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--text-secondary);
+}
+
+.aforo-ledger__price-box strong {
+  font-family: var(--font-editorial);
+  font-size: 1.6rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+/* Esqueletos y paneles de estado de la cartelera */
+.aforo-catalog__skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.aforo-skeleton-card {
+  background: var(--bg-surface-1);
+  border: 1px solid var(--hairline);
+  padding: 1rem;
+}
+
+.aforo-skeleton-card__media {
+  height: 180px;
+  background: var(--bg-surface-2);
+  margin-bottom: 1rem;
+}
+
+.aforo-skeleton-line {
+  height: 14px;
+  background: var(--bg-surface-2);
+  margin-bottom: 0.6rem;
+}
+
+.aforo-skeleton-line--short { width: 45%; }
+.aforo-skeleton-line--title { height: 24px; width: 85%; }
+.aforo-skeleton-line--medium { width: 65%; }
+
+.aforo-state-panel {
+  background-color: var(--bg-surface-1);
+  border: 1px solid var(--hairline-strong);
+  padding: 3rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.aforo-state-panel--error {
+  border-color: var(--orange);
+}
+
+.aforo-state-panel__title {
+  font-family: var(--font-editorial);
+  font-size: 2.15rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.aforo-state-panel__desc {
+  color: var(--text-secondary);
+  max-width: 48ch;
+  margin-bottom: 0.5rem;
+}
+
+/* Mosaico de Categorías (Seis Movimientos) */
+.aforo-categories__mosaic {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.25rem;
+}
+
+.aforo-cat-card {
+  position: relative;
+  background-color: var(--bg-surface-1);
+  border: 1px solid var(--hairline);
+  min-height: 295px;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.aforo-cat-card--span-7 { grid-column: span 7; }
+.aforo-cat-card--span-5 { grid-column: span 5; }
+.aforo-cat-card--span-4 { grid-column: span 4; }
+.aforo-cat-card--span-8 { grid-column: span 8; }
+
+.aforo-cat-card.is-selected {
+  border-color: var(--lime);
+  box-shadow: inset 0 0 0 1px var(--lime);
+}
+
+.aforo-cat-card__trigger {
+  width: 100%;
+  height: 100%;
+  min-height: 295px;
+  background: none;
+  border: 0;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.4rem;
+}
+
+.aforo-cat-card__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.aforo-cat-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.44;
+  transition: transform 0.45s ease, opacity 0.3s ease;
+}
+
+.aforo-cat-card__trigger:hover .aforo-cat-card__img {
+  opacity: 0.58;
+}
+
+.aforo-cat-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(16, 17, 20, 0.72) 0%,
+    rgba(16, 17, 20, 0.45) 45%,
+    rgba(16, 17, 20, 0.95) 100%
+  );
+}
+
+.aforo-cat-card__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  flex: 1;
+  gap: 2.5rem;
+}
+
+.aforo-cat-card__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.aforo-cat-card__index {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--acc, var(--orange));
+}
+
+.aforo-cat-card__descriptor {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  color: var(--text-secondary);
+}
+
+.aforo-cat-card__count {
+  background-color: rgba(16, 17, 20, 0.86);
+  border: 1px solid var(--hairline-strong);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  padding: 0.22rem 0.5rem;
+  color: var(--lime);
+}
+
+.aforo-cat-card__title {
+  font-family: var(--font-editorial);
+  font-size: clamp(1.9rem, 2.8vw, 2.55rem);
+  font-weight: 900;
+  line-height: 0.96;
+  text-transform: uppercase;
+  margin-bottom: 0.45rem;
+}
+
+.aforo-cat-card__subtitle {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  max-width: 52ch;
+  margin-bottom: 1rem;
+}
+
+.aforo-cat-card__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--hairline);
+}
+
+.aforo-cat-card__samples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.aforo-cat-card__sample-pill {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  color: var(--text-primary);
+  background: rgba(27, 29, 33, 0.85);
+  border: 1px solid var(--hairline);
+  padding: 0.18rem 0.45rem;
+}
+
+.aforo-cat-card__action {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--acc, var(--orange));
+  text-transform: uppercase;
+}
+
+/* Descubre el Perú en Vivo */
+.aforo-peru__layout {
+  display: grid;
+  grid-template-columns: 4.3fr 7.7fr;
+  gap: 1.75rem;
+  align-items: start;
+}
+
+.aforo-peru__selector {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--hairline-strong);
+  background-color: var(--bg-surface-1);
+}
+
+.aforo-peru__city-row {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--hairline);
+  padding: 1.2rem 1.35rem;
+  text-align: left;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color 0.18s ease;
+}
+
+.aforo-peru__city-row:last-child { border-bottom: 0; }
+.aforo-peru__city-row:hover { background-color: rgba(255, 255, 255, 0.03); }
+
+.aforo-peru__city-row.is-active {
+  background-color: var(--bg-surface-2);
+  border-left: 4px solid var(--orange);
+}
+
+.aforo-peru__city-row-top {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.aforo-peru__city-row-main {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.3rem;
+}
+
+.aforo-peru__city-name {
+  font-family: var(--font-editorial);
+  font-size: 2.05rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.aforo-peru__city-count {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--lime);
+}
+
+.aforo-peru__city-kicker {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.aforo-peru__dossier {
+  background-color: var(--bg-surface-1);
+  border: 1px solid var(--hairline-strong);
+}
+
+.aforo-peru__dossier-media {
+  position: relative;
+  aspect-ratio: 16 / 7.8;
+  overflow: hidden;
+}
+
+.aforo-peru__dossier-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.aforo-peru__dossier-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 30%, rgba(16, 17, 20, 0.92) 100%);
+}
+
+.aforo-peru__dossier-coords {
+  position: absolute;
+  bottom: 0.85rem;
+  left: 1.35rem;
+  right: 1.35rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--lime);
+}
+
+.aforo-peru__dossier-body {
+  padding: 1.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+}
+
+.aforo-peru__dossier-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.aforo-peru__dossier-title {
+  font-family: var(--font-editorial);
+  font-size: clamp(1.9rem, 2.8vw, 2.6rem);
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+  margin-top: 0.35rem;
+}
+
+.aforo-peru__dossier-text {
+  font-size: 0.96rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.aforo-peru__dossier-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  padding-block: 1.15rem;
+  border-block: 1px solid var(--hairline);
+}
+
+.aforo-peru__meta-title {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--acc, var(--orange));
+  margin-bottom: 0.55rem;
+}
+
+.aforo-peru__meta-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+}
+
+.aforo-peru__meta-list li::before {
+  content: '— ';
+  color: var(--text-secondary);
+}
+
+.aforo-peru__mini-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.aforo-peru__mini-card {
+  background-color: var(--bg-surface-2);
+  border: 1px solid var(--hairline);
+  padding: 0.95rem 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.aforo-peru__mini-date {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--lime);
+}
+
+.aforo-peru__mini-title {
+  font-family: var(--font-editorial);
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  margin-block: 0.15rem;
+  text-transform: uppercase;
+}
+
+.aforo-peru__mini-venue {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.aforo-peru__mini-btn {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  border: 1px solid var(--hairline-strong);
+  padding: 0.45rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.aforo-peru__mini-btn:hover {
+  border-color: var(--orange);
+  color: var(--orange);
+}
+
+/* Plano Acústico SVG (VenueStageMap) */
+.aforo-stage-map {
+  background-color: var(--bg-deep);
+  border: 1px solid var(--hairline-strong);
+  padding: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.aforo-stage-map__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.aforo-stage-map__venue-name {
+  font-family: var(--font-editorial);
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.aforo-stage-map__legend {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  color: var(--text-secondary);
+}
+
+.aforo-stage-map__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.legend-swatch {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+}
+
+.legend-swatch--selected {
+  background: rgba(255, 85, 56, 0.55);
+  border: 1px solid var(--acc, var(--orange));
+}
+
+.legend-swatch--lime {
+  background: rgba(216, 243, 106, 0.35);
+  border: 1px solid var(--lime);
+}
+
+.legend-swatch--soldout {
+  background: var(--bg-surface-2);
+  border: 1px solid var(--text-secondary);
+}
+
+.aforo-stage-map__canvas {
+  width: 100%;
+  background: radial-gradient(circle at 50% 15%, rgba(255, 85, 56, 0.14), transparent 65%);
+  border: 1px solid var(--hairline);
+}
+
+.aforo-stage-map__svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.aforo-stage-map__zone.is-interactive {
+  cursor: pointer;
+  transition: opacity 0.16s ease;
+}
+
+.aforo-stage-map__zone.is-interactive:hover { opacity: 0.9; }
+.aforo-stage-map__zone.is-disabled { cursor: not-allowed; }
+
+.aforo-stage-map__quick-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.aforo-stage-map__pill {
+  flex: 1;
+  min-width: 140px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.45rem;
+  background-color: var(--bg-surface-1);
+  color: var(--text-primary);
+  border: 1px solid var(--hairline);
+  padding: 0.5rem 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.aforo-stage-map__pill.is-selected {
+  border-color: var(--acc, var(--orange));
+  background-color: rgba(255, 85, 56, 0.14);
+}
+
+.aforo-stage-map__pill.is-soldout {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.aforo-stage-map__pill-num {
+  color: var(--acc, var(--orange));
+  font-weight: 700;
+}
+
+.aforo-stage-map__pill-price {
+  color: var(--lime);
+  font-weight: 700;
+}
+
+/* Modales nativos <dialog closedby="any"> */
+.aforo-dialog {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--cream);
+  max-width: min(1120px, 95vw);
+  max-height: 92vh;
+  width: 100%;
+  margin: auto;
+  overflow: visible;
+}
+
+.aforo-dialog::backdrop {
+  background-color: rgba(8, 9, 12, 0.84);
+  backdrop-filter: blur(6px);
+}
+
+.aforo-modal {
+  width: 100%;
+  max-height: 92vh;
+  background-color: var(--bg-surface-1);
+  border: 1px solid var(--hairline-strong);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.75);
+}
+
+.aforo-modal__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.35rem;
+  background-color: var(--bg-deep);
+  border-bottom: 1px solid var(--hairline);
+  flex-wrap: wrap;
+}
+
+.aforo-modal__topbar-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.aforo-modal__topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.aforo-modal__page-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--lime);
+  padding: 0.38rem 0.7rem;
+  border: 1px solid rgba(216, 243, 106, 0.45);
+}
+.aforo-modal__page-link:hover {
+  background: var(--lime);
+  color: var(--black);
+}
+
+.aforo-modal__close {
+  background-color: var(--bg-surface-2);
+  color: var(--text-primary);
+  border: 1px solid var(--hairline-strong);
+  padding: 0.4rem 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.aforo-modal__close:hover {
+  border-color: var(--orange);
+  color: var(--orange);
+}
+
+.aforo-modal__content {
+  display: grid;
+  grid-template-columns: 1.08fr 0.96fr;
+  overflow-y: auto;
+}
+
+.aforo-modal__dossier {
+  border-right: 1px solid var(--hairline);
+  display: flex;
+  flex-direction: column;
+}
+
+.aforo-modal__media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.aforo-modal__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.aforo-modal__media-badges {
+  position: absolute;
+  bottom: 0.85rem;
+  left: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.aforo-modal__info {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.aforo-modal__artist {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--acc, var(--orange));
+  text-transform: uppercase;
+}
+
+.aforo-modal__title {
+  font-family: var(--font-editorial);
+  font-size: clamp(2rem, 3vw, 2.75rem);
+  font-weight: 900;
+  line-height: 0.96;
+  text-transform: uppercase;
+}
+
+.aforo-modal__kicker {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--lime);
+}
+
+.aforo-modal__synopsis {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.aforo-modal__specs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  padding: 1rem;
+  background-color: var(--bg-deep);
+  border: 1px solid var(--hairline);
+}
+
+.aforo-modal__spec-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.09em;
+  color: var(--text-secondary);
+  margin-bottom: 0.2rem;
+}
+
+.aforo-modal__spec-val {
+  font-size: 0.84rem;
+  color: var(--text-primary);
+}
+
+.aforo-modal__lineup-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+}
+
+.aforo-modal__lineup-pill {
+  background-color: var(--bg-surface-2);
+  border: 1px solid var(--hairline);
+  padding: 0.28rem 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+.aforo-modal__lineup-pill small {
+  color: var(--text-secondary);
+}
+
+.aforo-modal__acoustic-box {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--hairline);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.aforo-modal__zones-panel {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  background-color: #16181c;
+}
+
+.aforo-modal__zones-heading {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+}
+
+.aforo-modal__zones-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.aforo-zone-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.95rem 1rem;
+  background-color: var(--bg-surface-1);
+  border: 1px solid var(--hairline);
+  cursor: pointer;
+}
+
+.aforo-zone-item.is-selected {
+  border-color: var(--acc, var(--orange));
+  background-color: rgba(255, 85, 56, 0.07);
+}
+
+.aforo-zone-item.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.aforo-zone-item__main { flex: 1; }
+
+.aforo-zone-item__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.aforo-zone-item__name {
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.aforo-zone-item__price {
+  font-family: var(--font-editorial);
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: var(--lime);
+}
+
+.aforo-zone-item__desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-block: 0.25rem 0.55rem;
+}
+
+.aforo-zone-item__bar-wrap {
+  height: 4px;
+  background-color: var(--bg-deep);
+  overflow: hidden;
+  margin-bottom: 0.35rem;
+}
+
+.aforo-zone-item__bar-fill {
+  height: 100%;
+  background-color: var(--acc, var(--orange));
+}
+
+.aforo-zone-item__meta {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  color: var(--text-secondary);
+}
+
+.aforo-modal__simulator {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--hairline);
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem;
+}
+
+.aforo-modal__sim-row {
+  display: flex;
+  gap: 0.85rem;
+}
+
+.aforo-modal__sim-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.aforo-modal__sim-field--grow { flex: 1; }
+
+.aforo-modal__sim-field label {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  color: var(--text-secondary);
+}
+
+.aforo-qty-stepper {
+  display: inline-flex;
+  border: 1px solid var(--hairline-strong);
+  background: var(--bg-deep);
+}
+
+.aforo-qty-stepper button {
+  width: 2.1rem;
+  height: 2.2rem;
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+  border: 0;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.aforo-qty-stepper input {
+  width: 2.5rem;
+  text-align: center;
+  background: transparent;
+  color: var(--text-primary);
+  border: 0;
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+.aforo-modal__sim-input {
+  width: 100%;
+  height: 2.2rem;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  border: 1px solid var(--hairline-strong);
+  padding-inline: 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.aforo-modal__sim-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.aforo-modal__sim-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.aforo-modal__sim-total {
+  display: block;
+  font-family: var(--font-editorial);
+  font-size: 2.1rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.aforo-modal__sim-feedback {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.7rem 0.9rem;
+  background-color: rgba(216, 243, 106, 0.14);
+  border: 1px solid var(--lime);
+  color: var(--lime);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+}
+
+/* Modal de Mis Entradas (TicketsModal) */
+.aforo-tickets-view {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  min-height: 460px;
+  overflow-y: auto;
+}
+
+.aforo-tickets-view__sidebar {
+  border-right: 1px solid var(--hairline);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: #14161a;
+}
+
+.aforo-tickets-view__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.aforo-ticket-stub {
+  background: var(--bg-surface-1);
+  border: 1px solid var(--hairline);
+  padding: 0.85rem;
+  text-align: left;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.aforo-ticket-stub.is-active {
+  border-color: var(--lime);
+  background: var(--bg-surface-2);
+}
+
+.aforo-ticket-stub__top {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--orange);
+}
+
+.aforo-ticket-stub__title {
+  font-family: var(--font-editorial);
+  font-size: 1.3rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.aforo-ticket-stub__meta {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.aforo-tickets-view__detail {
+  padding: 1.5rem;
+}
+
+.aforo-pass-card {
+  background: var(--bg-deep);
+  border: 1px solid var(--hairline-strong);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.aforo-pass-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.aforo-pass-card__id {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  margin-top: 0.35rem;
+}
+
+.aforo-pass-card__brand {
+  font-family: var(--font-editorial);
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--text-secondary);
+}
+
+.aforo-pass-card__artist {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--orange);
+}
+
+.aforo-pass-card__title {
+  font-family: var(--font-editorial);
+  font-size: 2.25rem;
+  font-weight: 900;
+  line-height: 0.98;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+.aforo-pass-card__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.aforo-pass-card__grid span {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  color: var(--text-secondary);
+}
+
+.aforo-pass-card__grid strong {
+  font-size: 0.86rem;
+}
+
+.aforo-pass-card__perforation {
+  border-top: 2px dashed var(--hairline-strong);
+}
+
+.aforo-pass-card__qr-section {
+  display: flex;
+  align-items: center;
+  gap: 1.35rem;
+}
+
+.aforo-pass-card__qr-box {
+  width: 116px;
+  height: 116px;
+  flex-shrink: 0;
+  border: 2px solid var(--text-primary);
+}
+
+.aforo-pass-card__qr-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.aforo-pass-card__qr-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.aforo-pass-card__hash {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--lime);
+}
+
+.aforo-pass-card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 0.35rem;
+}
+
+.aforo-pass-card__links {
+  display: flex;
+  gap: 12px;
+}
+
+/* Responsivo para Mosaico Editorial, Modales y Secciones */
+@media (max-width: 1180px) {
+  .aforo-event-card--featured-xl {
+    grid-column: span 12;
+  }
+
+  .aforo-event-card--editorial-wide,
+  .aforo-event-card--poster-tall,
+  .aforo-event-card {
+    grid-column: span 6;
+  }
+
+  .aforo-peru__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .aforo-peru__selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+
+@media (max-width: 960px) {
+  .aforo-section__header {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .aforo-cat-card--span-7,
+  .aforo-cat-card--span-5,
+  .aforo-cat-card--span-4,
+  .aforo-cat-card--span-8 {
+    grid-column: span 6;
+  }
+
+  .aforo-modal__content,
+  .aforo-tickets-view {
+    grid-template-columns: 1fr;
+  }
+
+  .aforo-ledger__row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .aforo-ledger__action-col {
+    grid-column: span 2;
+    justify-content: space-between;
+    border-top: 1px solid var(--hairline);
+    padding-top: 0.75rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .aforo-event-card--featured-xl {
+    grid-template-columns: 1fr;
+  }
+
+  .aforo-event-card--featured-xl,
+  .aforo-event-card--editorial-wide,
+  .aforo-event-card--poster-tall,
+  .aforo-event-card,
+  .aforo-cat-card--span-7,
+  .aforo-cat-card--span-5,
+  .aforo-cat-card--span-4,
+  .aforo-cat-card--span-8 {
+    grid-column: span 12;
+  }
+
+  .aforo-peru__dossier-columns,
+  .aforo-modal__specs,
+  .aforo-pass-card__grid,
+  .aforo-ledger__row {
+    grid-template-columns: 1fr;
+  }
+
+  .aforo-ledger__action-col {
+    grid-column: span 1;
+  }
+
+  .aforo-pass-card__qr-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .aforo-modal__sim-row,
+  .aforo-modal__sim-summary {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

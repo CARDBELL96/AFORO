@@ -1,0 +1,9 @@
+/* AFORO Fusion — hoja de estilos unificada por capas. */
+@import './base.css';
+@import './chrome.css';
+@import './cards.css';
+@import './home.css';
+@import './explore.css';
+@import './detail.css';
+@import './layers.css';
+@import './editorial.css';

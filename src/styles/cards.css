@@ -1,0 +1,81 @@
+/* ───────── Guardar (corazón) ───────── */
+.save { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 999px; background: rgba(16, 17, 20, 0.76); color: var(--cream); border: 1px solid rgba(244, 240, 232, 0.2); transition: transform 0.18s var(--ease), background-color 0.16s, color 0.16s; }
+.save:hover { transform: scale(1.08); background: var(--cream); color: var(--black); }
+.save.is-on { background: var(--orange); border-color: var(--orange); color: var(--black); }
+.save--solid { background: var(--black); }
+.save--text { width: auto; height: 48px; padding: 0 18px; border-radius: 999px; background: transparent; border: 2px solid var(--line); color: var(--fg); }
+.save--text:hover { transform: none; border-color: var(--fg); background: transparent; color: var(--fg); }
+.save--text.is-on { background: var(--orange); border-color: var(--orange); color: var(--black); }
+
+/* ───────── Cartel (tarjeta vertical de Claude en Explorar) ───────── */
+.poster { position: relative; }
+.poster__link { display: block; }
+.poster__media { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--stage); border-radius: 3px; border: 1px solid var(--hairline); }
+.poster__media .photo { transition: transform 0.7s var(--ease); }
+.poster__link:hover .poster__media .photo { transform: scale(1.05); }
+.poster__date {
+  position: absolute; left: 12px; top: 12px; display: grid; gap: 2px; padding: 8px 12px 9px;
+  background: var(--acc); color: var(--acc-ink); border-radius: 3px; transform: rotate(-3deg);
+  transform-origin: left top; transition: transform 0.25s var(--ease);
+}
+.poster__date b { font-family: var(--font-display); font-weight: 900; font-size: 1.375rem; letter-spacing: -0.04em; line-height: 1; text-transform: uppercase; }
+.poster__date small { font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; opacity: 0.8; }
+.poster__link:hover .poster__date { transform: rotate(0deg); }
+[data-accent='cream'] .poster__date { background: var(--cream); color: var(--black); }
+.poster__status {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+}
+.poster__flag { position: absolute; right: 12px; bottom: 12px; padding: 5px 11px; background: var(--black); color: var(--cream); font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; }
+.poster__save { position: absolute; right: 12px; top: 12px; }
+.poster__body { padding-top: 14px; display: grid; gap: 5px; }
+.poster__meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 0.875rem; color: var(--fg-2); }
+.poster__meta b { color: var(--fg); font-weight: 700; }
+.poster__code { margin-left: auto; font-family: var(--font-mono); font-size: 0.68rem; opacity: 0.65; }
+.poster__title { font-family: var(--font-display); font-weight: 900; font-size: clamp(1.45rem, 2.1vw, 1.8rem); letter-spacing: -0.04em; line-height: 0.98; text-wrap: balance; }
+.poster__artist { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600; color: var(--acc); text-transform: uppercase; }
+.poster__price { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; padding-top: 10px; border-top: 2px solid var(--fg); font-weight: 700; font-size: 0.9375rem; }
+.poster__price svg { transition: transform 0.2s var(--ease); }
+.poster__link:hover .poster__price svg { transform: translate(4px, -2px); }
+.poster--skeleton .poster__media { aspect-ratio: 4 / 5; }
+.poster--skeleton .poster__body { padding-top: 16px; }
+
+/* ───────── Rejillas de Explorar ───────── */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 44px 24px; }
+.grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 860px) { .grid--3 { grid-template-columns: 1fr; max-width: 420px; } }
+@media (max-width: 560px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 14px; } .grid--3 { grid-template-columns: 1fr; } }
+@media (max-width: 560px) {
+  .grid:not(.grid--3) .poster__title { font-size: 1.2rem; }
+  .grid:not(.grid--3) .poster__date b { font-size: 1.0625rem; }
+  .grid:not(.grid--3) .poster__date { padding: 6px 9px 7px; left: 8px; top: 8px; }
+  .grid:not(.grid--3) .poster__save { right: 6px; top: 6px; width: 38px; height: 38px; }
+  .grid:not(.grid--3) .poster__price { font-size: 0.8125rem; }
+  .grid:not(.grid--3) .poster__price svg { display: none; }
+}
+
+/* ───────── Fila (vista de lista en Explorar) ───────── */
+.rows { display: grid; }
+.rowcard { position: relative; border-top: 1.5px solid var(--line); }
+.rows li:last-child .rowcard { border-bottom: 1.5px solid var(--line); }
+.rowcard__link { display: grid; grid-template-columns: 112px 140px minmax(0, 1fr) auto; align-items: center; gap: 24px; padding: 16px 64px 16px 0; transition: background-color 0.16s; }
+.rowcard__link:hover { background: rgba(244, 240, 232, 0.05); }
+.rowcard__media { aspect-ratio: 1; overflow: hidden; border-radius: 3px; }
+.rowcard__date { display: grid; gap: 2px; }
+.rowcard__date b { font-family: var(--font-display); font-weight: 900; font-size: 1.75rem; letter-spacing: -0.04em; line-height: 1; color: var(--acc); text-transform: uppercase; }
+.rowcard__date small { font-family: var(--font-mono); color: var(--fg-2); font-size: 0.78rem; text-transform: uppercase; }
+.rowcard__artist { display: block; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600; color: var(--acc); text-transform: uppercase; margin-bottom: 3px; }
+.rowcard__title { font-family: var(--font-display); font-weight: 900; font-size: clamp(1.4rem, 3vw, 2.25rem); letter-spacing: -0.04em; line-height: 1; }
+.rowcard__meta { margin-top: 6px; color: var(--fg-2); font-size: 0.9375rem; }
+.rowcard__price { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; }
+.rowcard__save { position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+.rowcard__save:hover { transform: translateY(-50%) scale(1.08); }
+@media (max-width: 760px) {
+  .rowcard__link { grid-template-columns: 88px minmax(0, 1fr); gap: 6px 16px; padding-right: 52px; }
+  .rowcard__media { grid-row: 1 / span 3; align-self: start; }
+  .rowcard__date { grid-column: 2; grid-auto-flow: column; justify-content: start; align-items: baseline; gap: 10px; }
+  .rowcard__date b { font-size: 1.125rem; }
+  .rowcard__main { grid-column: 2; }
+  .rowcard__price { grid-column: 2; font-size: 0.9375rem; }
+}

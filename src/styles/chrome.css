@@ -1,0 +1,162 @@
+/* ───────── Cabecera fija: marquesina lima + barra fusionada ───────── */
+.chrome { position: fixed; inset: 0 0 auto 0; z-index: 50; }
+.chrome[data-solid='true'] .bar { background: rgba(16, 17, 20, 0.94); backdrop-filter: blur(10px); box-shadow: 0 1px 0 var(--line); }
+.chrome[data-solid='false'] .bar { background: linear-gradient(180deg, rgba(16, 17, 20, 0.75) 0%, rgba(16, 17, 20, 0) 100%); }
+
+.ticker { background: var(--lime); color: var(--black); height: 36px; overflow: hidden; display: flex; align-items: center; font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.02em; }
+.ticker .marquee { width: 100%; }
+.ticker__item { display: inline-flex; align-items: baseline; gap: 8px; padding-inline: 4px; }
+.ticker__item b { font-weight: 900; background: var(--black); color: var(--lime); padding: 2px 7px; border-radius: 3px; font-family: var(--font-mono); font-size: 0.75rem; }
+.ticker__item i { font-style: normal; font-weight: 500; opacity: 0.65; }
+.ticker__item:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+.bar { height: 64px; display: flex; align-items: center; gap: clamp(12px, 2vw, 28px); padding-inline: var(--gutter); transition: background-color 0.25s; }
+.brand { display: inline-flex; align-items: center; gap: 9px; color: var(--cream); }
+.brand__glyph { color: var(--orange); }
+.brand__country {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 700;
+  padding: 2px 5px;
+  border: 1px solid rgba(255, 85, 56, 0.65);
+  color: var(--orange);
+  letter-spacing: 0.08em;
+}
+.wordmark { font-family: var(--font-display); font-weight: 900; font-size: 1.75rem; letter-spacing: -0.06em; line-height: 1; }
+.wordmark__o { color: var(--orange); }
+
+.bar__nav { display: flex; align-items: center; gap: 4px; margin-right: auto; }
+.bar__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 13px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 999px;
+  transition: background-color 0.16s, color 0.16s;
+}
+.bar__link--mono {
+  font-size: 0.84rem;
+}
+.bar__num {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--orange);
+}
+.bar__link:hover { background: rgba(244, 240, 232, 0.12); }
+.bar__link[aria-current='page'] { background: var(--cream); color: var(--black); }
+.bar__link[aria-current='page'] .bar__num { color: var(--black); }
+
+.bar__actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.bar__nav + .bar__actions { margin-left: 0; }
+
+.bar__city-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 36px;
+  padding: 0 10px;
+  background: rgba(27, 29, 33, 0.88);
+  border: 1px solid var(--hairline-strong);
+  border-radius: 4px;
+}
+.bar__city-pin { color: var(--orange); flex-shrink: 0; }
+.bar__city-select {
+  background: transparent;
+  border: 0;
+  color: var(--cream);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+}
+.bar__city-select option {
+  background: var(--black);
+  color: var(--cream);
+}
+
+.bar__tickets-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 11px;
+  background: rgba(27, 29, 33, 0.88);
+  border: 1px solid var(--hairline-strong);
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  transition: border-color 0.16s, background-color 0.16s;
+}
+.bar__tickets-btn svg { color: var(--lime); }
+.bar__tickets-btn:hover { border-color: var(--lime); background: var(--bg-surface-2); }
+.bar__tickets-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  background: var(--lime);
+  color: var(--black);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.icon-btn--search { padding: 0 12px 0 14px; border: 1.5px solid rgba(244, 240, 232, 0.35); margin-inline: 2px; height: 38px; }
+.icon-btn--search:hover { border-color: var(--cream); background: transparent; }
+.icon-btn__label { font-weight: 600; font-size: 0.875rem; }
+.chrome .icon-btn--search .kbd { margin-left: 4px; }
+
+@media (max-width: 1080px) {
+  .bar__nav { display: none; }
+  .bar__actions { margin-left: auto; }
+}
+@media (max-width: 720px) {
+  .bar__city-picker { display: none; }
+  .bar__tickets-label, .icon-btn__label, .chrome .icon-btn--search .kbd { display: none; }
+  .icon-btn--search { padding: 0; border-color: transparent; margin-inline: 0; }
+  .wordmark { font-size: 1.5rem; }
+}
+
+/* ───────── Cinta en bucle ───────── */
+.marquee { overflow: hidden; }
+.marquee__track { display: flex; width: max-content; animation: marquee var(--marquee-s, 40s) linear infinite; }
+.marquee:hover .marquee__track { animation-play-state: paused; }
+.marquee__row { display: flex; flex: none; align-items: center; }
+.marquee__item { flex: none; display: inline-flex; align-items: center; white-space: nowrap; padding-right: 28px; }
+.ticker .marquee__item::after { content: ''; width: 7px; height: 7px; margin-left: 28px; background: var(--black); transform: rotate(45deg); }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ───────── Pie ───────── */
+.footer { background: var(--black); border-top: 1px solid var(--line); padding-top: clamp(48px, 7vw, 96px); overflow: hidden; }
+.footer__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 32px; }
+.footer__h { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lime); margin-bottom: 16px; }
+.footer__col li + li { margin-top: 10px; }
+.footer__col a, .footer__btn-link { font-size: 1.02rem; font-weight: 500; text-align: left; }
+.footer__col a:hover, .footer__btn-link:hover { color: var(--orange); }
+.footer__count { margin-left: 6px; font-family: var(--font-mono); font-size: 0.75rem; opacity: 0.6; }
+.footer__demo {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 72ch;
+  color: var(--fg-2);
+  font-size: 0.9375rem;
+  border-left: 4px solid var(--orange);
+  padding-left: 16px;
+}
+.footer__demo-glyph { color: var(--orange); flex-shrink: 0; margin-top: 3px; }
+.footer__demo strong { color: var(--cream); }
+.footer__mark { margin-top: clamp(40px, 6vw, 80px); height: 0.74em; font-size: clamp(6rem, 27.5vw, 27rem); overflow: hidden; color: var(--orange); text-align: center; line-height: 1; user-select: none; }
+.footer__mark .wordmark { font-size: inherit; display: block; line-height: 0.92; letter-spacing: -0.035em; color: var(--orange); }
+.footer__mark .wordmark__o { color: var(--cream); }
+.footer__base { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-block: 20px 28px; font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-2); }
+@media (max-width: 720px) {
+  .footer__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .footer__col:first-child { grid-column: 1 / -1; }
+}
