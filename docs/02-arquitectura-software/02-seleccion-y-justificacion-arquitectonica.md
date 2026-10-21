@@ -87,11 +87,11 @@ $$\text{Puntuación Total} = \sum_{i=1}^{n} (\text{Calificación}_i \times \text
 | **4. Rendimiento, Latencia Predecible y Concurrencia** | **15 %** | 4.0 | 3.5 | 2.5 | **4.5** |
 | **5. Esfuerzo y Velocidad de Pruebas Automatizadas** | **10 %** | 3.0 | 2.0 | 2.5 | **5.0** |
 | **6. Adecuación al Alcance del Proyecto y Equipo** | **10 %** | 3.5 | 1.5 | 2.5 | **4.5** |
-| **PUNTUACIÓN TOTAL PONDERADA** | **100 %** | **3.35 / 5.0** | **2.85 / 5.0** | **2.68 / 5.0** | **4.85 / 5.0** |
+| **PUNTUACIÓN TOTAL PONDERADA** | **100 %** | **3.35 / 5.0** | **2.85 / 5.0** | **2.68 / 5.0** | **4.88 / 5.0** |
 
 #### Desglose del Cálculo para la Alternativa Seleccionada (D):
 $$\text{Puntaje}_D = (5.0 \times 0.25) + (5.0 \times 0.20) + (5.0 \times 0.20) + (4.5 \times 0.15) + (5.0 \times 0.10) + (4.5 \times 0.10)$$
-$$\text{Puntaje}_D = 1.25 + 1.00 + 1.00 + 0.675 + 0.50 + 0.45 = \mathbf{4.875} \approx \mathbf{4.85 / 5.0}$$
+$$\text{Puntaje}_D = 1.25 + 1.00 + 1.00 + 0.675 + 0.50 + 0.45 = \mathbf{4.875} \approx \mathbf{4.88 / 5.0}$$
 
 ---
 
@@ -107,8 +107,9 @@ $$\text{Puntaje}_D = 1.25 + 1.00 + 1.00 + 0.675 + 0.50 + 0.45 = \mathbf{4.875} \
   3. *Temporizador de eventos*: Provee notificaciones de expiración basadas en llaves con TTL para detonar la liberación de reservas abandonadas.
   Redis **nunca opera como autoridad decisoria ni almacén primario del inventario**.
 - **Estrategia Transaccional y de Concurrencia**:
-  Para prevenir la sobreventa garantizando el cumplimiento de `RN-01` ($\text{Sold} + \text{ActiveHolds} \le \text{Capacity}$), se adopta la siguiente estrategia:
+  Para prevenir la sobreventa garantizando el cumplimiento estricto de `RN-01` ($\text{Sold} + \text{ActiveHolds} \le \text{Capacity}$), se adopta la siguiente estrategia:
   - Se ejecuta una transacción en PostgreSQL bajo el nivel de aislamiento estándar `READ COMMITTED` (o alternativamente `REPEATABLE READ`), utilizando un **bloqueo pesimista a nivel de fila (`SELECT ... FOR UPDATE`)** sobre el registro del sector o zona solicitado.
+  - **Comprobación y actualización atómicas dentro de la misma transacción**: El bloqueo pesimista garantiza la exclusión mutua para que ninguna otra transacción concurrentemente modifique la fila del sector, pero **no sustituye la validación de los invariantes de negocio**. La comprobación de disponibilidad libre ($\text{Capacidad} - (\text{Vendidas} + \text{ReservasActivas}) \ge \text{CantidadSolicitada}$) y la posterior inserción de la reserva o actualización de contadores deben ejecutarse obligatoriamente **dentro de la misma transacción PostgreSQL**. Si la validación falla tras adquirir el lock, la transacción emite un error de dominio `SECTOR_CAPACITY_EXCEEDED` y ejecuta rollback inmediato, liberando el lock sin alterar datos.
   - Este mecanismo serializa exclusivamente las solicitudes concurrentes que compiten por el mismo sector específico, permitiendo transacciones concurrentes simultáneas sin bloqueo sobre otros sectores o conciertos distintos.
   - Se descarta el uso simultáneo obligatorio de aislamiento `SERIALIZABLE` con `SELECT FOR UPDATE`, dado que `SERIALIZABLE` impone una verificación optimista basada en grafos de dependencias (*SSI - Serializable Snapshot Isolation*) que aborta transacciones concurrentes con errores de serialización (`could not serialize access`), obligando a reintentos costosos que resultan innecesarios cuando el bloqueo pesimista a nivel de fila ya garantiza la exclusión mutua directa sobre el recurso disputado.
 
