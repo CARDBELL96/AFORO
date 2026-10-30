@@ -116,5 +116,5 @@ flowchart TD
 
 ## 7. Trazabilidad
 
-- **Requisitos No Funcionales**: [`RNF-MA-01`](../01-analisis-de-sistema/02-requisitos-no-funcionales.md), [`RNF-MA-02`](../01-analisis-de-sistema/02-requisitos-no-funcionales.md), [`RNF-MA-03`](../01-analisis-de-sistema/02-requisitos-no-funcionales.md).
+- **Requisitos No Funcionales**: [`RNF-MA-01`](../../01-analisis-de-sistema/04-atributos-de-calidad.md), [`RNF-MA-02`](../../01-analisis-de-sistema/04-atributos-de-calidad.md), [`RNF-MA-03`](../../01-analisis-de-sistema/04-atributos-de-calidad.md).
 - **Constitution**: Principio I (Modularidad y Desacoplamiento Arquitectónico) y Principio III (Gobernanza del Sistema de Tipos).

@@ -44,7 +44,7 @@ flowchart LR
 | **3. Artefacto** | Capa de Presentación Web ([`AFORO Web SPA`](../../src/App.tsx) — *Implementado*), API Gateway y Módulo de Catálogo del Backend (*Diseño Propuesto*). |
 | **4. Entorno** | Operación pico durante los primeros 15 minutos del lanzamiento de una preventa exclusiva. |
 | **5. Respuesta del Sistema** | 1. La capa de caché HTTP y memoria distribuida (Redis / Cloudflare) entrega las respuestas de catálogo y metadatos de recinto sin impactar la base de datos relacional para lecturas repetitivas.<br>2. La SPA de AFORO Web mantiene navegación fluida y renderizado sin congelamiento de UI. |
-| **6. Medida de Respuesta (Meta de Diseño)** | - Latencia de respuesta en la API: **$\text{p95} < 250\text{ ms}$** y **$\text{p99} < 450\text{ ms}$** (objetivo de diseño a validar con k6 en sprint de backend).<br>- Tasa de errores HTTP 5xx: **$< 0.05\text{ \%}$** de las solicitudes.<br>- Rendimiento UI verificado en frontend: renderizado sostenido a **$60.0\text{ fps}$** ([`RNF-PE-02`](02-requisitos-no-funcionales.md)). |
+| **6. Medida de Respuesta (Meta de Diseño)** | - Latencia de respuesta en la API: **$\text{p95} < 250\text{ ms}$** y **$\text{p99} < 450\text{ ms}$** (objetivo de diseño a validar con k6 en sprint de backend).<br>- Tasa de errores HTTP 5xx: **$< 0.05\text{ \%}$** de las solicitudes.<br>- Rendimiento UI verificado en frontend: renderizado sostenido a **$60.0\text{ fps}$** ([`RNF-PE-02`](04-atributos-de-calidad.md)). |
 | **Estado de Realidad** | `[OBJETIVO ARQUITECTÓNICO / DISEÑO PROPUESTO]` para backend; `[VERIFICADO EXPERIMENTALMENTE]` para renderizado frontend. |
 
 ---

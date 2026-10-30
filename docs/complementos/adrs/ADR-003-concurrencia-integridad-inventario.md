@@ -92,8 +92,8 @@ Se decide adoptar la **Alternativa D**:
 
 ## 7. Trazabilidad
 
-- **Requisitos Funcionales**: [`RF-COR-02`](../01-analisis-de-sistema/01-requisitos-funcionales.md), [`RF-COR-03`](../01-analisis-de-sistema/01-requisitos-funcionales.md), [`RF-WEB-08`](../01-analisis-de-sistema/01-requisitos-funcionales.md).
-- **Requisitos No Funcionales**: [`RNF-PE-05`](../01-analisis-de-sistema/02-requisitos-no-funcionales.md), [`RNF-RE-01`](../01-analisis-de-sistema/02-requisitos-no-funcionales.md).
-- **Reglas de Negocio**: [`RN-01`](../01-analisis-de-sistema/03-reglas-de-negocio.md), [`RN-02`](../01-analisis-de-sistema/03-reglas-de-negocio.md), [`RN-03`](../01-analisis-de-sistema/03-reglas-de-negocio.md), [`RN-04`](../01-analisis-de-sistema/03-reglas-de-negocio.md).
-- **Escenarios de Calidad**: [`EAC-02`](../01-analisis-de-sistema/08-escenarios-atributos-calidad.md), [`EAC-03`](../01-analisis-de-sistema/08-escenarios-atributos-calidad.md).
+- **Requisitos Funcionales**: [`RF-COR-02`](../../01-analisis-de-sistema/03-requisitos-funcionales.md), [`RF-COR-03`](../../01-analisis-de-sistema/03-requisitos-funcionales.md), [`RF-WEB-08`](../../01-analisis-de-sistema/03-requisitos-funcionales.md).
+- **Requisitos No Funcionales**: [`RNF-PE-05`](../../01-analisis-de-sistema/04-atributos-de-calidad.md), [`RNF-RE-01`](../../01-analisis-de-sistema/04-atributos-de-calidad.md).
+- **Reglas de Negocio**: [`RN-01`](../03-reglas-de-negocio.md), [`RN-02`](../03-reglas-de-negocio.md), [`RN-03`](../03-reglas-de-negocio.md), [`RN-04`](../03-reglas-de-negocio.md).
+- **Escenarios de Calidad**: [`EAC-02`](../../01-analisis-de-sistema/../01-analisis-de-sistema/08-escenarios-atributos-calidad.md), [`EAC-03`](../../01-analisis-de-sistema/../01-analisis-de-sistema/08-escenarios-atributos-calidad.md).
 - **Constitution**: Principio II (Integridad Transaccional, No Sobreventa y Modelo de Dominio).

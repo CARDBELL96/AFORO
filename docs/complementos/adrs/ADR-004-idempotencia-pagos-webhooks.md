@@ -92,8 +92,8 @@ Se decide adoptar la **Alternativa C**:
 
 ## 7. Trazabilidad
 
-- **Requisitos Funcionales**: [`RF-COR-04`](../01-analisis-de-sistema/01-requisitos-funcionales.md), [`RF-WEB-13`](../01-analisis-de-sistema/01-requisitos-funcionales.md).
-- **Requisitos No Funcionales**: [`RNF-RE-02`](../01-analisis-de-sistema/02-requisitos-no-funcionales.md), [`RNF-SE-04`](../01-analisis-de-sistema/02-requisitos-no-funcionales.md).
-- **Reglas de Negocio**: [`RN-05`](../01-analisis-de-sistema/03-reglas-de-negocio.md).
-- **Escenarios de Calidad**: [`EAC-04`](../01-analisis-de-sistema/08-escenarios-atributos-calidad.md).
+- **Requisitos Funcionales**: [`RF-COR-04`](../../01-analisis-de-sistema/03-requisitos-funcionales.md), [`RF-WEB-13`](../../01-analisis-de-sistema/03-requisitos-funcionales.md).
+- **Requisitos No Funcionales**: [`RNF-RE-02`](../../01-analisis-de-sistema/04-atributos-de-calidad.md), [`RNF-SE-04`](../../01-analisis-de-sistema/04-atributos-de-calidad.md).
+- **Reglas de Negocio**: [`RN-05`](../03-reglas-de-negocio.md).
+- **Escenarios de Calidad**: [`EAC-04`](../../01-analisis-de-sistema/../01-analisis-de-sistema/08-escenarios-atributos-calidad.md).
 - **Constitution**: Principio II (Integridad Transaccional, Idempotencia de Pagos).

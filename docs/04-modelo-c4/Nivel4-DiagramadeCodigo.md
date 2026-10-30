@@ -3,17 +3,17 @@
 **Sistema**: Plataforma de Descubrimiento, Venta y Validación de Entradas para Eventos y Conciertos en Vivo  
 **Contenedor**: `API Core Backend` (Monolito Modular)  
 **Componente Analizado**: `Módulo Reservas e Inventario`  
-**Documento**: `docs/04-modelo-c4/04-diagrama-codigo-c4.md`  
+**Documento**: `docs/04-modelo-c4/Nivel4-DiagramadeCodigo.md`  
 **Versión**: `1.1.0` | **Fecha**: `2026-10-21`  
 **Referencia Metodológica**: C4 Model (Simon Brown) & Guía 04 de Arquitectura de Software  
-**Alineación Arquitectónica**: Conforme a la [Constitution](../../.specify/memory/constitution.md), el [Capítulo 01](../01-analisis-de-sistema/) y los [ADRs 001 al 006](../02-arquitectura-software/03-adrs/)  
+**Alineación Arquitectónica**: Conforme a la [Constitution](../../.specify/memory/constitution.md), el [Capítulo 01](../01-analisis-de-sistema/) y los [ADRs 001 al 006](../01-analisis-de-sistema/07-decisiones-arquitectonicas.md)  
 **Estado de Implementación**: **`[DISEÑO DE CÓDIGO PROPUESTO — NO IMPLEMENTADO]`**
 
 ---
 
 ## 1. Propósito y Alcance del Diagrama C4
 
-El **Diagrama de Código (C4)** constituye el máximo nivel de detalle del modelo C4. Desciende al diseño estructural orientado a objetos de un componente crítico dentro de [API Core Backend](03-diagrama-componentes-c3.md): el **Módulo de Reservas e Inventario**.
+El **Diagrama de Código (C4)** constituye el máximo nivel de detalle del modelo C4. Desciende al diseño estructural orientado a objetos de un componente crítico dentro de [API Core Backend](Nivel3-Diagrama-de-Componentes.md): el **Módulo de Reservas e Inventario**.
 
 Este componente ha sido seleccionado como representativo de todo el backend debido a que concentra la mayor tensión arquitectónica del sistema:
 - Gestión de alta concurrencia en aperturas de venta (*spikes* masivos de demanda).
@@ -209,7 +209,7 @@ classDiagram
 
 #### `IReservationsModuleFacade` (Puerto Inbound / Fachada Inter-Módulo)
 - **Tipo**: Puerto Inbound / Contrato de Integración Modular en Memoria.
-- **Responsabilidad**: Expone de manera desacoplada las capacidades del módulo hacia otros módulos del monolito (especialmente el [Módulo Pagos & Facturación](03-diagrama-componentes-c3.md) y el [Módulo Tickets & Emisión](03-diagrama-componentes-c3.md)).
+- **Responsabilidad**: Expone de manera desacoplada las capacidades del módulo hacia otros módulos del monolito (especialmente el [Módulo Pagos & Facturación](Nivel3-Diagrama-de-Componentes.md) y el [Módulo Tickets & Emisión](Nivel3-Diagrama-de-Componentes.md)).
 - **Aislamiento**: No es consumido vía HTTP; se ejecuta mediante inyección de dependencias dentro del mismo proceso Node.js.
 
 #### `ReservationsModuleFacadeImpl` (Implementación de Fachada Inter-Módulo)
@@ -348,7 +348,7 @@ sequenceDiagram
 
 ### 4.2. Límite de Cuatro Entradas y Prevención de Doble Conteo (RN-04)
 
-Para cumplir rigurosamente con la política antirrevendedores ([RN-04](../01-analisis-de-sistema/03-reglas-de-negocio.md#rn-04-límite-de-compra-por-usuario-y-política-antirrevendores)), el sistema calcula la cuota acumulada del titular considerando dos fuentes en base de datos:
+Para cumplir rigurosamente con la política antirrevendedores ([RN-04](../complementos/03-reglas-de-negocio.md#rn-04-tope-máximo-de-entradas-por-asistente)), el sistema calcula la cuota acumulada del titular considerando dos fuentes en base de datos:
 
 $$\text{CuotaAcumulada} = \text{EntradasCompradas (CONFIRMED/ACTIVE)} + \sum_{\text{otras reservas}} \text{Cantidad (PENDING\_PAYMENT con expires\_at} > \text{NOW())}$$
 
@@ -365,7 +365,7 @@ Un riesgo arquitectónico crítico ocurre cuando un usuario completa el pago en 
 Para evitar inconsistencias, **PostgreSQL es la única autoridad de vigencia efectiva** mediante **actualizaciones condicionales atómicas**:
 
 #### Caso A: El Pago se Confirma Antes de la Liberación
-1. El [Módulo Pagos](03-diagrama-componentes-c3.md) invoca `confirmReservationSold(reservationId)` a través de `ReservationsModuleFacadeImpl`.
+1. El [Módulo Pagos](Nivel3-Diagrama-de-Componentes.md) invoca `confirmReservationSold(reservationId)` a través de `ReservationsModuleFacadeImpl`.
 2. Se ejecuta la sentencia transaccional condicional:
    ```sql
    UPDATE reservations 
@@ -396,7 +396,7 @@ Para evitar inconsistencias, **PostgreSQL es la única autoridad de vigencia efe
 
 ## 5. Matriz de Trazabilidad Arquitectónica del Módulo
 
-Alineación formal con los identificadores exactos del [Catálogo de Requisitos Funcionales](../01-analisis-de-sistema/01-requisitos-funcionales.md), los [Requisitos No Funcionales](../01-analisis-de-sistema/02-requisitos-no-funcionales.md), las [Reglas de Negocio](../01-analisis-de-sistema/03-reglas-de-negocio.md) y los [ADRs](../02-arquitectura-software/03-adrs/):
+Alineación formal con los identificadores exactos del [Catálogo de Requisitos Funcionales](../01-analisis-de-sistema/03-requisitos-funcionales.md), los [Atributos de Calidad](../01-analisis-de-sistema/04-atributos-de-calidad.md), las [Reglas de Negocio](../complementos/03-reglas-de-negocio.md) y los [ADRs](../01-analisis-de-sistema/07-decisiones-arquitectonicas.md):
 
 | Código Exacto | Nombre / Tipo de Requisito | Elemento de Diseño en C4 que lo Satisface |
 | :--- | :--- | :--- |

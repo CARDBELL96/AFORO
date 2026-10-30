@@ -2,16 +2,16 @@
 
 **Sistema**: Plataforma de Descubrimiento, Venta y Validación de Entradas para Eventos y Conciertos en Vivo  
 **Contenedor Analizado**: `API Core Backend` (Monolito Modular)  
-**Documento**: `docs/04-modelo-c4/03-diagrama-componentes-c3.md`  
+**Documento**: `docs/04-modelo-c4/Nivel3-Diagrama-de-Componentes.md`  
 **Versión**: `1.1.0` | **Fecha**: `2026-10-21`  
 **Referencia Metodológica**: C4 Model (Simon Brown) & Guía 04 de Arquitectura de Software  
-**Alineación Arquitectónica**: Conforme a la [Constitution](../../.specify/memory/constitution.md), el [Capítulo 01](../01-analisis-de-sistema/) y los [ADRs 001 al 006](../02-arquitectura-software/03-adrs/)
+**Alineación Arquitectónica**: Conforme a la [Constitution](../../.specify/memory/constitution.md), el [Capítulo 01](../01-analisis-de-sistema/) y los [ADRs 001 al 006](../01-analisis-de-sistema/07-decisiones-arquitectonicas.md)
 
 ---
 
 ## 1. Propósito y Alcance del Diagrama C3
 
-El **Diagrama de Componentes (C3)** realiza un *zoom-in* sobre el contenedor central **API Core Backend**, ilustrado en el [Diagrama C2](02-diagrama-contenedores-c2.md). Muestra la organización interna del proceso monolítico en sus seis módulos de dominio cohesivos, detallando el flujo estricto de **Arquitectura Hexagonal (Casos de Uso $\rightarrow$ Puertos de Salida $\rightarrow$ Adaptadores $\rightarrow$ Infraestructura)**, los contratos de fachada inter-módulo, el procesamiento recuperable mediante **Transactional Outbox** y la emisión criptográfica asimétrica.
+El **Diagrama de Componentes (C3)** realiza un *zoom-in* sobre el contenedor central **API Core Backend**, ilustrado en el [Diagrama C2](Nivel2-DiagramadeContenedores.md). Muestra la organización interna del proceso monolítico en sus seis módulos de dominio cohesivos, detallando el flujo estricto de **Arquitectura Hexagonal (Casos de Uso $\rightarrow$ Puertos de Salida $\rightarrow$ Adaptadores $\rightarrow$ Infraestructura)**, los contratos de fachada inter-módulo, el procesamiento recuperable mediante **Transactional Outbox** y la emisión criptográfica asimétrica.
 
 ### Principios Arquitectónicos Fundamentales
 1. **Monolito Modular (ADR-001)**: Los seis módulos coexisten dentro de un **único artefacto ejecutable** en Node.js/TypeScript. No existen llamadas de red inter-módulo ni microservicios.
@@ -199,7 +199,7 @@ Cada módulo implementa de forma rigurosa la separación en tres planos concént
 ---
 
 ### 3.2 Fachadas Públicas de Comunicación Inter-Módulo
-En concordancia con el principio de aislamiento eferente (Principio I de la Constitution y [`ADR-001`](../02-arquitectura-software/03-adrs/ADR-001-seleccion-estilo-monolito-modular.md)):
+En concordancia con el principio de aislamiento eferente (Principio I de la Constitution y [`ADR-001`](../complementos/adrs/ADR-001-seleccion-estilo-monolito-modular.md)):
 - Las capas de dominio de los módulos **tienen terminantemente prohibido importar entidades o servicios internos de otros módulos**.
 - Cuando un módulo requiere datos de otro, consume exclusivamente una **Fachada Pública Tipada** expuesta en la raíz del módulo proveedor:
   - `ICatalogModuleFacade`: Expuesta por Catálogo; consumida por `HoldTicketsUseCase` (Reservas) para obtener la capacidad autorizada por sector sin acceder a las tablas de catálogo.
@@ -245,7 +245,7 @@ Para prevenir el doble ingreso concurrente en molinetes con conectividad online:
 ---
 
 ### 3.5 Criptografía: Puerto de Firma y Custodia en Backend
-En cumplimiento estricto de [`ADR-005`](../02-arquitectura-software/03-adrs/ADR-005-criptografia-entradas-qr.md):
+En cumplimiento estricto de [`ADR-005`](../complementos/adrs/ADR-005-criptografia-entradas-qr.md):
 - El módulo de tickets interactúa con la criptografía a través del puerto de salida `ISignatureService`.
 - La implementación `Ed25519SignatureAdapter` custodia la clave privada por evento ($SK_E$), almacenada en variables de entorno cifradas o servicio KMS seguro en la infraestructura confiable del backend.
 - La clave privada **jamás sale del servidor ni se transmite a clientes frontend**. Las terminales móviles de molinete en AFORO Access reciben únicamente la clave pública ($PK_E$, 32 bytes) para verificación local.

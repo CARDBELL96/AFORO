@@ -103,8 +103,8 @@ Se decide adoptar la **Alternativa C: Firma Digital Asimétrica Ed25519** como e
 
 ## 7. Trazabilidad
 
-- **Requisitos Funcionales**: [`RF-ACC-04`](../01-analisis-de-sistema/01-requisitos-funcionales.md), [`RF-COR-05`](../01-analisis-de-sistema/01-requisitos-funcionales.md).
-- **Requisitos No Funcionales**: [`RNF-SE-01`](../01-analisis-de-sistema/02-requisitos-no-funcionales.md), [`RNF-PE-06`](../01-analisis-de-sistema/02-requisitos-no-funcionales.md).
-- **Reglas de Negocio**: [`RN-06`](../01-analisis-de-sistema/03-reglas-de-negocio.md), [`RN-08`](../01-analisis-de-sistema/03-reglas-de-negocio.md).
-- **Escenarios de Calidad**: [`EAC-05`](../01-analisis-de-sistema/08-escenarios-atributos-calidad.md), [`EAC-06`](../01-analisis-de-sistema/08-escenarios-atributos-calidad.md).
+- **Requisitos Funcionales**: [`RF-ACC-04`](../../01-analisis-de-sistema/03-requisitos-funcionales.md), [`RF-COR-05`](../../01-analisis-de-sistema/03-requisitos-funcionales.md).
+- **Requisitos No Funcionales**: [`RNF-SE-01`](../../01-analisis-de-sistema/04-atributos-de-calidad.md), [`RNF-PE-06`](../../01-analisis-de-sistema/04-atributos-de-calidad.md).
+- **Reglas de Negocio**: [`RN-06`](../03-reglas-de-negocio.md), [`RN-08`](../03-reglas-de-negocio.md).
+- **Escenarios de Calidad**: [`EAC-05`](../../01-analisis-de-sistema/../01-analisis-de-sistema/08-escenarios-atributos-calidad.md), [`EAC-06`](../../01-analisis-de-sistema/../01-analisis-de-sistema/08-escenarios-atributos-calidad.md).
 - **Constitution**: Principio II (Integridad Transaccional y Autenticidad Criptográfica).

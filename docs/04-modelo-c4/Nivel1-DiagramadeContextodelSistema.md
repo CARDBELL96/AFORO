@@ -1,10 +1,10 @@
 # Modelo C4 — Nivel 1: Diagrama de Contexto del Sistema (C1)
 
 **Sistema**: Plataforma de Descubrimiento, Venta y Validación de Entradas para Eventos y Conciertos en Vivo  
-**Documento**: `docs/04-modelo-c4/01-diagrama-contexto-c1.md`  
+**Documento**: `docs/04-modelo-c4/Nivel1-DiagramadeContextodelSistema.md`  
 **Versión**: `1.1.0` | **Fecha**: `2026-10-21`  
 **Referencia Metodológica**: C4 Model (Simon Brown) & Guía 04 de Arquitectura de Software  
-**Alineación Arquitectónica**: Conforme a la [Constitution](../../.specify/memory/constitution.md), el [Capítulo 01](../01-analisis-de-sistema/) y los [ADRs 001 al 006](../02-arquitectura-software/03-adrs/)
+**Alineación Arquitectónica**: Conforme a la [Constitution](../../.specify/memory/constitution.md), el [Capítulo 01](../01-analisis-de-sistema/) y los [ADRs 001 al 006](../01-analisis-de-sistema/07-decisiones-arquitectonicas.md)
 
 ---
 

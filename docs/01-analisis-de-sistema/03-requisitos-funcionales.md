@@ -1,7 +1,7 @@
 # Catálogo de Requisitos Funcionales — AFORO
 
 **Sistema**: Plataforma de Descubrimiento, Venta y Validación de Entradas para Eventos y Conciertos en Vivo  
-**Documento**: `docs/01-analisis-de-sistema/01-requisitos-funcionales.md`  
+**Documento**: `docs/01-analisis-de-sistema/03-requisitos-funcionales.md`  
 **Versión**: `1.1.0` | **Fecha**: `2026-10-21`  
 **Estado del Sistema**: Frontend web verificado y consolidado ([`AFORO Web`](../../src/App.tsx)); aplicaciones especializadas ([`AFORO Studio`](#22-aforo-studio-aplicación-web-de-gestión-para-organizadores-y-promotores), [`AFORO Access`](#23-aforo-access-aplicación-especializada-para-control-de-acceso-y-operadores-de-puerta)) y [`API Core Backend`](#24-api-core-backend-servicios-centrales-del-monolito-modular) en estado de diseño arquitectónico propuesto.
 

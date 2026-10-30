@@ -2,10 +2,10 @@
 
 **Sistema**: Plataforma de Descubrimiento, Venta y Validación de Entradas para Eventos y Conciertos en Vivo  
 **Contenedor**: `API Core Backend` (Monolito Modular) & `AFORO Web` (Frontend SPA)  
-**Documento**: `docs/03-diseno-de-software/01-principios-solid-y-diseno-modular.md`  
+**Documento**: `docs/03-diseño-de-software/diseño-interno/principios-de-diseño.md`  
 **Versión**: `1.1.0` | **Fecha**: `2026-10-21`  
 **Referencia Metodológica**: Guía 04 de Arquitectura y Diseño de Software, Principios de Robert C. Martin (Clean Architecture / SOLID)  
-**Alineación Arquitectónica**: Conforme a la [Constitution](../../.specify/memory/constitution.md), los [ADRs 001 al 006](../02-arquitectura-software/03-adrs/) y el [Modelo C4](../04-modelo-c4/)
+**Alineación Arquitectónica**: Conforme a la [Constitution](../../../.specify/memory/constitution.md), los [ADRs 001 al 006](../../01-analisis-de-sistema/07-decisiones-arquitectonicas.md) y el [Modelo C4](../../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md)
 
 ---
 
@@ -53,10 +53,10 @@ En plataformas de venta de entradas tradicionales, es común encontrar clases o 
 
 #### Decisión Concreta en AFORO
 AFORO fragmenta rigurosamente el ciclo de vida de la compra en componentes con una única razón de cambio:
-- **`SectorInventory` ([Módulo Reservas e Inventario](../04-modelo-c4/04-diagrama-codigo-c4.md))**: Su única razón de cambio es la variación en las reglas matemáticas y de conservación del aforo nominal y sectorial ($S + H \le C$, límite de 4 entradas). No conoce pasarelas de pago, clientes HTTP ni correos electrónicos.
+- **`SectorInventory` ([Módulo Reservas e Inventario](../../04-modelo-c4/Nivel4-DiagramadeCodigo.md))**: Su única razón de cambio es la variación en las reglas matemáticas y de conservación del aforo nominal y sectorial ($S + H \le C$, límite de 4 entradas). No conoce pasarelas de pago, clientes HTTP ni correos electrónicos.
 - **`HoldTicketsUseCase`**: Su única razón de cambio es la política de retención temporal preventiva (orquestación transaccional de 600 segundos).
-- **`ProcessPaymentUseCase` ([Módulo Pagos](../04-modelo-c4/03-diagrama-componentes-c3.md))**: Su única razón de cambio es la interacción de cobro e idempotencia con procesadores de pago externos.
-- **`IssueTicketsUseCase` ([Módulo Tickets](../04-modelo-c4/03-diagrama-componentes-c3.md))**: Su única razón de cambio es la emisión formal y firma digital asimétrica (Ed25519) del ticket una vez confirmado el cobro.
+- **`ProcessPaymentUseCase` ([Módulo Pagos](../../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md))**: Su única razón de cambio es la interacción de cobro e idempotencia con procesadores de pago externos.
+- **`IssueTicketsUseCase` ([Módulo Tickets](../../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md))**: Su única razón de cambio es la emisión formal y firma digital asimétrica (Ed25519) del ticket una vez confirmado el cobro.
 - **`EmailNotificationAdapter`**: Su única razón de cambio son los cambios en plantillas HTML o proveedores de correo transaccional (SendGrid/Resend).
 
 #### Manifestación en el Frontend (`src/`)
@@ -84,7 +84,7 @@ AFORO define puertos de salida abstractos en la capa de aplicación, permitiendo
     verifyWebhookSignature(payload: string, signature: string): boolean;
   }
   ```
-  Para dar soporte a Culqi, Niubiz o Stripe ([ADR-004](../02-arquitectura-software/03-adrs/ADR-004-idempotencia-pagos-webhooks.md)), se desarrollan adaptadores secundarios (`CulqiPaymentAdapter`, `NiubizPaymentAdapter`, `StripePaymentAdapter`).  
+  Para dar soporte a Culqi, Niubiz o Stripe ([ADR-004](../../complementos/adrs/ADR-004-idempotencia-pagos-webhooks.md)), se desarrollan adaptadores secundarios (`CulqiPaymentAdapter`, `NiubizPaymentAdapter`, `StripePaymentAdapter`).  
   **Alcance y Límite de OCP**: La extensibilidad es efectiva siempre y cuando el nuevo proveedor (por ejemplo, Mercado Pago o servicios de transferencias directas) satisfaga los supuestos semánticos del contrato existente (cobro directo o autorización con webhook asíncrono). Si una pasarela impone un flujo fundamentalmente incompatible (como redirecciones de múltiples saltos interactivos o autenticaciones no modeladas), será necesario versionar o ajustar el contrato del puerto y su caso de uso consumidor.
 - **Canales de Notificación (`INotificationService`)**:  
   Permite incorporar notificaciones SMS o mensajería instantánea implementando la interfaz sin tocar la emisión de tickets.
@@ -102,13 +102,13 @@ Crear adaptadores que implementan una interfaz común pero violan las precondici
 - **Adaptadores de Pago e Idempotencia**:  
   Cualquier implementación de `IPaymentGateway` debe preservar el contrato semántico y traducir los errores de los SDKs externos a tipos tipados de dominio.  
   Es fundamental **diferenciar la naturaleza del resultado del pago**:
-  1. *Rechazo Definitivo* (ej. tarjeta bloqueada o fondos insuficientes): Retorna `PaymentDeclinedResult`. La reserva no se cancela inmediatamente de forma destructiva; el usuario conserva la posibilidad de reintentar con otro medio de pago mientras permanezca vigente el TTL de 600 segundos ([RN-03](../01-analisis-de-sistema/03-reglas-de-negocio.md#rn-03-temporalidad-de-la-reserva-preventiva-hold)).
+  1. *Rechazo Definitivo* (ej. tarjeta bloqueada o fondos insuficientes): Retorna `PaymentDeclinedResult`. La reserva no se cancela inmediatamente de forma destructiva; el usuario conserva la posibilidad de reintentar con otro medio de pago mientras permanezca vigente el TTL de 600 segundos ([RN-03](../../complementos/03-reglas-de-negocio.md#rn-03-reserva-temporal-con-expiración-determinista-ttl-de-10-minutos)).
   2. *Fallo Técnico Transitorio* (ej. timeout de red con la pasarela): Retorna `GatewayUnavailableError`. No altera el estado de la reserva, permitiendo reintentos idempotentes mediante la misma `Idempotency-Key`.
   3. *Resultado Incierto o Asíncrono* (ej. procesamiento 3D Secure pendiente): La reserva permanece en `PENDING_PAYMENT` hasta recibir el webhook firmado o alcanzar la expiración natural.
 - **Aislamiento Semántico en Control de Acceso (Online vs. Offline)**:  
   **Los validadores online y offline no son sustitutos de Liskov intercambiables bajo una misma interfaz única.** Sus garantías de consistencia son asimétricas:
   - *Modo Online (`IOnlineAccessValidator`)*: Garantiza unicidad atómica global mutando el estado en PostgreSQL (`ACTIVE → USED`).
-  - *Modo Offline (`IOfflineAccessValidator`)*: Verifica la firma asimétrica del QR y previene el reúso únicamente en el almacenamiento local de la terminal lectora, asumiendo el riesgo inherente de colisión o doble ingreso si dos terminales desconectadas validan el mismo ticket simultáneamente ([ADR-006](../02-arquitectura-software/03-adrs/ADR-006-persistencia-operacion-offline-access.md)).  
+  - *Modo Offline (`IOfflineAccessValidator`)*: Verifica la firma asimétrica del QR y previene el reúso únicamente en el almacenamiento local de la terminal lectora, asumiendo el riesgo inherente de colisión o doble ingreso si dos terminales desconectadas validan el mismo ticket simultáneamente ([ADR-006](../../complementos/adrs/ADR-006-persistencia-operacion-offline-access.md)).  
   Para honrar LSP, AFORO no disfraza estas dos modalidades bajo una interfaz común engañosa, sino que mantiene contratos separados con garantías y limitaciones explícitamente documentadas.
 
 ---
@@ -122,12 +122,12 @@ Crear interfaces generales gigantescas como `IAforoSystemRepository` que agrupen
 
 #### Decisión Concreta en AFORO
 AFORO segrega minuciosamente los puertos e interfaces en contratos específicos de grano fino:
-- **Segregación en el Módulo de Reservas ([C4 Código](../04-modelo-c4/04-diagrama-codigo-c4.md))**:  
+- **Segregación en el Módulo de Reservas ([C4 Código](../../04-modelo-c4/Nivel4-DiagramadeCodigo.md))**:  
   En lugar de mezclar la persistencia relacional con el sistema de alarmas volátiles en una sola interfaz, el módulo define dos puertos independientes:
   - `IReservationUnitOfWork`: Dedicado estrictamente a la delimitación transaccional, bloqueo pesimista `SELECT ... FOR UPDATE` y actualización atómica en PostgreSQL.
   - `ITimerNotifier`: Dedicado exclusivamente al registro de claves temporizadas volátiles en Redis.
 - **Coherencia de la Fachada Pública Inter-Módulo (`IReservationsModuleFacade`)**:  
-  En estricta consonancia con el [Diagrama C4](04-diagrama-codigo-c4.md), la fachada intermodular expone exclusivamente las tres operaciones requeridas por otros módulos del monolito:
+  En estricta consonancia con el [Diagrama C4](../../04-modelo-c4/Nivel4-DiagramadeCodigo.md), la fachada intermodular expone exclusivamente las tres operaciones requeridas por otros módulos del monolito:
   ```typescript
   interface IReservationsModuleFacade {
     getReservationStatus(reservationId: string): ReservationDTO;
@@ -149,7 +149,7 @@ AFORO segrega minuciosamente los puertos e interfaces en contratos específicos 
 Casos de uso de negocio que importan directamente clientes de base de datos (`pg`, `PrismaClient`, `ioredis`), SDKs de terceros (`culqi-node`, `stripe`) o APIs nativas del sistema operativo. Esto acopla la regla de negocio a la tecnología, imposibilitando las pruebas unitarias aisladas y dificultando migraciones de infraestructura.
 
 #### Decisión Concreta en AFORO
-AFORO aplica la **Arquitectura Hexagonal ([ADR-002](../02-arquitectura-software/03-adrs/ADR-002-adopcion-arquitectura-hexagonal.md))** como mecanismo formal para materializar DIP:
+AFORO aplica la **Arquitectura Hexagonal ([ADR-002](../../complementos/adrs/ADR-002-adopcion-arquitectura-hexagonal.md))** como mecanismo formal para materializar DIP:
 - El núcleo de aplicación (`HoldTicketsUseCase`, `ProcessPaymentUseCase`, `IssueTicketsUseCase`) reside en el centro del hexágono y **solo conoce interfaces abstractas** ubicadas en su propia capa (puertos).
 - Los módulos de bajo nivel (`PostgreSQLReservationAdapter`, `RedisTTLTimerAdapter`, `CulqiPaymentAdapter`, `Ed25519SignatureAdapter`) residen en la capa exterior de infraestructura e implementan dichas interfaces.
 - La inyección de dependencias se realiza en el punto de entrada de la aplicación (*Composition Root*), asegurando que el dominio sea 100% independiente de frameworks y bibliotecas de terceros.
@@ -207,7 +207,7 @@ classDiagram
 
 ## 4. Separación de Capas: Dominio, Aplicación y Adaptadores
 
-En coherencia con la **Arquitectura Hexagonal ([ADR-002](../02-arquitectura-software/03-adrs/ADR-002-adopcion-arquitectura-hexagonal.md))**, cada uno de los módulos de API Core se estructura internamente en tres capas concéntricas con fronteras inviolables:
+En coherencia con la **Arquitectura Hexagonal ([ADR-002](../../complementos/adrs/ADR-002-adopcion-arquitectura-hexagonal.md))**, cada uno de los módulos de API Core se estructura internamente en tres capas concéntricas con fronteras inviolables:
 
 ```mermaid
 graph TD
@@ -279,7 +279,7 @@ flowchart LR
 
 ### Reglas de Encapsulamiento Inter-Modular
 1. **Punto Único de Contacto**: Todo módulo expone una única interfaz de fachada (`I<Nombre>ModuleFacade`) que representa el contrato público del módulo hacia el resto del monolito.
-2. **Invocación en Memoria**: Las llamadas inter-módulo son llamadas a métodos locales de TypeScript/Node.js en el mismo proceso; **no utilizan HTTP ni colas de red externas**, eliminando la sobrecarga de red y serialización HTTP inherente a llamadas remotas inter-proceso ([ADR-001](../02-arquitectura-software/03-adrs/ADR-001-seleccion-estilo-monolito-modular.md)).
+2. **Invocación en Memoria**: Las llamadas inter-módulo son llamadas a métodos locales de TypeScript/Node.js en el mismo proceso; **no utilizan HTTP ni colas de red externas**, eliminando la sobrecarga de red y serialización HTTP inherente a llamadas remotas inter-proceso ([ADR-001](../../complementos/adrs/ADR-001-seleccion-estilo-monolito-modular.md)).
 3. **Uso de DTOs Inmutables**: Los parámetros de entrada y salida de las fachadas son objetos de transferencia de datos (`ReservationDTO`, `PaymentConfirmationDTO`). Las entidades internas de dominio (`SectorInventory`, `Reservation`) jamás se exponen fuera del módulo.
 
 ---
@@ -302,19 +302,29 @@ Para asegurar la gobernanza del código y prevenir acoplamientos indeseados, se 
 | **Módulo A** | **Llamada HTTP a Módulo B** | ❌ **PROHIBIDO** | Dentro del monolito modular no se realizan llamadas de red internas redundantes. |
 | **Módulo A $\leftrightarrow$ Módulo B** | **Dependencia Cíclica** | ❌ **PROHIBIDO** | Si A depende de B, B no puede depender de A (requiere inversión con eventos Outbox). |
 
+### 6.1. Gobernanza de Dependencias y Prevención de Acoplamiento Circular (`[DISEÑO PROPUESTO]`)
+
+Para garantizar que las reglas de la matriz anterior se preserven durante la construcción del backend y no se degraden con el tiempo:
+1. **Grafo Acíclico Dirigido (DAG) entre Módulos**:  
+   Las dependencias sincrónicas en memoria fluyen en una sola dirección jerárquica (`Payments` $\rightarrow$ `Reservations` $\rightarrow$ `Catalog`, y `Access` $\rightarrow$ `Tickets`, con `Identity` como servicio transversal base). Cuando un flujo de negocio requiere notificar en sentido inverso o hacia un módulo aguas abajo tras una transacción crítica (como `Payments` $\rightarrow$ `Tickets`), la dependencia directa se rompe empleando eventos persistidos en **Transactional Outbox** (`outbox_events`), eliminando cualquier ciclo $A \leftrightarrow B$.
+2. **Encapsulamiento por Punto de Entrada (`index.ts`)**:  
+   Cada módulo expone hacia el exterior únicamente su archivo barrera (`index.ts`), el cual reexporta la interfaz de su fachada pública (`I<Modulo>ModuleFacade`) y sus DTOs inmutables. Las carpetas internas (`domain/`, `application/use-cases/`, `infrastructure/`) permanecen privadas al módulo.
+3. **Verificación Estática Automatizada**:  
+   En el diseño del pipeline de calidad del backend se contempla la validación estática de importaciones (mediante reglas de `eslint-plugin-boundaries` o `dependency-cruiser`) para bloquear en tiempo de integración continua cualquier importación que atraviese fronteras modulares sin pasar por la fachada pública o que introduzca referencias desde `domain/` hacia capas exteriores.
+
 ---
 
 ## 7. Relación con ADRs y Diagramas C3/C4
 
 El diseño de software consolidado en este documento materializa de manera coherente las decisiones arquitectónicas previas:
 
-- **Con [ADR-001: Selección del Monolito Modular](../02-arquitectura-software/03-adrs/ADR-001-seleccion-estilo-monolito-modular.md)**:  
+- **Con [ADR-001: Selección del Monolito Modular](../../complementos/adrs/ADR-001-seleccion-estilo-monolito-modular.md)**:  
   El diseño utiliza fachadas en memoria (`IReservationsModuleFacade`) para garantizar que la modularidad no imponga sobrecostos de red ni serialización JSON innecesaria.
-- **Con [ADR-002: Adopción de Arquitectura Hexagonal](../02-arquitectura-software/03-adrs/ADR-002-adopcion-arquitectura-hexagonal.md)**:  
+- **Con [ADR-002: Adopción de Arquitectura Hexagonal](../../complementos/adrs/ADR-002-adopcion-arquitectura-hexagonal.md)**:  
   Los principios DIP e ISP se implementan dividiendo cada módulo en núcleo hexagonal, puertos tipados y adaptadores de infraestructura sustituibles.
-- **Con [ADR-003: Concurrencia e Integridad de Inventario](../02-arquitectura-software/03-adrs/ADR-003-concurrencia-integridad-inventario.md)**:  
+- **Con [ADR-003: Concurrencia e Integridad de Inventario](../../complementos/adrs/ADR-003-concurrencia-integridad-inventario.md)**:  
   Se aplica SRP y delimitación transaccional única en `IReservationUnitOfWork`, protegiendo la comprobación de aforo y el bloqueo pesimista en PostgreSQL sin delegar autoridad en Redis.
-- **Con [Diagrama C3 (Componentes)](../04-modelo-c4/03-diagrama-componentes-c3.md) y [Diagrama C4 (Código)](../04-modelo-c4/04-diagrama-codigo-c4.md)**:  
+- **Con [Diagrama C3 (Componentes)](../../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md) y [Diagrama C4 (Código)](../../04-modelo-c4/Nivel4-DiagramadeCodigo.md)**:  
   La separación estructural detallada en el diagrama de clases (`ReservationsController`, `HoldTicketsUseCase`, `SectorInventory`, `IReservationUnitOfWork`, `ReservationsModuleFacadeImpl`) es la plasmación directa en código de los componentes identificados en C3 y C4.
 
 ---
@@ -336,4 +346,4 @@ La aplicación rigurosa de los principios SOLID introduce indiscutibles ventajas
 - **Mitigación en AFORO**: Se aplica OCP e interfaces de puerto exclusivamente donde existe una variabilidad arquitectónica demostrada (múltiples pasarelas de pago, soporte de almacenamiento transaccional vs auxiliar volátil y motores de firma criptográfica).
 
 ### 4. Transacciones Inter-Módulo y Desacoplamiento Asíncrono
-- **Compromiso**: Dentro de un monolito modular es técnicamente posible coordinar transacciones compartidas en una misma base de datos relacional mediante contratos o unidades de trabajo comunes. Sin embargo, en AFORO la adopción del patrón **Transactional Outbox ([ADR-004](../02-arquitectura-software/03-adrs/ADR-004-idempotencia-pagos-webhooks.md))** responde a una decisión arquitectónica deliberada de desacoplamiento temporal, resiliencia ante reinicios del proceso y garantía de emisión idempotente. El compromiso resultante es que la consistencia entre el cobro y la emisión de entradas es eventual y asíncrona, gestionada mediante eventos persistidos y un despachador recuperable.
+- **Compromiso**: Dentro de un monolito modular es técnicamente posible coordinar transacciones compartidas en una misma base de datos relacional mediante contratos o unidades de trabajo comunes. Sin embargo, en AFORO la adopción del patrón **Transactional Outbox ([ADR-004](../../complementos/adrs/ADR-004-idempotencia-pagos-webhooks.md))** responde a una decisión arquitectónica deliberada de desacoplamiento temporal, resiliencia ante reinicios del proceso y garantía de emisión idempotente. El compromiso resultante es que la consistencia entre el cobro y la emisión de entradas es eventual y asíncrona, gestionada mediante eventos persistidos y un despachador recuperable.

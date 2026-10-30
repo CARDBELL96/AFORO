@@ -82,8 +82,8 @@ El sistema se diseñará como un único servicio en Node.js/TypeScript orquestad
 
 ## 7. Trazabilidad
 
-- **Requisitos Funcionales**: [`RF-COR-01` al `RF-COR-07`](../01-analisis-de-sistema/01-requisitos-funcionales.md).
-- **Requisitos No Funcionales**: [`RNF-MA-01`](../01-analisis-de-sistema/02-requisitos-no-funcionales.md), [`RNF-MA-02`](../01-analisis-de-sistema/02-requisitos-no-funcionales.md), [`RNF-PE-04`](../01-analisis-de-sistema/02-requisitos-no-funcionales.md), [`RNF-PE-05`](../01-analisis-de-sistema/02-requisitos-no-funcionales.md).
-- **Reglas de Negocio**: [`RN-01`](../01-analisis-de-sistema/03-reglas-de-negocio.md), [`RN-03`](../01-analisis-de-sistema/03-reglas-de-negocio.md).
-- **Escenarios de Calidad**: [`EAC-01`](../01-analisis-de-sistema/08-escenarios-atributos-calidad.md), [`EAC-02`](../01-analisis-de-sistema/08-escenarios-atributos-calidad.md).
+- **Requisitos Funcionales**: [`RF-COR-01` al `RF-COR-07`](../../01-analisis-de-sistema/03-requisitos-funcionales.md).
+- **Requisitos No Funcionales**: [`RNF-MA-01`](../../01-analisis-de-sistema/04-atributos-de-calidad.md), [`RNF-MA-02`](../../01-analisis-de-sistema/04-atributos-de-calidad.md), [`RNF-PE-04`](../../01-analisis-de-sistema/04-atributos-de-calidad.md), [`RNF-PE-05`](../../01-analisis-de-sistema/04-atributos-de-calidad.md).
+- **Reglas de Negocio**: [`RN-01`](../03-reglas-de-negocio.md), [`RN-03`](../03-reglas-de-negocio.md).
+- **Escenarios de Calidad**: [`EAC-01`](../../01-analisis-de-sistema/../01-analisis-de-sistema/08-escenarios-atributos-calidad.md), [`EAC-02`](../../01-analisis-de-sistema/../01-analisis-de-sistema/08-escenarios-atributos-calidad.md).
 - **Constitution**: Principio I (Modularidad y Desacoplamiento Arquitectónico).

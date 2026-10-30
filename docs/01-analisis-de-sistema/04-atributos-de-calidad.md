@@ -1,7 +1,7 @@
 # Requisitos No Funcionales — AFORO (Alineados a ISO/IEC 25010)
 
 **Sistema**: Plataforma de Descubrimiento, Venta y Validación de Entradas para Eventos y Conciertos en Vivo  
-**Documento**: `docs/01-analisis-de-sistema/02-requisitos-no-funcionales.md`  
+**Documento**: `docs/01-analisis-de-sistema/04-atributos-de-calidad.md`  
 **Norma de Referencia**: ISO/IEC 25010:2011 — Modelo de Calidad del Producto de Software  
 **Versión**: `1.1.0` | **Fecha**: `2026-10-21`
 

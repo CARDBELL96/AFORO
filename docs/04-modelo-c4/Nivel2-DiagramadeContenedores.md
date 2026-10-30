@@ -1,10 +1,10 @@
 # Modelo C4 — Nivel 2: Diagrama de Contenedores de Software (C2)
 
 **Sistema**: Plataforma de Descubrimiento, Venta y Validación de Entradas para Eventos y Conciertos en Vivo  
-**Documento**: `docs/04-modelo-c4/02-diagrama-contenedores-c2.md`  
+**Documento**: `docs/04-modelo-c4/Nivel2-DiagramadeContenedores.md`  
 **Versión**: `1.1.0` | **Fecha**: `2026-10-21`  
 **Referencia Metodológica**: C4 Model (Simon Brown) & Guía 04 de Arquitectura de Software  
-**Alineación Arquitectónica**: Conforme a la [Constitution](../../.specify/memory/constitution.md), el [Capítulo 01](../01-analisis-de-sistema/) y los [ADRs 001 al 006](../02-arquitectura-software/03-adrs/)
+**Alineación Arquitectónica**: Conforme a la [Constitution](../../.specify/memory/constitution.md), el [Capítulo 01](../01-analisis-de-sistema/) y los [ADRs 001 al 006](../01-analisis-de-sistema/07-decisiones-arquitectonicas.md)
 
 ---
 
@@ -123,7 +123,7 @@ flowchart TD
   - Configuración espacial de recintos y fijación de aforos máximos (`RF-STU-03`).
   - Programación de fases de venta y precios (`RF-STU-04`).
   - Tablero de control de ocupación en vivo (`RF-STU-05`).
-  - *Visión Conceptual Futura (AFORO Creative AI)*: Generación asistida de configuraciones estéticas declarativas (paletas y estilos de cartelera) para su renderizado seguro en AFORO Web, sin ejecución de código arbitrario ni alteración de reglas financieras (`01-drivers-y-restricciones.md`).
+  - *Visión Conceptual Futura (AFORO Creative AI)*: Generación asistida de configuraciones estéticas declarativas (paletas y estilos de cartelera) para su renderizado seguro en AFORO Web, sin ejecución de código arbitrario ni alteración de reglas financieras (`../01-analisis-de-sistema/06-driver-arquitectonicos.md`).
 - **Estado de Realidad Técnica**: **`[DISEÑO PROPUESTO]`**.
 
 #### C2-03: AFORO Access (PWA para Control de Accesos)
@@ -143,7 +143,7 @@ flowchart TD
 
 #### C2-04: API Core Backend (Monolito Modular)
 - **Tecnología Planificada**: Node.js, TypeScript, contenedor Docker.
-- **Estructura Interna ([`ADR-001`](../02-arquitectura-software/03-adrs/ADR-001-seleccion-estilo-monolito-modular.md), [`ADR-002`](../02-arquitectura-software/03-adrs/ADR-002-adopcion-arquitectura-hexagonal.md))**:
+- **Estructura Interna ([`ADR-001`](../complementos/adrs/ADR-001-seleccion-estilo-monolito-modular.md), [`ADR-002`](../complementos/adrs/ADR-002-adopcion-arquitectura-hexagonal.md))**:
   Un único proceso monolítico modular organizado en seis módulos bajo Arquitectura Hexagonal:
   1. `modules/catalog`: Gestión editorial de conciertos y recintos (`RF-COR-01`).
   2. `modules/reservations`: Bloqueo transaccional de aforo e inserción atómica de reserva con TTL de 10 minutos (`RF-COR-02`, `RN-01`, `RN-03`, `ADR-003`).
@@ -159,8 +159,8 @@ flowchart TD
 
 #### C2-05: Base de Datos Relacional (PostgreSQL)
 - **Tecnología**: PostgreSQL.
-- **Rol Crítico**: **Única Fuente de Verdad** para aforos, disponibilidad por sector, vigencia efectiva de reservas y emisión de boletos (`02-seleccion-y-justificacion-arquitectonica.md`).
-- **Estrategia Transaccional ([`ADR-003`](../02-arquitectura-software/03-adrs/ADR-003-concurrencia-inventario.md))**:
+- **Rol Crítico**: **Única Fuente de Verdad** para aforos, disponibilidad por sector, vigencia efectiva de reservas y emisión de boletos (`../02-arquitectura-software/estilo-arquitectonico.md`).
+- **Estrategia Transaccional ([`ADR-003`](../complementos/adrs/ADR-003-concurrencia-integridad-inventario.md))**:
   - Transacciones bajo `READ COMMITTED` con bloqueo pesimista a nivel de fila (`SELECT ... FOR UPDATE`) sobre el sector solicitado.
   - Comprobación del invariante de capacidad ($\text{Sold} + \text{ActiveHolds} + \text{Qty} \le \text{Capacity}$) e inserción de la reserva **dentro de la misma transacción atómica**.
   - La vigencia efectiva de las reservas temporales la determina la base de datos comparando las marcas de tiempo transaccionales.

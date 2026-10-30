@@ -2,10 +2,10 @@
 
 **Sistema**: Plataforma de Descubrimiento, Venta y Validación de Entradas para Eventos y Conciertos en Vivo  
 **Contenedor**: `API Core Backend` (Monolito Modular) & Clientes del Ecosistema (`AFORO Web`, `AFORO Studio`, `AFORO Access`)  
-**Documento**: `docs/03-diseno-de-software/02-patrones-de-diseno.md`  
+**Documento**: `docs/03-diseño-de-software/diseño-interno/patrones-de-diseño.md`  
 **Versión**: `1.1.0` | **Fecha**: `2026-10-21`  
 **Referencia Metodológica**: Guía 04 de Arquitectura de Software, Patrones de Arquitectura y Diseño Empresarial (Erich Gamma et al., Martin Fowler)  
-**Alineación Arquitectónica**: Conforme a la [Constitution](../../.specify/memory/constitution.md), los [ADRs 001 al 006](../02-arquitectura-software/03-adrs/) y el [Modelo C4](../04-modelo-c4/)
+**Alineación Arquitectónica**: Conforme a la [Constitution](../../../.specify/memory/constitution.md), los [ADRs 001 al 006](../../01-analisis-de-sistema/07-decisiones-arquitectonicas.md) y el [Modelo C4](../../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md)
 
 ---
 
@@ -21,8 +21,8 @@ El presente documento especifica el catálogo de **patrones de diseño de softwa
 > [!IMPORTANT]
 > **Declaración de Realidad Técnica**:  
 > Conforme al Principio IV de la Constitución del proyecto:  
-> - Los patrones vinculados al backend ([API Core](01-principios-solid-y-diseno-modular.md)) corresponden a un **`[DISEÑO PROPUESTO — NO IMPLEMENTADO]`**.  
-> - En el frontend ([AFORO Web SPA](../../src/App.tsx)), ciertos patrones se encuentran **`[IMPLEMENTADO EN WEB]`** (como Adaptadores y provisión de contexto) o **`[DEMO / SIMULADO]`** (como el flujo simulado de pago y reserva en cliente).
+> - Los patrones vinculados al backend ([API Core](principios-de-diseño.md)) corresponden a un **`[DISEÑO PROPUESTO — NO IMPLEMENTADO]`**.  
+> - En el frontend ([AFORO Web SPA](../../../src/App.tsx)), ciertos patrones se encuentran **`[IMPLEMENTADO EN WEB]`** (como Adaptadores y provisión de contexto) o **`[DEMO / SIMULADO]`** (como el flujo simulado de pago y reserva en cliente).
 
 ---
 
@@ -76,7 +76,7 @@ classDiagram
 Acoplamiento directo entre la lógica de negocio y las consultas SQL relacionales, fragmentando las sentencias de base de datos a lo largo de controladores o servicios y dificultando la creación de pruebas unitarias sin dependencias de infraestructura.
 
 #### Contexto dentro de AFORO
-Se aplica en todos los módulos de dominio de API Core que requieren persistir o consultar colecciones de entidades: Catálogo ([`ICatalogRepository`](../04-modelo-c4/03-diagrama-componentes-c3.md)), Tickets ([`ITicketRepository`](../04-modelo-c4/03-diagrama-componentes-c3.md)), Pagos ([`IPaymentRepository`](../04-modelo-c4/03-diagrama-componentes-c3.md)) y Accesos ([`IAccessRepository`](../04-modelo-c4/03-diagrama-componentes-c3.md)).
+Se aplica en todos los módulos de dominio de API Core que requieren persistir o consultar colecciones de entidades: Catálogo ([`ICatalogRepository`](../../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md)), Tickets ([`ITicketRepository`](../../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md)), Pagos ([`IPaymentRepository`](../../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md)) y Accesos ([`IAccessRepository`](../../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md)).
 
 #### Componentes Participantes
 - **Puerto de Salida (`ICatalogRepository`, `ITicketRepository`)**: Define la interfaz abstracta orientada a colección de objetos (`findById`, `save`, `findUpcoming`).
@@ -91,10 +91,10 @@ El caso de uso invoca métodos con semántica de colección de dominio (ej. `cat
 - **Compromisos**: Introduce código de traducción entre filas de bases de datos relacionales y entidades de dominio (*data mapping overhead*), que debe mantenerse sincronizado con el esquema.
 
 #### Relación con ADRs y C3/C4
-- Conforme a [ADR-002 (Arquitectura Hexagonal)](../02-arquitectura-software/03-adrs/ADR-002-adopcion-arquitectura-hexagonal.md) y visible en los seis módulos del [Diagrama C3 (Componentes)](../04-modelo-c4/03-diagrama-componentes-c3.md).
+- Conforme a [ADR-002 (Arquitectura Hexagonal)](../../complementos/adrs/ADR-002-adopcion-arquitectura-hexagonal.md) y visible en los seis módulos del [Diagrama C3 (Componentes)](../../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md).
 
 #### Estado Real de Implementación
-- **`[DISEÑO PROPUESTO — NO IMPLEMENTADO]`**: En el estado actual del repositorio, los eventos y sectores del catálogo web se cargan desde un archivo estático en cliente ([`src/data/mockEvents.ts`](../../src/data/mockEvents.ts)).
+- **`[DISEÑO PROPUESTO — NO IMPLEMENTADO]`**: En el estado actual del repositorio, los eventos y sectores del catálogo web se cargan desde un archivo estático en cliente ([`src/data/events.ts`](../../../src/data/events.ts)).
 
 ---
 
@@ -127,7 +127,7 @@ sequenceDiagram
 Dispersión transaccional y riesgo de operaciones parciales o condiciones de carrera concurrentes al actualizar múltiples registros relacionados (reserva temporal y contadores de inventario sectorial) en la base de datos.
 
 #### Contexto dentro de AFORO
-Concentrado exclusivamente en el [Módulo Reservas e Inventario](../04-modelo-c4/04-diagrama-codigo-c4.md) para garantizar la regla de oro: la adquisición del bloqueo de fila, la consulta de cupos, la comprobación de límites por comprador y la persistencia del *hold* deben ejecutarse dentro de **una única e indivisible transacción relacional en PostgreSQL sobre la misma conexión**.
+Concentrado exclusivamente en el [Módulo Reservas e Inventario](../../04-modelo-c4/Nivel4-DiagramadeCodigo.md) para garantizar la regla de oro: la adquisición del bloqueo de fila, la consulta de cupos, la comprobación de límites por comprador y la persistencia del *hold* deben ejecutarse dentro de **una única e indivisible transacción relacional en PostgreSQL sobre la misma conexión**.
 
 #### Componentes Participantes
 - **Puerto Outbound (`IReservationUnitOfWork`)**: Expone el método de delimitación `executeInTransaction(work)` y las operaciones atómicas asociadas sobre el contexto transaccional (`findSectorInventoryWithLock`, `countAccumulatedByHolder`, `saveHoldAndInventoryAtomic`, `transitionHoldConditionally`).
@@ -138,7 +138,7 @@ Concentrado exclusivamente en el [Módulo Reservas e Inventario](../04-modelo-c4
 El caso de uso llama a `executeInTransaction(async (txContext) => { ... })`. El adaptador adquiere una conexión del pool y abre una transacción en PostgreSQL bajo nivel de aislamiento `READ COMMITTED`. Dentro de esa misma conexión y transacción:
 1. Adquiere el bloqueo pesimista `SELECT ... FOR UPDATE` sobre la fila del sector.
 2. Consulta las entradas previamente acumuladas por el titular en dicho sector.
-3. Carga el agregado `SectorInventory` y comprueba las reglas de negocio ([RN-01](../01-analisis-de-sistema/03-reglas-de-negocio.md#rn-01-conservación-estricta-del-aforo-global-y-sectorial) y [RN-04](../01-analisis-de-sistema/03-reglas-de-negocio.md#rn-04-límite-de-compra-por-usuario-y-política-antirrevendores)).
+3. Carga el agregado `SectorInventory` y comprueba las reglas de negocio ([RN-01](../../complementos/03-reglas-de-negocio.md#rn-01-invariante-estricta-de-no-sobreventa-aforo-inviolable) y [RN-04](../../complementos/03-reglas-de-negocio.md#rn-04-tope-máximo-de-entradas-por-asistente)).
 4. Inserta la reserva y actualiza los contadores de inventario.
 Si todo el callback concluye sin errores, el adaptador ejecuta `COMMIT`; si ocurre una excepción de dominio (ej. aforo superado o cuota excedida), se ejecuta `ROLLBACK` total y se libera la conexión al pool.
 
@@ -147,10 +147,10 @@ Si todo el callback concluye sin errores, el adaptador ejecuta `COMMIT`; si ocur
 - **Compromisos**: Mantiene un bloqueo de fila durante la transacción. Para mitigar la contención, la transacción debe ser ultracorta (sin llamadas de red externas, pasarelas ni Redis dentro de la transacción SQL).
 
 #### Relación con ADRs y C3/C4
-- Base fundamental de [ADR-003 (Concurrencia e Integridad de Inventario)](../02-arquitectura-software/03-adrs/ADR-003-concurrencia-integridad-inventario.md) y centro del diseño en [C4 Código](../04-modelo-c4/04-diagrama-codigo-c4.md).
+- Base fundamental de [ADR-003 (Concurrencia e Integridad de Inventario)](../../complementos/adrs/ADR-003-concurrencia-integridad-inventario.md) y centro del diseño en [C4 Código](../../04-modelo-c4/Nivel4-DiagramadeCodigo.md).
 
 #### Estado Real de Implementación
-- **`[DISEÑO PROPUESTO — NO IMPLEMENTADO]`**: En el frontend web actual la reserva opera como simulación en memoria del cliente ([`src/components/TicketPicker.tsx`](../../src/components/TicketPicker.tsx)).
+- **`[DISEÑO PROPUESTO — NO IMPLEMENTADO]`**: En el estado actual del repositorio, la reserva opera como simulación en memoria del cliente ([`src/components/TicketPicker.tsx`](../../../src/components/TicketPicker.tsx)).
 
 ---
 
@@ -185,7 +185,7 @@ El acoplamiento del software a frameworks web específicos (Express/Fastify), li
 #### Contexto dentro de AFORO
 Aplica en la totalidad de la frontera del sistema AFORO (estilo Hexagonal):
 - **Adaptadores Primarios (Entrada)**: Controladores HTTP que reciben JSON, validan esquemas y despachan hacia casos de uso.
-- **Adaptadores Secundarios (Salida)**: Implementaciones técnicas para PostgreSQL, Redis, firmas asimétricas Ed25519 ([ADR-005](../02-arquitectura-software/03-adrs/ADR-005-criptografia-entradas-qr.md)) y pasarelas de pago ([ADR-004](../02-arquitectura-software/03-adrs/ADR-004-idempotencia-pagos-webhooks.md)).
+- **Adaptadores Secundarios (Salida)**: Implementaciones técnicas para PostgreSQL, Redis, firmas asimétricas Ed25519 ([ADR-005](../../complementos/adrs/ADR-005-criptografia-entradas-qr.md)) y pasarelas de pago ([ADR-004](../../complementos/adrs/ADR-004-idempotencia-pagos-webhooks.md)).
 
 #### Componentes Participantes
 - **Puertos (Interfaces de Dominio/Aplicación)**: `IReservationUnitOfWork`, `ITimerNotifier`, `ISignatureService`, `IPaymentGateway`.
@@ -200,10 +200,10 @@ Los adaptadores primarios absorben las peculiaridades del protocolo HTTP (cabece
 - **Compromisos**: Requiere escribir capas de adaptación para cada componente externo, aumentando el número total de clases del proyecto.
 
 #### Relación con ADRs y C3/C4
-- Pilar de [ADR-002 (Arquitectura Hexagonal)](../02-arquitectura-software/03-adrs/ADR-002-adopcion-arquitectura-hexagonal.md) y visible en [C3 Componentes](../04-modelo-c4/03-diagrama-componentes-c3.md) y [C4 Código](../04-modelo-c4/04-diagrama-codigo-c4.md).
+- Pilar de [ADR-002 (Arquitectura Hexagonal)](../../complementos/adrs/ADR-002-adopcion-arquitectura-hexagonal.md) y visible en [C3 Componentes](../../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md) y [C4 Código](../../04-modelo-c4/Nivel4-DiagramadeCodigo.md).
 
 #### Estado Real de Implementación
-- **En Frontend**: **`[IMPLEMENTADO EN WEB]`**. Enrutador desacoplado ([`src/router.tsx`](../../src/router.tsx)) que adapta la API nativa del navegador a componentes React, y almacén de estado persistente ([`src/lib/store.tsx`](../../src/lib/store.tsx)) que adapta eventos nativos `storage`.
+- **En Frontend**: **`[IMPLEMENTADO EN WEB]`**. Enrutador desacoplado ([`src/router.tsx`](../../../src/router.tsx)) que adapta la API nativa del navegador a componentes React, y almacén de estado persistente ([`src/lib/store.tsx`](../../../src/lib/store.tsx)) que adapta eventos nativos `storage`.
 - **En Backend**: **`[DISEÑO PROPUESTO — NO IMPLEMENTADO]`**.
 
 ---
@@ -236,7 +236,7 @@ flowchart LR
 Degeneración del monolito modular en un sistema fuertemente acoplado (*Big Ball of Mud*), donde los casos de uso de un módulo importan directamente repositorios, entidades o esquemas de base de datos de otros módulos.
 
 #### Contexto dentro de AFORO
-Regula la comunicación entre los seis módulos cohesivos de API Core dentro del mismo proceso Node.js ([ADR-001](../02-arquitectura-software/03-adrs/ADR-001-seleccion-estilo-monolito-modular.md)):
+Regula la comunicación entre los seis módulos cohesivos de API Core dentro del mismo proceso Node.js ([ADR-001](../../complementos/adrs/ADR-001-seleccion-estilo-monolito-modular.md)):
 - El Módulo Pagos necesita conocer el estado de la reserva y confirmarla tras el cobro sin acceder a la tabla `reservations`.
 - El Módulo Tickets consulta datos del evento a través de la fachada de Catálogo sin acceder a la tabla `events`.
 
@@ -253,7 +253,7 @@ Cuando el Módulo de Pagos confirma un cobro, invoca `reservationsFacade.confirm
 - **Compromisos**: Exige definir y mantener DTOs públicos para no exponer entidades internas de dominio.
 
 #### Relación con ADRs y C3/C4
-- Directamente alineado con [ADR-001 (Monolito Modular)](../02-arquitectura-software/03-adrs/ADR-001-seleccion-estilo-monolito-modular.md), [C3 Componentes](../04-modelo-c4/03-diagrama-componentes-c3.md) y [C4 Código](../04-modelo-c4/04-diagrama-codigo-c4.md).
+- Directamente alineado con [ADR-001 (Monolito Modular)](../../complementos/adrs/ADR-001-seleccion-estilo-monolito-modular.md), [C3 Componentes](../../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md) y [C4 Código](../../04-modelo-c4/Nivel4-DiagramadeCodigo.md).
 
 #### Estado Real de Implementación
 - **`[DISEÑO PROPUESTO — NO IMPLEMENTADO]`**.
@@ -306,7 +306,7 @@ classDiagram
 Manejo de múltiples pasarelas de pago y medios de recaudación (Culqi, Niubiz, Stripe) sin condicionar el flujo de negocio con bloques condicionales `if/switch` dispersos por el código, permitiendo seleccionar el proveedor adecuado según la configuración comercial del evento.
 
 #### Contexto dentro de AFORO
-Módulo de Pagos & Facturación ([ADR-004](../02-arquitectura-software/03-adrs/ADR-004-idempotencia-pagos-webhooks.md)), donde un concierto puede requerir procesamiento con pasarelas locales peruanas (Culqi o Niubiz) o pasarelas internacionales (Stripe) dependiendo del tipo de evento y moneda.
+Módulo de Pagos & Facturación ([ADR-004](../../complementos/adrs/ADR-004-idempotencia-pagos-webhooks.md)), donde un concierto puede requerir procesamiento con pasarelas locales peruanas (Culqi o Niubiz) o pasarelas internacionales (Stripe) dependiendo del tipo de evento y moneda.
 
 #### Componentes Participantes
 - **Estrategia Común (`IPaymentGateway`)**: Contrato unificado que define las operaciones `charge()`, `verifyWebhookSignature()` y `queryPaymentStatus()`.
@@ -323,10 +323,10 @@ Módulo de Pagos & Facturación ([ADR-004](../02-arquitectura-software/03-adrs/A
 - **Compromisos**: La intercambiabilidad está condicionada a que los proveedores compartan modelos de interacción compatibles; pasarelas con flujos asíncronos complejos o múltiples pasos interactivos pueden requerir extensiones en la interfaz.
 
 #### Relación con ADRs y C3/C4
-- Conforme a [ADR-004 (Idempotencia en Pagos y Webhooks)](../02-arquitectura-software/03-adrs/ADR-004-idempotencia-pagos-webhooks.md) y visible en [C3 Componentes](../04-modelo-c4/03-diagrama-componentes-c3.md).
+- Conforme a [ADR-004 (Idempotencia en Pagos y Webhooks)](../../complementos/adrs/ADR-004-idempotencia-pagos-webhooks.md) y visible en [C3 Componentes](../../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md).
 
 #### Estado Real de Implementación
-- **En Frontend**: **`[DEMO / SIMULADO]`**. El selector visual de medios de pago en la pasarela simulada del cliente ([`src/components/TicketPicker.tsx`](../../src/components/TicketPicker.tsx)) genera entradas con estado `ACTIVA_DEMO`.
+- **En Frontend**: **`[DEMO / SIMULADO]`**. El selector visual de medios de pago en la pasarela simulada del cliente ([`src/components/TicketPicker.tsx`](../../../src/components/TicketPicker.tsx)) genera entradas con estado `ACTIVA_DEMO`.
 - **En Backend**: **`[DISEÑO PROPUESTO — NO IMPLEMENTADO]`**.
 
 ---
@@ -365,7 +365,7 @@ sequenceDiagram
 Pérdida de eventos de negocio críticos ante reinicios del servidor. Si tras confirmar el cobro en la pasarela el sistema intenta emitir las entradas mediante un evento volátil en memoria y el proceso se reinicia abruptamente en ese instante, el dinero fue cobrado pero el usuario jamás recibe sus tickets (*ghost charge*).
 
 #### Contexto dentro de AFORO
-Interconexión entre el Módulo de Pagos & Facturación y el Módulo de Tickets & Emisión dentro del monolito modular. Garantiza la emisión de los boletos digitales tras cada pago exitoso sin recurrir a middlewares externos de mensajería (como Kafka o RabbitMQ) que excederían la justificación operativa del sistema ([ADR-001](../02-arquitectura-software/03-adrs/ADR-001-seleccion-estilo-monolito-modular.md)).
+Interconexión entre el Módulo de Pagos & Facturación y el Módulo de Tickets & Emisión dentro del monolito modular. Garantiza la emisión de los boletos digitales tras cada pago exitoso sin recurrir a middlewares externos de mensajería (como Kafka o RabbitMQ) que excederían la justificación operativa del sistema ([ADR-001](../../complementos/adrs/ADR-001-seleccion-estilo-monolito-modular.md)).
 
 #### Componentes Participantes
 - **Tabla Relacional (`outbox_events` en PostgreSQL)**: Almacena los eventos de dominio persistidos de forma transaccional.
@@ -383,7 +383,7 @@ Interconexión entre el Módulo de Pagos & Facturación y el Módulo de Tickets 
 - **Compromisos**: Consistencia eventual entre el cobro y la emisión; requiere control de reintentos con retroceso exponencial (*exponential backoff*) y lógica de deduplicación en el receptor.
 
 #### Relación con ADRs y C3/C4
-- Base de [ADR-001 (Monolito Modular)](../02-arquitectura-software/03-adrs/ADR-001-seleccion-estilo-monolito-modular.md), [ADR-004 (Idempotencia)](../02-arquitectura-software/03-adrs/ADR-004-idempotencia-pagos-webhooks.md) y visible explícitamente en [C3 Componentes](../04-modelo-c4/03-diagrama-componentes-c3.md).
+- Base de [ADR-001 (Monolito Modular)](../../complementos/adrs/ADR-001-seleccion-estilo-monolito-modular.md), [ADR-004 (Idempotencia)](../../complementos/adrs/ADR-004-idempotencia-pagos-webhooks.md) y visible explícitamente en [C3 Componentes](../../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md).
 
 #### Estado Real de Implementación
 - **`[DISEÑO PROPUESTO — NO IMPLEMENTADO]`**.
@@ -434,14 +434,14 @@ Para evitar condiciones de carrera, **no se realiza una comprobación previa med
 3. Si la inserción produce conflicto (0 filas retornadas), se consulta el estado actual:
    - Si está en `PROCESSING`, se responde con rechazo temporal de concurrencia (`409 Conflict`).
    - Si está en `SUCCEEDED`, se entrega la respuesta persistida sin reejecutar la lógica de cobro ni emisión.
-4. **Política de Retención**: Se adopta el plazo provisional de **72 horas** formalizado en [ADR-004](../02-arquitectura-software/03-adrs/ADR-004-idempotencia-pagos-webhooks.md) para la purga periódica de claves de idempotencia resueltas.
+4. **Política de Retención**: Se adopta el plazo provisional de **72 horas** formalizado en [ADR-004](../../complementos/adrs/ADR-004-idempotencia-pagos-webhooks.md) para la purga periódica de claves de idempotencia resueltas.
 
 #### Ventajas y Compromisos
 - **Ventajas**: Mitiga el riesgo de cobros duplicados y generación redundante de tickets ante reintentos automáticos.
 - **Compromisos**: Exige almacenamiento adicional y un proceso periódico de mantenimiento para depurar registros después de la ventana de 72 horas.
 
 #### Relación con ADRs y C3/C4
-- Conforme a [ADR-004 (Idempotencia en Pagos y Webhooks)](../02-arquitectura-software/03-adrs/ADR-004-idempotencia-pagos-webhooks.md) y [C3 Componentes](../04-modelo-c4/03-diagrama-componentes-c3.md).
+- Conforme a [ADR-004 (Idempotencia en Pagos y Webhooks)](../../complementos/adrs/ADR-004-idempotencia-pagos-webhooks.md) y [C3 Componentes](../../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md).
 
 #### Estado Real de Implementación
 - **`[DISEÑO PROPUESTO — NO IMPLEMENTADO]`**.
@@ -477,7 +477,7 @@ flowchart TD
 El acoplamiento directo provocado por la instanciación de clases con la palabra reservada `new` dentro de la lógica de negocio, lo que impediría sustituir componentes de infraestructura, dificultaría la configuración centralizada y obstaculizaría las pruebas unitarias aisladas.
 
 #### Contexto dentro de AFORO
-Aplica como principio de diseño tanto en la arquitectura proyectada para API Core como en la provisión de estado en el frontend web ([`src/lib/store.tsx`](../../src/lib/store.tsx)).
+Aplica como principio de diseño tanto en la arquitectura proyectada para API Core como en la provisión de estado en el frontend web ([`src/lib/store.tsx`](../../../src/lib/store.tsx)).
 
 #### Componentes Participantes
 - **Punto de Composición Proyectado (*Composition Root*)**: Archivo central de inicialización del backend (`src/server.ts` o `src/container.ts`, planificado para la construcción del backend), responsable de instanciar los clientes de PostgreSQL y Redis, cablear los adaptadores secundarios hacia los casos de uso y entregar estos a los adaptadores primarios.
@@ -498,14 +498,14 @@ Durante el arranque de la aplicación, el punto de composición instancia `Postg
 
 #### Diferenciación Frontend vs. Backend
 - **En Backend (`[DISEÑO PROPUESTO]`)**: Inyección de dependencias estricta por constructor a nivel de clases e interfaces tipadas.
-- **En Frontend (`[IMPLEMENTADO EN WEB]`)**: Se utiliza la API de React Context mediante el componente proveedor [`StoreProvider`](../../src/lib/store.tsx). Este mecanismo resuelve la **provisión de dependencias y estado** a lo largo del árbol de componentes de la interfaz de usuario, compartiendo el carrito, los eventos guardados y los pases digitales simulados de forma declarativa, sin constituir una inyección por constructor de clases.
+- **En Frontend (`[IMPLEMENTADO EN WEB]`)**: Se utiliza la API de React Context mediante el componente proveedor [`StoreProvider`](../../../src/lib/store.tsx). Este mecanismo resuelve la **provisión de dependencias y estado** a lo largo del árbol de componentes de la interfaz de usuario, compartiendo el carrito, los eventos guardados y los pases digitales simulados de forma declarativa, sin constituir una inyección por constructor de clases.
 
 #### Ventajas y Compromisos
 - **Ventajas**: Grafo de dependencias explícito y tipado en tiempo de compilación; desacoplamiento estructural sin depender de frameworks de inyección invasivos o basados en metadatos y reflexión en tiempo de ejecución.
 - **Compromisos**: Exige mantener manualmente el cableado de dependencias a medida que se incorporan nuevos módulos y casos de uso.
 
 #### Relación con ADRs y C3/C4
-- Base estructural de [ADR-002 (Arquitectura Hexagonal)](../02-arquitectura-software/03-adrs/ADR-002-adopcion-arquitectura-hexagonal.md) y modelado en [C4 Código](../04-modelo-c4/04-diagrama-codigo-c4.md).
+- Base estructural de [ADR-002 (Arquitectura Hexagonal)](../../complementos/adrs/ADR-002-adopcion-arquitectura-hexagonal.md) y modelado en [C4 Código](../../04-modelo-c4/Nivel4-DiagramadeCodigo.md).
 
 #### Estado Real de Implementación
 - **En Frontend**: **`[IMPLEMENTADO EN WEB]`** (vía React Context en `src/lib/store.tsx`).
