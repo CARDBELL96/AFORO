@@ -16,22 +16,27 @@ El backend central de AFORO se estructura como un **Monolito Modular** organizad
 
 ```mermaid
 flowchart TD
-    subgraph API_CORE["Contenedor API Core Backend [Monolito Modular - DISEÑO PROPUESTO]"]
-        M1["<b>1. Módulo Catálogo & Eventos</b><br/>Cartelera pública, eventos, recintos y sectores<br/>Fachada: <code>ICatalogModuleFacade</code>"]
-        M2["<b>2. Módulo Reservas e Inventario</b><br/>Control de aforo (S + H &lt;= C), TTL 600s y cuota &lt;= 4<br/>Fachada: <code>IReservationsModuleFacade</code>"]
-        M3["<b>3. Módulo Pagos & Facturación</b><br/>Idempotencia de cobros, pasarelas y registro Outbox"]
-        OUTBOX["🔄 <b>OutboxProcessor Worker</b><br/>Despacho recuperable at-least-once con lease"]
-        M4["<b>4. Módulo Tickets & Emisión</b><br/>Emisión idempotente, firma Ed25519 y correo<br/>Fachada: <code>ITicketsModuleFacade</code>"]
-        M5["<b>5. Módulo Control de Acceso</b><br/>Validación atómica online (ACTIVE → USED)<br/>y reconciliación de lotes offline"]
-        M6["<b>6. Módulo Identidad & Seguridad</b><br/>Autenticación JWT y control de roles RBAC<br/>Fachada: <code>IIdentityModuleFacade</code>"]
+    subgraph API_CORE["Contenedor API Core Backend [Monolito Modular - DISENO PROPUESTO]"]
+        M1["<b>1. Modulo Catalog</b><br/>Cartelera, eventos, recintos y sectores<br/>Fachada: <code>ICatalogModuleFacade</code>"]
+        M2["<b>2. Modulo Reservations</b><br/>Aforo (S + H &lt;= C), TTL 600s y cuota &lt;= 4<br/>Fachada: <code>IReservationsModuleFacade</code>"]
+        M3["<b>3. Modulo Payments</b><br/>Idempotencia de cobros, pasarelas y Outbox"]
+        OUTBOX["<b>OutboxProcessor Worker</b><br/>Despacho recuperable at-least-once con lease"]
+        M4["<b>4. Modulo Tickets</b><br/>Emision idempotente, firma Ed25519 y correo<br/>Fachada: <code>ITicketsModuleFacade</code>"]
+        M5["<b>5. Modulo Access</b><br/>Validacion atomica online (ACTIVE a USED)<br/>y reconciliacion de lotes offline"]
+        M6["<b>6. Modulo Identity</b><br/>Autenticacion JWT y control de roles RBAC<br/>Fachada: <code>IIdentityModuleFacade</code>"]
     end
 
-    M2 -.->|"1. Consulta configuración de sector (En memoria)"| M1
-    M3 -.->|"2. Consulta estado y confirma venta de reserva (En memoria)"| M2
-    M3 ==>|"3. Persiste evento PAYMENT_CONFIRMED en misma TX"| OUTBOX
+    M2 -.->|"1. Consulta sector (En memoria)"| M1
+    M3 -.->|"2. Confirma venta en misma TX (txContext)"| M2
+    M3 ==>|"3. Persiste evento en outbox_events (Misma TX)"| OUTBOX
     OUTBOX ==>|"4. Entrega evento recuperable"| M4
-    M5 -.->|"5. Solicita validación / transición de ticket (En memoria)"| M4
-    M1 & M2 & M3 & M4 & M5 -.->|"6. Verifica sesión y rol RBAC"| M6
+    M5 -.->|"5. Consume ticket en misma TX (txContext)"| M4
+    M1 & M2 & M3 & M4 & M5 -.->|"6. Verifica sesion y rol RBAC"| M6
+
+    classDef app fill:#3b0764,stroke:#a855f7,stroke-width:2px,color:#ffffff;
+    classDef infra fill:#1f2937,stroke:#64748b,stroke-width:2px,color:#ffffff;
+    class M1,M2,M3,M4,M5,M6 app;
+    class OUTBOX infra;
 ```
 
 ---
@@ -109,19 +114,19 @@ La siguiente matriz resume las únicas colaboraciones permitidas entre los seis 
 
 ## 4. Contratos Públicos: Fachadas y Eventos Outbox
 
-### 4.1. Contratos de Fachadas Públicas en Memoria
-Cada fachada actúa como una barrera de encapsulamiento que oculta las entidades de dominio y los detalles de persistencia del módulo proveedor:
+### 4.1. Contratos de Fachadas Públicas en Memoria y Propagación Transaccional (`ITransactionContext`)
+Cada fachada actúa como una barrera de encapsulamiento que oculta las entidades de dominio y los detalles de persistencia del módulo proveedor. Para que dos módulos puedan participar atómicamente en **una única transacción PostgreSQL** (un solo `PoolClient` y un único `COMMIT`/`ROLLBACK`) sin exponer conexiones SQL ni repositorios privados, el núcleo compartido define un token opaco `ITransactionContext` (`shared/application/ITransactionContext.ts`):
 - **`IReservationsModuleFacade`** (definida en [C4 Código](../04-modelo-c4/Nivel4-DiagramadeCodigo.md)):
-  - `getReservationStatus(reservationId: string): ReservationDTO`
-  - `confirmReservationSold(reservationId: string): boolean`
-  - `cancelHoldManually(reservationId: string, reason: string): boolean`
+  - `getReservationStatus(reservationId: string): Promise<ReservationDTO>`
+  - `confirmReservationSold(reservationId: string, txContext: ITransactionContext): Promise<ReservationConfirmationStatus>` *(retorna `'CONFIRMED_NOW' | 'ALREADY_CONFIRMED' | 'EXPIRED' | 'CANCELLED' | 'NOT_FOUND'`, ejecutando la transición de la reserva y el ajuste $H \leftarrow H - Q, S \leftarrow S + Q$ en `sector_inventory` dentro de la misma transacción iniciada por `Payments`)*.
+  - `cancelHoldManually(reservationId: string, reason: string): Promise<boolean>`
 - **`ICatalogModuleFacade`**:
-  - `getSectorConfiguration(eventId: string, sectorId: string): SectorConfigDTO`
+  - `getSectorConfiguration(eventId: string, sectorId: string): Promise<SectorConfigDTO>`
 - **`ITicketsModuleFacade`**:
-  - `consumeTicketAtomically(ticketId: string, gateId: string, operatorId: string): TicketConsumptionResultDTO`
-  - `getEventPublicKey(eventId: string): string`
+  - `consumeTicketAtomically(ticketId: string, gateId: string, operatorId: string, txContext: ITransactionContext): Promise<TicketConsumptionResultDTO>` *(ejecuta la transición condicional `ACTIVE → USED` en la tabla privada `tickets` dentro de la misma transacción en que `Access` persiste el registro de auditoría en `access_logs`)*.
+  - `getEventPublicKey(eventId: string): Promise<string>`
 - **`IIdentityModuleFacade`**:
-  - `verifySessionToken(token: string): AuthenticatedUserDTO`
+  - `verifySessionToken(token: string): Promise<AuthenticatedUserDTO>`
 
 ### 4.2. Contrato Asíncrono mediante Transactional Outbox
 Para desacoplar la confirmación financiera de la generación criptográfica y el envío de correos sin depender de un bus en memoria volátil ni de brokers externos:

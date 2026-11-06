@@ -18,13 +18,13 @@
 2. **Equidad en el Acceso y Control Antirrevendedores**:  
    Aplicar un límite estricto de máximo 4 entradas acumuladas por titular y sector ([`RN-04`](../complementos/03-reglas-de-negocio.md#rn-04-tope-máximo-de-entradas-por-asistente)), complementado con selección visual no bloqueante en el navegador ([`RN-02`](../complementos/03-reglas-de-negocio.md#rn-02-selección-visual-no-bloqueante-de-inventario)) y reservas preventivas con tiempo de vida determinista de 10 minutos ($\text{TTL} = 600\text{ s}$, [`RN-03`](../complementos/03-reglas-de-negocio.md#rn-03-reserva-temporal-con-expiración-determinista-ttl-de-10-minutos)).
 3. **Continuidad Operativa en Puertas de Acceso**:  
-   Permitir que los operadores de molinetes verifiquen la autenticidad criptográfica de los códigos QR tanto en modo conectado (mutación atómica `ACTIVE → USED`) como en modo desconectado de contingencia con reconciliación posterior ([`RN-06`](../complementos/03-reglas-de-negocio.md#rn-06-emisión-atómica-y-firma-criptográfica-de-tickets-qr), [`RN-08`](../complementos/03-reglas-de-negocio.md#rn-08-validación-acceso-en-puerta-y-tolerancia-a-desconexión-anti-reúso)).
+   Permitir que los operadores de molinetes verifiquen la autenticidad criptográfica de los códigos QR tanto en modo conectado (mutación atómica `ISSUED → USED` coordinada entre `Access` y `Tickets` con idempotencia por `attemptId`) como en modo desconectado de contingencia con reconciliación posterior ([`RN-06`](../complementos/03-reglas-de-negocio.md#rn-06-emisión-atómica-y-firma-criptográfica-de-tickets-qr), [`RN-08`](../complementos/03-reglas-de-negocio.md#rn-08-validación-acceso-en-puerta-y-tolerancia-a-desconexión-anti-reúso)).
 4. **Sostenibilidad Económica y Simplicidad Operativa**:  
    Centralizar la lógica de negocio en un único artefacto desplegable bien modularizado, evitando la sobrecarga de red, orquestación y costos fijos asociados a microservicios distribuidos prematuros ([`ADR-001`](../complementos/adrs/ADR-001-seleccion-estilo-monolito-modular.md)).
 
 > [!IMPORTANT]
 > **Declaración de Realidad Técnica del Repositorio**:  
-> - **`[IMPLEMENTADO EN WEB]`**: La aplicación pública [`AFORO Web SPA`](../../src/App.tsx) está implementada en React / TypeScript con catálogo editorial, filtros multicriterio, sincronización entre pestañas y mapas interactivos de recintos en SVG nativo ([`VenueStageMap.tsx`](../../src/components/VenueStageMap.tsx)).  
+> - **`[IMPLEMENTADO EN WEB]`**: La aplicación pública [`AFORO Web SPA`](../../frontend/src/App.tsx) está implementada en React / TypeScript con catálogo editorial, filtros multicriterio, sincronización entre pestañas y mapas interactivos de recintos en SVG nativo ([`VenueStageMap.tsx`](../../frontend/src/components/VenueStageMap.tsx)).
 > - **`[DEMO / SIMULADO]`**: El flujo de reserva temporal, selección de pasarela de pago y emisión de pases QR (`ACTIVA_DEMO`) opera actualmente como una simulación interactiva en el navegador (`localStorage`).  
 > - **`[DISEÑO PROPUESTO]`**: El contenedor `API Core Backend`, las aplicaciones `AFORO Studio` y `AFORO Access`, la persistencia en `PostgreSQL` / `Redis` y las integraciones con pasarelas de pago y correo constituyen la arquitectura objetivo formalizada en esta especificación.
 
@@ -37,39 +37,43 @@ El modelo estructural de AFORO se organiza en cuatro bloques claramente delimita
 ```mermaid
 flowchart TD
     subgraph CLIENTES["1. Clientes del Ecosistema (Frontend)"]
-        WEB["🌐 AFORO Web SPA<br/><i>Catálogo, mapa SVG propio y compra</i><br/><b>[IMPLEMENTADO EN WEB / COMPRA DEMO]</b>"]
-        STUDIO["🖥️ AFORO Studio SPA<br/><i>Gestión de eventos, recintos y aforos</i><br/><b>[DISEÑO PROPUESTO]</b>"]
-        subgraph ACCESS_BOX["Terminal de Puerta"]
-            ACCESS["📱 AFORO Access PWA<br/><i>Escaneo QR y control de ingreso</i><br/><b>[DISEÑO PROPUESTO]</b>"]
-            IDB[("💾 IndexedDB Local<br/><i>Clave pública Ed25519 y bitácora local</i><br/><b>[DISEÑO PROPUESTO]</b>")]
-            ACCESS <--> IDB
-        end
+        WEB["AFORO Web SPA<br>[React 19 / TypeScript]<br>Catalogo, mapa SVG propio y compra<br>[IMPLEMENTADO EN WEB / COMPRA DEMO]"]
+        STUDIO["AFORO Studio SPA<br>[React 19 / TypeScript]<br>Gestion de eventos, recintos y aforos<br>[DISENO PROPUESTO]"]
+        ACCESS["AFORO Access PWA<br>[PWA / WebCrypto + IndexedDB interno]<br>Escaneo QR y control de ingreso<br>[DISENO PROPUESTO]"]
     end
 
-    subgraph NUCLEO["2. Núcleo de Servicios (Backend Central)"]
-        API["⚙️ API Core Backend<br/><i>Monolito Modular con Arquitectura Hexagonal</i><br/><i>(Catálogo, Reservas, Pagos, Tickets, Accesos, Identidad)</i><br/><b>[DISEÑO PROPUESTO]</b>"]
+    subgraph NUCLEO["2. Nucleo de Servicios (Backend Central)"]
+        API["API Core Backend<br>[Node.js 20 LTS / TypeScript]<br>Monolito Modular con Arquitectura Hexagonal<br>(Catalog, Reservations, Payments, Tickets, Access, Identity)<br>[DISENO PROPUESTO]"]
     end
 
-    subgraph PERSISTENCIA["3. Persistencia y Caché Central"]
-        PG[("🐘 PostgreSQL Relacional<br/><i>Única Fuente de Verdad Transaccional</i><br/><b>[DISEÑO PROPUESTO]</b>")]
-        RD[("⚡ Redis Auxiliar<br/><i>Caché de lectura y timers TTL 600s</i><br/><b>[DISEÑO PROPUESTO]</b>")]
+    subgraph PERSISTENCIA["3. Persistencia y Cache Central"]
+        PG[("PostgreSQL 16 Relacional<br>[Unica Fuente de Verdad Transaccional]<br>[DISENO PROPUESTO]")]
+        RD[("Redis 7 Auxiliar<br>[Cache de lectura y timers TTL 600s]<br>[DISENO PROPUESTO]")]
     end
 
     subgraph EXTERNOS["4. Sistemas Externos"]
-        GW["🏛️ Pasarelas de Pago<br/><i>Culqi / Niubiz / Stripe</i><br/><b>[DISEÑO PROPUESTO]</b>"]
-        MAIL["📨 Servicio de Correo<br/><i>Despacho transaccional de entradas</i><br/><b>[DISEÑO PROPUESTO]</b>"]
+        GW["Pasarelas de Pago<br>[Culqi / Niubiz / Stripe]"]
+        MAIL["Servicio de Correo<br>[Despacho transaccional de entradas]"]
     end
 
     WEB -->|"HTTPS / REST (JSON)"| API
     STUDIO -->|"HTTPS / REST (JSON)"| API
-    ACCESS -->|"HTTPS / REST (Online y Reconciliación)"| API
+    ACCESS -->|"HTTPS / REST (Online y Reconciliacion)"| API
 
     API <-->|"Transacciones ACID / SELECT FOR UPDATE"| PG
-    API <-->|"Caché pública y señales TTL"| RD
+    API <-->|"Cache publica y senales TTL"| RD
 
     API -->|"Cobros con Idempotency-Key"| GW
     GW -->|"Webhooks firmados"| API
-    API -->|"Envío de boletos emitidos"| MAIL
+    API -->|"Envio de boletos emitidos"| MAIL
+
+    classDef client fill:#1e3a8a,stroke:#3b82f6,stroke-width:2px,color:#ffffff;
+    classDef core fill:#3b0764,stroke:#a855f7,stroke-width:3px,color:#ffffff;
+    classDef infra fill:#1f2937,stroke:#64748b,stroke-width:2px,color:#e2e8f0;
+
+    class WEB,STUDIO,ACCESS client;
+    class API core;
+    class PG,RD,GW,MAIL infra;
 ```
 
 ### 2.1. Delimitación de Clientes del Ecosistema

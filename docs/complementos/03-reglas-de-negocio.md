@@ -34,7 +34,7 @@ flowchart LR
 - **Declaración**: Para cualquier sector o zona $Z$ perteneciente a un evento $E$, la suma de las entradas efectivamente vendidas ($\text{Sold}$) más las reservas temporales activas no expiradas ($\text{ActiveHolds}$) jamás puede superar la capacidad máxima autorizada ($\text{Capacity}$).
 - **Fórmula Formal**:
   $$\text{Sold}(Z) + \text{ActiveHolds}(Z) \le \text{Capacity}(Z) \quad \forall Z \in E$$
-- **Mecanismo de Cumplimiento**: En el backend relacional (PostgreSQL), la verificación y deducción de cupos debe realizarse dentro de una transacción con aislamiento Serializable o bloqueo pesimista mediante `SELECT ... FOR UPDATE` sobre la fila del sector, o mediante contadores atómicos en Redis (`DECRBY`) verificando que el saldo resultante sea $\ge 0$.
+- **Mecanismo de Cumplimiento**: En el backend relacional (PostgreSQL, única fuente de verdad transaccional conforme a [`ADR-003`](adrs/ADR-003-concurrencia-integridad-inventario.md)), la verificación y deducción de cupos se realiza dentro de una transacción con aislamiento `READ COMMITTED` y bloqueo pesimista exclusivo mediante `SELECT ... FOR UPDATE` sobre la fila del sector en `sector_inventory` (manteniendo a Redis exclusivamente como infraestructura auxiliar no autoritativa).
 - **Manejo de Violación**: Si la cantidad solicitada supera el aforo libre actual, la transacción es rechazada de inmediato con un error de dominio `SECTOR_CAPACITY_EXCEEDED`, impidiendo el registro de la reserva.
 - **Estado de Realidad**: `[DISEÑO ARQUITECTÓNICO]`. En el frontend actual, los eventos indican porcentaje de disponibilidad referencial y estado visual `sold_out`.
 
@@ -44,7 +44,7 @@ flowchart LR
 - **Declaración**: La navegación en la página web, la exploración de sectores en el mapa interactivo y la adición de entradas al carrito de compras **NO bloquean ni descuentan inventario en el servidor**.
 - **Justificación**: Permitir que la simple selección visual en el cliente bloquee cupos provocaría ataques de denegación de servicio (DoS) o acaparamiento pasivo, donde usuarios agotan artificialmente una preventa manteniendo carritos abiertos sin intención de compra.
 - **Consecuencia Técnica**: El inventario real permanece disponible para otros compradores hasta que el usuario hace clic formalmente en «Continuar al pago» y el backend confirma la creación de la reserva temporal con TTL.
-- **Estado de Realidad**: `[IMPLEMENTADO EN WEB]`. El frontend actual cumple estrictamente esta regla: el carrito opera sobre almacenamiento local ([`src/components/CartDrawer.tsx`](../../src/components/CartDrawer.tsx), [`src/lib/cart.ts`](../../src/lib/cart.ts)) y muestra el aviso explícito de que no se ha bloqueado aforo en servidor.
+- **Estado de Realidad**: `[IMPLEMENTADO EN WEB]`. El frontend actual cumple estrictamente esta regla: el carrito opera sobre almacenamiento local ([`frontend/src/components/CartDrawer.tsx`](../../frontend/src/components/CartDrawer.tsx), [`frontend/src/lib/cart.ts`](../../frontend/src/lib/cart.ts)) y muestra el aviso explícito de que no se ha bloqueado aforo en servidor.
 
 ---
 
@@ -56,7 +56,7 @@ flowchart LR
   1. Durante la ventana de 10 minutos, los cupos reservados se restan de la disponibilidad pública y quedan asegurados exclusivamente para el comprador.
   2. Si el pago es confirmado antes de la expiración, la reserva pasa a estado `CONFIRMED` y se emiten los tickets definitivos.
   3. Si transcurren los 10 minutos sin confirmación de pago, la reserva cambia automáticamente a estado `EXPIRED` y los cupos son reincorporados al inventario disponible para el público general.
-- **Mecanismo de Liberación**: Claves con expiración en Redis (`SET reservation:{id} ... EX 600`) escuchadas vía *keyspace notifications* o un job recurrente en base de datos que libera las reservas vencidas.
+- **Mecanismo de Liberación**: Claves con expiración en Redis (`SET hold:ttl:{id} ... EX 600`) escuchadas vía *keyspace notifications* como disparador auxiliar complementadas por un worker recurrente en PostgreSQL que libera atómicamente (`WHERE status = 'PENDING_PAYMENT' AND expires_at <= NOW()`) las reservas vencidas sin riesgo de doble liberación.
 - **Estado de Realidad**: `[DISEÑO ARQUITECTÓNICO]`. Actualmente ilustrado en la interfaz mediante el aviso `MODO DEMO`.
 
 ---
@@ -65,7 +65,7 @@ flowchart LR
 - **Declaración**: Un mismo usuario o titular registrado no puede adquirir más de **4 entradas por sector** para un mismo evento en una única orden de compra.
 - **Justificación**: Mitigación de prácticas de acaparamiento y reventa automatizada de entradas en conciertos y festivales de alta demanda.
 - **Validación en Cliente y Servidor**:
-  - En cliente: el componente [`Stepper.tsx`](../../src/components/Stepper.tsx) y la lógica de carrito en [`cart.ts`](../../src/lib/cart.ts) bloquean el botón de incremento al alcanzar `MAX_PER_TIER = 4`.
+  - En cliente: el componente [`Stepper.tsx`](../../frontend/src/components/Stepper.tsx) y la lógica de carrito en [`cart.ts`](../../frontend/src/lib/cart.ts) bloquean el botón de incremento al alcanzar `MAX_PER_TIER = 4`.
   - En servidor: el caso de uso `HoldTicketsUseCase` validará la regla $\sum \text{qty} \le 4$ por zona antes de generar el bloqueo en inventario.
 - **Estado de Realidad**: `[IMPLEMENTADO EN CLIENTE / DISEÑO EN BACKEND]`.
 
@@ -91,8 +91,8 @@ flowchart LR
 - **Análisis de Mecanismos Criptográficos y Alternativa Preferida**:
   - *Alternativa 1 — HMAC-SHA256 (Clave Secreta Compartida / Simétrico)*: Es un código de autenticación simétrico rápido, pero requiere que todos los dispositivos lectores de puerta posean la clave secreta compartida $K_E$. Si un terminal físico en puerta es vulnerado o sustraído, la clave secreta queda expuesta, permitiendo potencialmente la falsificación de tickets.
   - *Alternativa Preferida — Firma Digital Asimétrica (Ed25519 o ECDSA)*: El backend central firma los tickets utilizando una clave privada que jamás abandona el servidor seguro. Los dispositivos lectores de **AFORO Access** únicamente requieren la clave pública correspondiente para verificar de forma instantánea y fuera de línea la autenticidad de la entrada, eliminando por completo el riesgo de falsificación ante la pérdida de un terminal lector.
-  - *Decisión Arquitectónica*: La selección definitiva entre firma asimétrica (Ed25519) vs simétrica (HMAC-SHA256) queda formalmente diferida a su correspondiente **ADR** en el Capítulo 02.
-- **Estado de Realidad**: `[DISEÑO ARQUITECTÓNICO]`. En el frontend actual, el ticket emitido en [`TicketsModal.tsx`](../../src/components/TicketsModal.tsx) porta el estado simulado `ACTIVA_DEMO` y un hash representativo `PULSO-LIM-XXXX-CART`.
+  - *Decisión Arquitectónica*: Se selecciona formalmente la firma digital asimétrica **Ed25519** conforme a [`ADR-005`](adrs/ADR-005-criptografia-entradas-qr.md).
+- **Estado de Realidad**: `[DISEÑO ARQUITECTÓNICO]`. En el frontend actual, el ticket emitido en [`TicketsModal.tsx`](../../frontend/src/components/TicketsModal.tsx) porta el estado simulado `ACTIVA_DEMO` y un hash representativo `PULSO-LIM-XXXX-CART`.
 
 ---
 
