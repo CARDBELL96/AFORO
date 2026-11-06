@@ -2,7 +2,7 @@
  * Uso: node scripts/render-architecture.mjs
  * PNG opcional: AFORO_SHARP_MODULE=ruta/al/modulo/sharp
  * Las fuentes Mermaid de los documentos describen las mismas relaciones;
- * este archivo controla la composición visual de estas cuatro vistas.
+ * este archivo controla la composición visual de estas tres vistas.
  */
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -104,25 +104,4 @@ function reservations(name, title) {
 await reservations('C3-hexagonal', 'AFORO | Puertos, adaptadores y dominio');
 await reservations('reservations-hexagonal', 'AFORO | Arquitectura hexagonal de Reservations');
 
-start('AFORO | Arquitectura hexagonal en un monolito modular', 'Vista conceptual del enfoque · DISEÑO PROPUESTO — BACKEND NO IMPLEMENTADO', 1030);
-panel(320, 130, 950, 700, 'API Core · Seis módulos independientes en el mismo proceso');
-box(35, 240, 245, 155, 'Clientes', ['AFORO Web', 'AFORO Studio', 'AFORO Access'], 'blue');
-box(35, 480, 245, 155, 'Entrada', ['Controladores REST', 'Validación de solicitudes', 'Autenticación y RBAC'], 'blue');
-const modules = [['Catalog','Eventos, recintos y sectores','blue'],['Reservations','Holds, cuota y aforo','pink'],['Payments','Cobros e idempotencia','yellow'],['Identity','Usuarios y permisos','purple'],['Access','Ingresos y auditoría','green'],['Tickets','Emisión y firma QR','purple']];
-for (let i=0;i<modules.length;i++) {
-  const [name, purpose, color] = modules[i], x=350+(i%3)*300, y=210+Math.floor(i/3)*280;
-  box(x,y,280,225,name,[purpose],color);
-  text(x+140,y+110,['Puertos de entrada y salida'],15,'middle',700);
-  text(x+140,y+145,['Aplicación · casos de uso'],16);
-  parts.push(`<rect x="${x+20}" y="${y+166}" width="240" height="40" rx="12" fill="white" stroke="#7852b7"/>`);
-  text(x+140,y+192,['Dominio propio · reglas'],16,'middle',700);
-}
-box(1310, 210, 255, 160, 'Persistencia', ['PostgreSQL 16', 'Única fuente de verdad', 'Redis 7 auxiliar'], 'gray');
-box(1310, 440, 255, 155, 'Sistemas externos', ['Pasarelas de pago', 'Servicio de correo'], 'yellow');
-arrow('155,395 155,480', 'HTTPS / JSON', 220, 440);
-arrow('280,560 320,560', '',0,0);
-arrow('1270,290 1310,290','',0,0);
-arrow('1270,525 1310,525','',0,0);
-text(800, 785, ['Cada módulo tiene adaptadores propios; los módulos colaboran mediante fachadas públicas.', 'Outbox: evento persistido y worker interno recuperable entre Payments y Tickets.'], 17);
-text(800, 890, ['Estilo: monolito modular. Enfoque interno: puertos y adaptadores en cada módulo.', 'Los seis módulos no son capas ni caras de un único dominio compartido.', 'Web implementada en modo DEMO; Studio, Access e integraciones corresponden al diseño propuesto.'], 20);
-await save('aforo-enfoque-general');
+// aforo-enfoque-general.png es la imagen original del usuario. No regenerar ni modificar.

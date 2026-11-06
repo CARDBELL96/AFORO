@@ -17,9 +17,9 @@ Para blindar las reglas de negocio de AFORO frente a dependencias tecnológicas 
 
 ### 1.0. Vista conceptual del enfoque
 
-![AFORO: arquitectura hexagonal dentro de cada módulo](../diagramas-exportados/aforo-enfoque-general.svg)
+![AFORO: imagen original de arquitectura hexagonal](../diagramas-exportados/aforo-enfoque-general.png)
 
-[PNG para exposición](../diagramas-exportados/aforo-enfoque-general.png). Cada módulo tiene su propio dominio, aplicación, puertos y adaptadores. Esta ilustración explica el enfoque; las relaciones formales entre módulos se detallan en C3. No representa un dominio compartido ni seis capas alrededor de un único núcleo.
+Imagen original proporcionada por el usuario, incorporada sin modificaciones el 2026-11-06. Las relaciones formales entre módulos se detallan en C3.
 
 **Adaptación del modelo docente**: el Marketplace utiliza Clean Architecture con interfaces en dominio y presentación separada. AFORO mantiene ADR-002: puertos en aplicación y adaptadores primarios/secundarios en infraestructura. La carpeta presentation/ usada en diseño interno es una separación organizativa para adaptadores primarios, no una capa adicional del núcleo.
 
