@@ -29,7 +29,7 @@ Esta skill se activa ante:
 - Inyectar adaptadores secundarios mediante puertos de salida abstractos (`ports/out/`).
 - Validar rigurosamente los datos de entrada en el límite de la infraestructura antes de invocar la aplicación.
 - Mapear excepciones de dominio a códigos de estado HTTP estandarizados (400, 404, 409, 422, 500).
-- Diseñar contratos API compatibles con el frontend existente de AFORO Web ([`src/`](../../../src/)).
+- Diseñar contratos API compatibles con el frontend existente de AFORO Web ([`frontend/src/`](../../../frontend/src/)).
 - Alinear cada caso de uso con su especificación en [`specs/`](../../../specs/) y sus tareas en `tasks.md`.
 - Garantizar el cumplimiento de la Política de Preservación Histórica ([`AGENTS.md`](../../../AGENTS.md#8-política-de-preservación-histórica-y-trazabilidad-innegociable)).
 

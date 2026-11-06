@@ -28,7 +28,7 @@ Esta skill se activa ante:
 - Exigir la ejecución y paso exitoso de `npm run check` antes de cerrar cualquier tarea técnica.
 - Diseñar pruebas unitarias para entidades de dominio y casos de uso con cobertura de casos límite (*edge cases*).
 - Formular pruebas de concurrencia que simulen solicitudes simultáneas compitiendo por un mismo inventario.
-- Preservar íntegras las 30 pruebas automatizadas ya existentes en [`src/`](../../../src/).
+- Preservar íntegras las 30 pruebas automatizadas ya existentes en [`frontend/src/`](../../../frontend/src/).
 - Reportar de forma explícita el número de pruebas ejecutadas, pasando y fallidas.
 - Validar que las definiciones de TypeScript compilen sin suprimir errores con `any` o `@ts-ignore` injustificados.
 - **Trazabilidad y Balance Documental en Cierre**: Cumplir la Política de Preservación Histórica ([`AGENTS.md`](../../../AGENTS.md#8-política-de-preservación-histórica-y-trazabilidad-innegociable)), detallando en el balance final de cada tarea la lista exacta de archivos creados, modificados, conservados y propuestos para sustitución, respetando siempre las modificaciones locales previas.

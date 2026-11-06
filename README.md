@@ -5,7 +5,7 @@
 
 Su propuesta combina una experiencia digital editorial con una arquitectura diseñada para afrontar desafíos como la alta concurrencia de compradores, la integridad del inventario, la prevención de sobreventa y la validación segura de entradas.
 
-> **Estado actual:** Sprint 01 — Análisis, arquitectura y diseño de software. AFORO Web cuenta con un frontend DEMO funcional. Los demás componentes corresponden al diseño arquitectónico propuesto.
+> **Estado actual:** Sprint 01 — Análisis, arquitectura y diseño de software. AFORO Web cuenta con un frontend DEMO funcional encapsulado en `frontend/`. Los demás componentes corresponden al diseño arquitectónico propuesto.
 
 ---
 
@@ -27,7 +27,7 @@ La plataforma contempla tres aplicaciones especializadas y un backend compartido
 
 | Aplicación | Descripción | Estado |
 |---|---|---|
-| AFORO Web | Descubrimiento de eventos, selección de entradas y experiencia de compra. | Frontend DEMO |
+| AFORO Web | Descubrimiento de eventos, selección de entradas y experiencia de compra. | Frontend DEMO (`frontend/`) |
 | AFORO Studio | Administración de eventos, recintos, sectores, precios y ventas. | Propuesto |
 | AFORO Access | Validación de entradas mediante códigos QR, con contingencia offline. | Propuesto |
 | AFORO API Core | Backend compartido responsable de las reglas de negocio y operaciones transaccionales. | Propuesto |
@@ -71,7 +71,7 @@ Esta decisión busca mantener límites claros entre responsabilidades, facilitar
 
 | Tecnología | Responsabilidad |
 |---|---|
-| React + TypeScript + Vite | Frontend implementado |
+| React + TypeScript + Vite | Frontend implementado (`frontend/`) |
 | PostgreSQL | Fuente de verdad del inventario (propuesto) |
 | Redis | Soporte auxiliar para caché y notificaciones (propuesto) |
 | IndexedDB | Persistencia local de AFORO Access (propuesto) |
@@ -115,7 +115,7 @@ La documentación del Sprint 01 se encuentra organizada en el directorio `docs/`
 |---|---|
 | `docs/01-analisis-de-sistema/` | Requisitos funcionales y no funcionales, reglas de negocio, escenarios de calidad y trazabilidad. |
 | `docs/02-arquitectura-software/` | Drivers, restricciones, selección arquitectónica y registros de decisiones (ADR). |
-| `docs/03-diseno-de-software/` | Principios SOLID, diseño modular, patrones y diagramas de secuencia. |
+| `docs/03-diseño-de-software/` | Principios SOLID, diseño modular, patrones y diagramas de secuencia. |
 | `docs/04-modelo-c4/` | Diagramas de contexto, contenedores, componentes y código. |
 
 La documentación distingue entre funcionalidades implementadas, simuladas y propuestas.
@@ -126,26 +126,40 @@ La documentación distingue entre funcionalidades implementadas, simuladas y pro
 
 ### Requisitos
 
-- Node.js
+- Node.js (v20 o superior recomendado)
 - npm
 
-Desde el directorio del frontend:
+### Ejecución desde la Raíz (Orquestación)
 
 ```bash
+# Iniciar servidor de desarrollo frontend
+npm run dev:web
+
+# Verificación completa del frontend (tipos, tests, build)
+npm run check:web
+
+# Ejecutar suite de pruebas
+npm run test:web
+
+# Chequeo estático de tipos
+npm run typecheck:web
+```
+
+### Ejecución dentro del Directorio `frontend/`
+
+```bash
+# Acceder a la aplicación web
+cd frontend
+
 # Instalar dependencias
 npm install
 
 # Iniciar servidor de desarrollo
 npm run dev
-```
 
-### Verificación del proyecto
-
-```bash
+# Verificación completa
 npm run check
 ```
-
-El comando ejecuta las verificaciones configuradas en el proyecto, incluyendo TypeScript, pruebas automatizadas y compilación de producción.
 
 ---
 
@@ -171,7 +185,7 @@ La documentación arquitectónica complementa este proceso mediante requisitos t
 
 | Elemento | Estado |
 |---|---|
-| Interfaz de AFORO Web | Implementada |
+| Interfaz de AFORO Web | Implementada (`frontend/`) |
 | Exploración y búsqueda de eventos | DEMO funcional |
 | Selección de sectores y carrito | DEMO funcional |
 | Checkout y entradas QR | Simulados |

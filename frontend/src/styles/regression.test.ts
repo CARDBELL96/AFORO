@@ -102,11 +102,11 @@ test('US1 Calibración del Hero: escala tipográfica proporcionada al 100 % y cl
 });
 
 test('US1 Regresión DOM (T011): comparación ANTES vs DESPUÉS en el mismo viewport y nivel de zoom', () => {
+  const rootSpecs = path.resolve(stylesDir, '..', '..', '..', 'specs');
+  const fallbackSpecs = path.resolve(stylesDir, '..', '..', 'specs');
+  const baseSpecsDir = fs.existsSync(rootSpecs) ? rootSpecs : fallbackSpecs;
   const evidenceDir = path.resolve(
-    stylesDir,
-    '..',
-    '..',
-    'specs',
+    baseSpecsDir,
     '001-frontend-proportions-and-ticket-page',
     'evidence',
   );

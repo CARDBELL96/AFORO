@@ -9,7 +9,7 @@ Este documento establece las reglas operativas, arquitectónicas y de gobernanza
 - **Sistema**: AFORO — Plataforma integral de descubrimiento, compra, emisión y validación de entradas para eventos y conciertos en vivo en el Perú.
 - **Contexto**: Proyecto del curso de Arquitectura de Software (Universidad Nacional de San Cristóbal de Huamanga).
 - **Estado Actual**:
-  - **AFORO Web SPA**: Implementado y verificado en Sprint 01 ([`src/`](src/)). Opera en modo `[DEMO / SIMULADO]` con datos locales en [`src/data/repository.ts`](src/data/repository.ts).
+  - **AFORO Web SPA**: Implementado y verificado en Sprint 01 ([`frontend/src/`](frontend/src/)). Opera en modo `[DEMO / SIMULADO]` con datos locales en [`frontend/src/data/repository.ts`](frontend/src/data/repository.ts).
   - **API Core Backend**: Arquitectura formalmente especificada y aprobada en `docs/`; código pendiente de implementación.
   - **Base de Datos y Servicios Externos**: Diseñados formalmente; no conectados en producción.
 
