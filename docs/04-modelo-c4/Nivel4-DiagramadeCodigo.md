@@ -27,9 +27,16 @@ Este componente ha sido seleccionado como representativo de todo el backend debi
 
 ---
 
-## 2. Diagrama Estructural de Clases e Interfaces (Mermaid)
+## 2. Diagrama Estructural de Clases e Interfaces (C4)
 
 El siguiente diagrama modela la estructura de clases, interfaces, tipos de datos, visibilidad y relaciones en el **Módulo de Reservas e Inventario** siguiendo los principios de la **Arquitectura Hexagonal (Puertos y Adaptadores)**:
+
+![Diagrama C4 — Clases e Interfaces del Módulo Reservations](../diagramas-exportados/C4-clases.svg)
+
+> **Formatos exportados disponibles**: [SVG Vectorial (`C4-clases.svg`)](../diagramas-exportados/C4-clases.svg) | [PNG Alta Resolución (`C4-clases.png`)](../diagramas-exportados/C4-clases.png)
+
+<details>
+<summary><b>Ver código fuente Mermaid editable (C4-clases)</b></summary>
 
 ```mermaid
 classDiagram
@@ -42,6 +49,19 @@ classDiagram
         CONFIRMED
         EXPIRED
         CANCELLED
+    }
+
+    class ReservationConfirmationStatus {
+        <<enumeration>>
+        CONFIRMED
+        EXPIRED
+        ALREADY_CONFIRMED
+        NOT_FOUND
+    }
+
+    class ITransactionContext {
+        <<interface>>
+        +readonly transactionId string
     }
 
     class HoldTicketsCommand {
@@ -75,25 +95,25 @@ classDiagram
     %% Fachada Pública Inter-Módulo (Inbound Port)
     class IReservationsModuleFacade {
         <<interface>>
-        +getReservationStatus(reservationId: string) ReservationDTO
-        +confirmReservationSold(reservationId: string) boolean
-        +cancelHoldManually(reservationId: string, reason: string) boolean
+        +getReservationStatus(id) ReservationDTO
+        +confirmReservationSold(id, txContext) ReservationConfirmationStatus
+        +cancelHoldManually(id, reason) boolean
     }
 
     %% Implementación de Fachada Inter-Módulo (Capa de Aplicación)
     class ReservationsModuleFacadeImpl {
         -IReservationUnitOfWork unitOfWork
         -ITimerNotifier timerNotifier
-        +getReservationStatus(reservationId: string) ReservationDTO
-        +confirmReservationSold(reservationId: string) boolean
-        +cancelHoldManually(reservationId: string, reason: string) boolean
+        +getReservationStatus(id) ReservationDTO
+        +confirmReservationSold(id, txContext) ReservationConfirmationStatus
+        +cancelHoldManually(id, reason) boolean
     }
 
     %% Adaptador Primario HTTP / REST (Inbound Adapter)
     class ReservationsController {
         -HoldTicketsUseCase holdTicketsUseCase
         -ReleaseExpiredHoldsUseCase releaseExpiredHoldsUseCase
-        +createHold(request: HoldTicketsCommand) HttpResponse
+        +createHold(cmd) HttpResponse
         +releaseExpired() HttpResponse
     }
 
@@ -101,7 +121,7 @@ classDiagram
     class HoldTicketsUseCase {
         -IReservationUnitOfWork unitOfWork
         -ITimerNotifier timerNotifier
-        +execute(command: HoldTicketsCommand) HoldTicketsResult
+        +execute(cmd) HoldTicketsResult
     }
 
     class ReleaseExpiredHoldsUseCase {
@@ -117,11 +137,11 @@ classDiagram
         -number soldCount
         -number activeHoldsCount
         +getAvailableCapacity() number
-        +canHold(quantity: number) boolean
-        +validateHolderQuota(currentAccumulatedTickets: number, requestedQuantity: number) boolean
-        +registerHold(quantity: number) void
-        +releaseHold(quantity: number) void
-        +confirmSale(quantity: number) void
+        +canHold(qty) boolean
+        +validateHolderQuota(accumulated, qty) boolean
+        +registerHold(qty) void
+        +releaseHold(qty) void
+        +confirmSale(qty) void
         +assertInvariantIntegrity() void
     }
 
@@ -134,72 +154,76 @@ classDiagram
         -ReservationStatus status
         -Date createdAt
         -Date expiresAt
-        +isExpired(referenceDate: Date) boolean
+        +isExpired(refDate) boolean
         +markConfirmed() void
         +markExpired() void
         +markCancelled() void
-        +getRemainingTtlSeconds(referenceDate: Date) number
+        +getRemainingTtlSeconds(refDate) number
     }
 
     %% Puerto de Unidad de Trabajo Transaccional (Outbound Port)
     class IReservationUnitOfWork {
         <<interface>>
-        +findSectorInventoryWithLock(sectorId: string) SectorInventory
-        +countAccumulatedByHolder(sectorId: string, userId: string, excludeReservationId: string) number
-        +saveHoldAndInventoryAtomic(inventory: SectorInventory, reservation: Reservation) void
-        +findExpiredReservationsForUpdate(referenceDate: Date, limit: number) Reservation[]
-        +transitionHoldConditionally(reservationId: string, fromStatus: ReservationStatus, toStatus: ReservationStatus) boolean
-        +executeInTransaction(work: Function) Object
+        +findSectorInventoryWithLock(sectorId, txContext) SectorInventory
+        +countAccumulatedByHolder(sectorId, userId, excludeId, txContext) number
+        +saveHoldAndInventoryAtomic(inventory, reservation, txContext) void
+        +findExpiredReservationsForUpdate(limit, txContext) Reservation[]
+        +transitionHoldConditionally(id, from, to, txContext) boolean
+        +executeInTransaction(work, externalTxContext) Object
     }
 
     %% Puerto de Notificaciones Temporizadas (Outbound Port)
     class ITimerNotifier {
         <<interface>>
-        +scheduleHoldExpirationKey(reservationId: string, ttlSeconds: number) void
-        +cancelHoldExpirationKey(reservationId: string) void
+        +scheduleHoldExpirationKey(id, ttlSeconds) void
+        +cancelHoldExpirationKey(id) void
     }
 
     %% Adaptadores Secundarios (Outbound Adapters)
     class PostgreSQLReservationAdapter {
         -DatabasePool dbConnectionPool
-        +findSectorInventoryWithLock(sectorId: string) SectorInventory
-        +countAccumulatedByHolder(sectorId: string, userId: string, excludeReservationId: string) number
-        +saveHoldAndInventoryAtomic(inventory: SectorInventory, reservation: Reservation) void
-        +findExpiredReservationsForUpdate(referenceDate: Date, limit: number) Reservation[]
-        +transitionHoldConditionally(reservationId: string, fromStatus: ReservationStatus, toStatus: ReservationStatus) boolean
-        +executeInTransaction(work: Function) Object
+        +findSectorInventoryWithLock(sectorId, txContext) SectorInventory
+        +countAccumulatedByHolder(sectorId, userId, excludeId, txContext) number
+        +saveHoldAndInventoryAtomic(inventory, reservation, txContext) void
+        +findExpiredReservationsForUpdate(limit, txContext) Reservation[]
+        +transitionHoldConditionally(id, from, to, txContext) boolean
+        +executeInTransaction(work, externalTxContext) Object
     }
 
     class RedisTTLTimerAdapter {
         -RedisClient redisClient
-        +scheduleHoldExpirationKey(reservationId: string, ttlSeconds: number) void
-        +cancelHoldExpirationKey(reservationId: string) void
+        +scheduleHoldExpirationKey(id, ttlSeconds) void
+        +cancelHoldExpirationKey(id) void
     }
 
     %% Relaciones de Dependencia y Realización
     ReservationsController ..> HoldTicketsUseCase : orquesta
     ReservationsController ..> ReleaseExpiredHoldsUseCase : invoca barrido
     
-    ReservationsModuleFacadeImpl ..|> IReservationsModuleFacade : implementa en memoria
+    IReservationsModuleFacade <|.. ReservationsModuleFacadeImpl : implementa en memoria
+    IReservationsModuleFacade ..> ReservationDTO : expone DTO
+    IReservationsModuleFacade ..> ITransactionContext : comparte TX intermodular
+    IReservationsModuleFacade ..> ReservationConfirmationStatus : retorna estado tipado
+
     ReservationsModuleFacadeImpl --> IReservationUnitOfWork : transacciona en DB
     ReservationsModuleFacadeImpl --> ITimerNotifier : cancela alarmas
 
-    HoldTicketsUseCase --> IReservationUnitOfWork : delimita transacción atómica
-    HoldTicketsUseCase --> ITimerNotifier : programa alarma post-commit
-    HoldTicketsUseCase ..> SectorInventory : valida reglas de dominio
-    HoldTicketsUseCase ..> Reservation : instancia y transiciona
-    HoldTicketsUseCase ..> HoldTicketsCommand : recibe entrada
+    HoldTicketsUseCase --> IReservationUnitOfWork : delimita TX atomica
+    HoldTicketsUseCase --> ITimerNotifier : alarma post-commit
+    HoldTicketsUseCase ..> SectorInventory : valida invariantes
+    HoldTicketsUseCase ..> Reservation : instancia hold
+    HoldTicketsUseCase ..> HoldTicketsCommand : recibe comando
     HoldTicketsUseCase ..> HoldTicketsResult : retorna resultado
 
-    ReleaseExpiredHoldsUseCase --> IReservationUnitOfWork : consulta y libera condicionalmente
+    ReleaseExpiredHoldsUseCase --> IReservationUnitOfWork : libera expirados
 
-    PostgreSQLReservationAdapter ..|> IReservationUnitOfWork : implementa en PostgreSQL
-    RedisTTLTimerAdapter ..|> ITimerNotifier : implementa en Redis
+    IReservationUnitOfWork <|.. PostgreSQLReservationAdapter : implementa en PostgreSQL (DIP)
+    ITimerNotifier <|.. RedisTTLTimerAdapter : implementa en Redis (DIP)
 
-    PostgreSQLReservationAdapter ..> SectorInventory : bloquea fila y actualiza
-    PostgreSQLReservationAdapter ..> Reservation : persiste y transiciona
     Reservation --> ReservationStatus : posee estado
 ```
+
+</details>
 
 ---
 
@@ -209,12 +233,12 @@ classDiagram
 
 #### `IReservationsModuleFacade` (Puerto Inbound / Fachada Inter-Módulo)
 - **Tipo**: Puerto Inbound / Contrato de Integración Modular en Memoria.
-- **Responsabilidad**: Expone de manera desacoplada las capacidades del módulo hacia otros módulos del monolito (especialmente el [Módulo Pagos & Facturación](Nivel3-Diagrama-de-Componentes.md) y el [Módulo Tickets & Emisión](Nivel3-Diagrama-de-Componentes.md)).
-- **Aislamiento**: No es consumido vía HTTP; se ejecuta mediante inyección de dependencias dentro del mismo proceso Node.js.
+- **Responsabilidad**: Expone de manera desacoplada las capacidades del módulo hacia otros módulos del monolito (especialmente el [Módulo Pagos & Facturación](Nivel3-Diagrama-de-Componentes.md)).
+- **Coordinación Transaccional**: Su método `confirmReservationSold(reservationId, txContext): ReservationConfirmationStatus` acepta un token opaco `ITransactionContext` provisto por el módulo `Payments` para ejecutar la transición del hold y del inventario dentro de la misma transacción PostgreSQL que registra el pago y el evento en `outbox_events`, sin exponer tablas ni consultas SQL entre módulos.
 
 #### `ReservationsModuleFacadeImpl` (Implementación de Fachada Inter-Módulo)
 - **Tipo**: Servicio de Aplicación de Fachada.
-- **Responsabilidad**: Implementa `IReservationsModuleFacade` orquestando las llamadas internas a `IReservationUnitOfWork`. Es un componente **independiente del controlador HTTP** (`ReservationsController`), asegurando que los módulos de Pagos o Taquilla interactúen sin intermediación ni sobrecarga de capas web.
+- **Responsabilidad**: Implementa `IReservationsModuleFacade` delegando en `IReservationUnitOfWork` (reutilizando `txContext` cuando es invocado desde `Payments`). Es un componente **independiente del controlador HTTP** (`ReservationsController`), asegurando que otros módulos interactúen sin intermediación ni sobrecarga de capas web.
 
 #### `ReservationsController` (Adaptador Primario HTTP / REST)
 - **Tipo**: Adaptador Inbound (Entrada de Control Web).
@@ -228,19 +252,19 @@ classDiagram
 - **Tipo**: Servicio de Aplicación / Caso de Uso Central.
 - **Responsabilidad**: Orquestar el flujo integral de retención preventiva en una **única delimitación transaccional**:
   1. Invoca `unitOfWork.executeInTransaction()`, garantizando que todo el ciclo ocurra dentro de una única transacción en PostgreSQL bajo nivel de aislamiento `READ COMMITTED`.
-  2. Adquiere el bloqueo pesimista exclusivo de la fila del sector mediante `findSectorInventoryWithLock(sectorId)` (`SELECT ... FOR UPDATE`).
-  3. Consulta las entradas previamente acumuladas por el titular en dicho sector mediante `countAccumulatedByHolder()`.
+  2. Adquiere el bloqueo pesimista exclusivo de la fila del sector mediante `findSectorInventoryWithLock(sectorId, txContext)` (`SELECT ... FROM sector_inventory WHERE sector_id = $1 FOR UPDATE`). Si una operación involucra múltiples sectores, bloquea las filas en orden canónico ascendente (`ORDER BY sector_id ASC`) para prevenir interbloqueos (*deadlocks*).
+  3. Consulta las entradas previamente acumuladas por el titular en dicho sector mediante `countAccumulatedByHolder()`, ejecutada dentro de la misma transacción tras adquirir el bloqueo de `sector_inventory` para serializar solicitudes concurrentes del mismo usuario.
   4. Ejecuta las validaciones de invariantes en el aggregate `SectorInventory`:
      - Verificación de aforo disponible con `canHold(quantity)`.
      - Verificación de tope estricto de 4 entradas con `validateHolderQuota()`.
      - Registro del incremento de retenciones temporales con `registerHold(quantity)` y comprobación de la regla $S + H \le C$ (`assertInvariantIntegrity()`).
-  5. Instancia la entidad `Reservation` con temporización determinista de 600 segundos (10 minutos) en estado `PENDING_PAYMENT`.
+  5. Instancia la entidad `Reservation` con temporización determinista de 600 segundos (10 minutos) gobernada exclusivamente por el reloj del motor PostgreSQL (`NOW() + INTERVAL '600 seconds'`) en estado `PENDING_PAYMENT`.
   6. Persiste atómicamente la reserva y la actualización de los contadores del inventario en PostgreSQL mediante `saveHoldAndInventoryAtomic()`.
   7. Si la transacción hace `COMMIT` satisfactorio, programa asíncronamente la clave auxiliar en Redis mediante `timerNotifier.scheduleHoldExpirationKey()` como mecanismo de alarma secundaria. Si ocurre cualquier excepción de dominio o base de datos, la transacción hace `ROLLBACK` total.
 
 #### `ReleaseExpiredHoldsUseCase` (Caso de Uso de Liberación de Reservas Vencidas)
 - **Tipo**: Servicio de Aplicación / Caso de Uso de Mantenimiento.
-- **Responsabilidad**: Reincorporar la capacidad al sector cuando una reserva vence sin haberse confirmado el pago, ejecutando transiciones condicionales protegidas para evitar conflictos con confirmaciones tardías.
+- **Responsabilidad**: Reincorporar la capacidad al sector cuando una reserva vence (`expires_at <= NOW()`) sin haberse confirmado el pago, ejecutando transiciones condicionales idempotentes protegidas bajo `SELECT ... FOR UPDATE` sobre `sector_inventory`.
 
 ---
 
@@ -250,8 +274,9 @@ classDiagram
 - **Tipo**: Domain Entity / Aggregate Root.
 - **Responsabilidad**: Salvaguardar la consistencia matemática y física del aforo de un sector.
 - **Atributos**:
-  - `capacity`: Capacidad nominal física máxima autorizada para el sector.
-  - `soldCount`: Entradas efectivamente pagadas y emitidas ($S$).
+  - `sectorId`: Identificador único del sector.
+  - `capacity`: Capacidad nominal física máxima autorizada para el sector ($C$).
+  - `soldCount`: Entradas efectivamente pagadas y confirmadas ($S$).
   - `activeHoldsCount`: Entradas actualmente retenidas en proceso de compra vigente ($H$, donde $TTL \le 600\text{ s}$).
 - **Métodos e Invariantes**:
   - `getAvailableCapacity()`: Retorna $C - (S + H)$.
@@ -268,10 +293,10 @@ classDiagram
 - **Atributos**:
   - `id`: Identificador único de la reserva (UUIDv4).
   - `status`: Estado del ciclo de vida (`PENDING_PAYMENT`, `CONFIRMED`, `EXPIRED`, `CANCELLED`).
-  - `createdAt`: Marca temporal de inicio de la reserva.
-  - `expiresAt`: Marca temporal de expiración determinista ($createdAt + 600\text{ s}$).
+  - `createdAt`: Marca temporal de inicio de la reserva (`NOW()` en PostgreSQL).
+  - `expiresAt`: Marca temporal de expiración determinista (`NOW() + INTERVAL '600 seconds'` en PostgreSQL).
 - **Métodos de Ciclo de Vida**:
-  - `isExpired(referenceDate)`: Evalúa si `referenceDate > expiresAt`.
+  - `isExpired(referenceDate)`: Evalúa si `referenceDate >= expiresAt`.
   - `markConfirmed()`: Transiciona a `CONFIRMED` tras confirmación de pago.
   - `markExpired()`: Transiciona a `EXPIRED` si el tiempo expira sin pago.
   - `markCancelled()`: Transiciona a `CANCELLED` ante cancelación manual.
@@ -282,14 +307,14 @@ classDiagram
 
 #### `IReservationUnitOfWork` (Puerto Outbound de Unidad de Trabajo Transaccional)
 - **Tipo**: Puerto Secundario (Contrato Transaccional).
-- **Responsabilidad**: Define el contrato unificado para operaciones atómicas de reserva e inventario, asegurando que la consulta bajo bloqueo, la validación de cuotas, el alta de reserva y el descuento de capacidad se ejecuten dentro de **un único contexto transaccional indivisible**.
+- **Responsabilidad**: Define el contrato unificado para operaciones atómicas de reserva e inventario, aceptando un `ITransactionContext` opcional cuando la operación forma parte de una transacción iniciada por otro módulo a través de la fachada pública.
 
 #### `PostgreSQLReservationAdapter` (Adaptador Outbound Relacional)
 - **Tipo**: Adaptador Secundario (Implementación de Persistencia en PostgreSQL).
 - **Responsabilidad**: Implementa `IReservationUnitOfWork` ejecutando sentencias SQL transaccionales:
-  - Inicia la transacción y ejecuta `SELECT ... FROM sector_inventory WHERE id = $1 FOR UPDATE`.
-  - Computa la cuota del titular sumando entradas compradas y reservas activas vigentes.
-  - Inserta el registro en `reservations` y actualiza los contadores en `sector_inventory`.
+  - Adquiere bloqueo pesimista con `SELECT sector_id, event_id, capacity, sold_count, active_holds_count FROM sector_inventory WHERE sector_id = $1 FOR UPDATE`.
+  - Computa la cuota del titular en la tabla propia `reservations` sumando reservas pagadas (`status = 'CONFIRMED'`) y reservas activas vigentes (`status = 'PENDING_PAYMENT'` con `expires_at > NOW()`).
+  - Inserta el registro en `reservations` empleando `NOW()` del motor PostgreSQL y actualiza los contadores en `sector_inventory`.
   - Resuelve transiciones condicionales atómicas con cláusula `WHERE status = 'PENDING_PAYMENT' RETURNING *`.
 
 #### `ITimerNotifier` (Puerto Outbound de Temporización)
@@ -308,6 +333,13 @@ classDiagram
 
 Para garantizar consistencia estricta y eliminar cualquier condición de carrera (*race condition*), el diseño establece que **todas las operaciones de reserva ocurren dentro de una misma transacción PostgreSQL**:
 
+![Diagrama C4 — Secuencia de Reserva Transaccional Única](../diagramas-exportados/C4-secuencia.svg)
+
+> **Formatos exportados disponibles**: [SVG Vectorial (`C4-secuencia.svg`)](../diagramas-exportados/C4-secuencia.svg) | [PNG Alta Resolución (`C4-secuencia.png`)](../diagramas-exportados/C4-secuencia.png)
+
+<details>
+<summary><b>Ver código fuente Mermaid editable (C4-secuencia)</b></summary>
+
 ```mermaid
 sequenceDiagram
     autonumber
@@ -319,26 +351,28 @@ sequenceDiagram
     UC->>UoW: executeInTransaction()
     Note over UoW: BEGIN TRANSACTION (READ COMMITTED)
     
-    UC->>UoW: findSectorInventoryWithLock(sectorId)
-    UoW-->>UC: SELECT * FROM sector_inventory WHERE id = $1 FOR UPDATE (Bloqueo Pesimista)
+    UC->>UoW: findSectorInventoryWithLock(sectorId, txContext)
+    UoW-->>UC: SELECT * FROM sector_inventory WHERE sector_id = $1 FOR UPDATE
     
-    UC->>UoW: countAccumulatedByHolder(sectorId, userId)
-    UoW-->>UC: Total acumulado = Entradas Compradas + Holds Activos Vigentes
+    UC->>UoW: countAccumulatedByHolder(sectorId, userId, txContext)
+    UoW-->>UC: Total acumulado = Entradas Compradas + Holds Activos (expires_at > NOW())
     
     UC->>DOM: canHold(qty) & validateHolderQuota(totalAcumulado, qty)
-    Note over DOM: Evaluación de Reglas de Negocio RN-01 y RN-04
+    Note over DOM: Evaluacion de Reglas de Negocio RN-01 y RN-04
     
     UC->>DOM: registerHold(qty) & assertInvariantIntegrity()
     Note over DOM: Verifica invariante S + H <= C
     
-    UC->>UoW: saveHoldAndInventoryAtomic(inventory, reservation)
-    UoW-->>UC: INSERT INTO reservations (...) && UPDATE sector_inventory (...)
+    UC->>UoW: saveHoldAndInventoryAtomic(inventory, reservation, txContext)
+    UoW-->>UC: INSERT INTO reservations (..., NOW() + INTERVAL '600s') && UPDATE sector_inventory
     
     Note over UoW: COMMIT TRANSACTION (Libera lock de fila)
     
     UC->>REDIS: scheduleHoldExpirationKey(reservationId, 600) [Auxiliar post-commit]
     Note over REDIS: Alarma reactiva SET hold:ttl:... EX 600
 ```
+
+</details>
 
 > [!CAUTION]
 > **El bloqueo pesimista no sustituye la validación de los invariantes de negocio.**  
@@ -348,11 +382,11 @@ sequenceDiagram
 
 ### 4.2. Límite de Cuatro Entradas y Prevención de Doble Conteo (RN-04)
 
-Para cumplir rigurosamente con la política antirrevendedores ([RN-04](../complementos/03-reglas-de-negocio.md#rn-04-tope-máximo-de-entradas-por-asistente)), el sistema calcula la cuota acumulada del titular considerando dos fuentes en base de datos:
+Para cumplir rigurosamente con la política antirrevendedores ([RN-04](../complementos/03-reglas-de-negocio.md#rn-04-tope-máximo-de-entradas-por-asistente)), el sistema calcula la cuota acumulada del titular dentro de la misma transacción que adquirió el bloqueo `FOR UPDATE` sobre `sector_inventory`:
 
-$$\text{CuotaAcumulada} = \text{EntradasCompradas (CONFIRMED/ACTIVE)} + \sum_{\text{otras reservas}} \text{Cantidad (PENDING\_PAYMENT con expires\_at} > \text{NOW())}$$
+$$\text{CuotaAcumulada} = \text{ReservasPagadas (status = CONFIRMED)} + \sum_{\text{otras reservas}} \text{Cantidad (PENDING\_PAYMENT con expires\_at} > \text{NOW())}$$
 
-- **Al crear una nueva reserva**: Se evalúa que $\text{CuotaAcumulada} + \text{CantidadSolicitada} \le 4$.
+- **Serialización por Sector**: Dado que toda creación de reserva sobre un sector adquiere primero `SELECT ... FOR UPDATE` en `sector_inventory`, dos solicitudes simultáneas del mismo usuario para el mismo sector quedan estrictamente serializadas; la segunda lee los cambios confirmados de la primera e impide superar el tope de 4 entradas.
 - **Al transicionar de reserva a compra confirmada**:  
   El método `confirmSale(quantity)` convierte directamente las entradas retenidas en vendidas ($H \leftarrow H - \text{quantity}$, $S \leftarrow S + \text{quantity}$) y marca la reserva como `CONFIRMED`. **No existe doble conteo**, pues las entradas de la reserva que se confirma dejan de contarse como reserva pendiente y pasan a ser entradas compradas en la misma operación atómica.
 
@@ -362,11 +396,11 @@ $$\text{CuotaAcumulada} = \text{EntradasCompradas (CONFIRMED/ACTIVE)} + \sum_{\t
 
 Un riesgo arquitectónico crítico ocurre cuando un usuario completa el pago en la pasarela externa en el instante límite de los 10 minutos (segundo 599–601), al mismo tiempo que el worker de expiración intenta liberar las entradas.
 
-Para evitar inconsistencias, **PostgreSQL es la única autoridad de vigencia efectiva** mediante **actualizaciones condicionales atómicas**:
+Para evitar inconsistencias, **PostgreSQL es la única autoridad de vigencia efectiva** mediante **actualizaciones condicionales atómicas** y el reloj único del motor (`NOW()`):
 
 #### Caso A: El Pago se Confirma Antes de la Liberación
-1. El [Módulo Pagos](Nivel3-Diagrama-de-Componentes.md) invoca `confirmReservationSold(reservationId)` a través de `ReservationsModuleFacadeImpl`.
-2. Se ejecuta la sentencia transaccional condicional:
+1. El [Módulo Pagos](Nivel3-Diagrama-de-Componentes.md) inicia un `txContext: ITransactionContext` e invoca `confirmReservationSold(reservationId, txContext)` a través de `ReservationsModuleFacadeImpl`.
+2. Dentro de `txContext`, se bloquea la fila en `sector_inventory` (`FOR UPDATE`) y se ejecuta la sentencia condicional:
    ```sql
    UPDATE reservations 
    SET status = 'CONFIRMED', updated_at = NOW() 
@@ -375,11 +409,11 @@ Para evitar inconsistencias, **PostgreSQL es la única autoridad de vigencia efe
      AND expires_at > NOW() 
    RETURNING *;
    ```
-3. La consulta actualiza 1 fila satisfactoriamente. Se confirma la venta en `sector_inventory` ($H \leftarrow H - Q, S \leftarrow S + Q$) y se cancela la alarma en Redis (`cancelHoldExpirationKey`).
-4. Si el worker de expiración se ejecuta milisegundos después, intentará actualizar la reserva con `WHERE status = 'PENDING_PAYMENT'`; al encontrar 0 filas afectadas, aborta la liberación sin alterar el inventario.
+3. La consulta actualiza 1 fila satisfactoriamente. Se confirma la venta en `sector_inventory` ($H \leftarrow H - Q, S \leftarrow S + Q$), `Payments` registra la orden `PAID` y el evento `PAYMENT_CONFIRMED` en `outbox_events`, y se ejecuta un único `COMMIT`. Tras el commit, se cancela la alarma auxiliar en Redis (`cancelHoldExpirationKey`).
+4. Si el worker de expiración (`ReleaseExpiredHoldsUseCase`) o el listener de Redis se ejecutan milisegundos después, intentarán actualizar la reserva con `WHERE status = 'PENDING_PAYMENT'`; al encontrar **0 filas afectadas**, retornan idempotentemente sin decrementar `active_holds_count`.
 
-#### Caso B: El Worker de Expiración Libera Antes de la Confirmación
-1. El worker de expiración ejecuta la transición condicional atómica:
+#### Caso B: El Worker de Expiración Libera Antes de la Confirmación (Pago Tardío)
+1. El worker de expiración bloquea `sector_inventory` (`FOR UPDATE`) y ejecuta la transición condicional atómica:
    ```sql
    UPDATE reservations 
    SET status = 'EXPIRED', updated_at = NOW() 
@@ -388,9 +422,9 @@ Para evitar inconsistencias, **PostgreSQL es la única autoridad de vigencia efe
      AND expires_at <= NOW() 
    RETURNING *;
    ```
-2. La consulta actualiza 1 fila satisfactoriamente. El worker restituye la capacidad disponible en `sector_inventory` ($H \leftarrow H - Q$).
-3. Si el webhook de pago llega con retraso y pretende confirmar la compra, su `UPDATE` condicional retornará 0 filas afectadas (`status` ya no es `PENDING_PAYMENT`).
-4. El sistema detecta el conflicto de expiración, rechaza la emisión de tickets y desencadena automáticamente la reversión o reembolso del cobro al comprador a través del Módulo de Pagos.
+2. La consulta actualiza 1 fila satisfactoriamente y restituye la capacidad disponible en `sector_inventory` ($H \leftarrow H - Q$).
+3. Si el webhook de la pasarela llega con retraso y `Payments` invoca `confirmReservationSold(reservationId, txContext)`, el `UPDATE` condicional retorna **0 filas afectadas** y la fachada devuelve `ReservationConfirmationStatus.EXPIRED`.
+4. En la misma transacción `txContext`, el Módulo de Pagos **jamás fuerza la venta ni emite tickets**; registra la transacción de pago con estado `REQUIRES_REFUND` e inserta en `outbox_events` el evento `PAYMENT_EXPIRED_REFUND_REQUIRED` para que el `OutboxProcessor` ejecute de manera garantizada la reversión o reembolso automático ante la pasarela.
 
 ---
 
@@ -406,12 +440,12 @@ Alineación formal con los identificadores exactos del [Catálogo de Requisitos 
 | **RF-COR-01** | Consulta Pública de Disponibilidad | `IReservationsModuleFacade.getReservationStatus()` |
 | **RF-COR-02** | Bloqueo Transaccional con TTL (10 min) | `IReservationUnitOfWork`, `PostgreSQLReservationAdapter` (`SELECT FOR UPDATE`) |
 | **RF-COR-03** | Liberación Automática de Reservas Vencidas | `ReleaseExpiredHoldsUseCase`, `RedisTTLTimerAdapter` |
-| **RF-COR-04** | Recepción Idempotente de Cobros | Integración vía `ReservationsModuleFacadeImpl.confirmReservationSold()` |
+| **RF-COR-04** | Recepción Idempotente de Cobros | Integración vía `ReservationsModuleFacadeImpl.confirmReservationSold(id, txContext)` |
 | **RN-01** | Conservación Estricta del Aforo | `SectorInventory.assertInvariantIntegrity()` ($S + H \le C$) |
-| **RN-03** | Temporalidad de la Reserva (600 s) | `Reservation.expiresAt`, `Reservation.getRemainingTtlSeconds()` |
+| **RN-03** | Temporalidad de la Reserva (600 s) | `Reservation.expiresAt` (`NOW() + INTERVAL '600 seconds'`) |
 | **RN-04** | Límite Máximo de 4 Entradas por Comprador | `countAccumulatedByHolder()` + `SectorInventory.validateHolderQuota()` |
 | **EAC-01** | Concurrencia Masiva en Preventas | Serialización en PostgreSQL con `READ COMMITTED` + `FOR UPDATE` |
-| **EAC-02** | Prevención Absoluta de Sobreventa | Transacción atómica única indivisible (`IReservationUnitOfWork`) |
+| **EAC-02** | Prevención Absoluta de Sobreventa | Transacción atómica única indivisible (`IReservationUnitOfWork` + `ITransactionContext`) |
 | **ADR-001** | Selección del Estilo Monolito Modular | `IReservationsModuleFacade` consumible en memoria sin llamadas HTTP |
 | **ADR-002** | Adopción de Arquitectura Hexagonal | Puertos (`IReservationUnitOfWork`, `ITimerNotifier`) y adaptadores aislados |
 | **ADR-003** | Concurrencia e Integridad de Inventario | `PostgreSQLReservationAdapter` como autoridad exclusiva de persistencia |
@@ -423,7 +457,7 @@ Alineación formal con los identificadores exactos del [Catálogo de Requisitos 
 Para mantener absoluta honestidad técnica y académica en las entregas del proyecto AFORO:
 
 1. **Estado del Frontend (AFORO Web SPA)**:  
-   Implementado funcionalmente en el directorio [`src/`](file:///g:/2026%20400%20Par/Arquitectura%20de%20Software/AFORO-TF/AFORO-Fusion/src/) mediante React 19, TypeScript, Tailwind CSS y Zustand. Cuenta con 30 pruebas unitarias y de integración que verifican la interfaz de usuario, renderizado de mapas SVG, filtros y navegación de catálogo. En la entrega actual, la experiencia de reserva y compra opera como una **demostración interactiva en cliente (*client-side demo*)** que simula tiempos de espera y temporizadores de 10 minutos en memoria del navegador.
+   Implementado funcionalmente en el directorio [`frontend/src/`](../../frontend/src/) mediante React 19, TypeScript, CSS nativo con Cascade Layers (`@layer`), Container Queries y estado global con React Context API (`StoreProvider`). Cuenta con 30 pruebas unitarias y de integración que verifican la interfaz de usuario, renderizado de mapas SVG, filtros y navegación de catálogo. En la entrega actual, la experiencia de reserva y compra opera como una **demostración interactiva en cliente (*client-side demo*)** que simula tiempos de espera y temporizadores de 10 minutos en memoria del navegador.
 
 2. **Estado del Backend (API Core)**:  
    El backend se encuentra formalizado en sus cuatro niveles de abstracción arquitectónica (C1 Contexto, C2 Contenedores, C3 Componentes y C4 Código). No existen clases de backend, repositorios SQL ni conexiones a bases de datos implementadas en el código fuente actual. La implementación física del backend se llevará a cabo en las fases de desarrollo correspondientes a las entregas de construcción de la Guía de Arquitectura de Software.

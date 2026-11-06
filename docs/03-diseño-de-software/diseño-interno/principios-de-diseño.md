@@ -17,13 +17,13 @@ El presente documento establece las directrices fundamentales de diseño orienta
 1. **API Core Backend (`[DISEÑO PROPUESTO — NO IMPLEMENTADO]`)**:  
    Formaliza la arquitectura interna de los seis módulos de dominio cohesivos que componen el monolito modular, garantizando que cada componente respete el aislamiento hexagonal, los principios SOLID y la delimitación estricta de fronteras transaccionales.
 2. **AFORO Web SPA (`[IMPLEMENTADO EN WEB]`)**:  
-   Define cómo los principios de modularidad, cohesión y segregación de responsabilidades se reflejan en el código fuente actual del frontend ([`src/`](file:///g:/2026%20400%20Par/Arquitectura%20de%20Software/AFORO-TF/AFORO-Fusion/src/)), separando componentes visuales, lógica de filtrado de datos, sincronización de estado global y contratos de navegación.
+   Define cómo los principios de modularidad, cohesión y segregación de responsabilidades se reflejan en el código fuente actual del frontend ([`frontend/src/`](../../../frontend/src/)), separando componentes visuales, lógica de filtrado de datos, sincronización de estado global y contratos de navegación.
 
 > [!IMPORTANT]
 > **Declaración de Realidad Técnica**:  
 > Conforme al Principio IV de la Constitución del proyecto, se distingue expresamente la realidad técnica de las partes:  
-> - El frontend web se encuentra **físicamente implementado** en React 19 / TypeScript bajo `src/`, respaldado por 30 pruebas unitarias y de integración.  
-> - El backend API Core se encuentra **formalizado a nivel de diseño y especificación técnica**; no existen archivos fuente de backend en `src/`.
+> - El frontend web se encuentra **físicamente implementado** en React 19 / TypeScript bajo `frontend/src/`, respaldado por 30 pruebas unitarias y de integración.
+> - El backend API Core se encuentra **formalizado a nivel de diseño y especificación técnica**; no existen archivos fuente de backend en el repositorio.
 
 ---
 
@@ -59,11 +59,11 @@ AFORO fragmenta rigurosamente el ciclo de vida de la compra en componentes con u
 - **`IssueTicketsUseCase` ([Módulo Tickets](../../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md))**: Su única razón de cambio es la emisión formal y firma digital asimétrica (Ed25519) del ticket una vez confirmado el cobro.
 - **`EmailNotificationAdapter`**: Su única razón de cambio son los cambios en plantillas HTML o proveedores de correo transaccional (SendGrid/Resend).
 
-#### Manifestación en el Frontend (`src/`)
+#### Manifestación en el Frontend (`frontend/src/`)
 En el código implementado, SRP se materializa separando la presentación visual de la lógica de transformación:
-- [`src/lib/filters.ts`](file:///g:/2026%20400%20Par/Arquitectura%20de%20Software/AFORO-TF/AFORO-Fusion/src/lib/filters.ts): Función pura dedicada exclusivamente a normalización fonética, ordenamiento y filtrado multicriterio de eventos.
-- [`src/lib/cart.ts`](file:///g:/2026%20400%20Par/Arquitectura%20de%20Software/AFORO-TF/AFORO-Fusion/src/lib/cart.ts): Lógica pura para cálculo de líneas, límites por sector y totales monetarios.
-- [`src/components/TicketPicker.tsx`](file:///g:/2026%20400%20Par/Arquitectura%20de%20Software/AFORO-TF/AFORO-Fusion/src/components/TicketPicker.tsx): Componente visual que únicamente orquesta la interacción del usuario y delega el cálculo a las funciones puras anteriores.
+- [`frontend/src/lib/filters.ts`](../../../frontend/src/lib/filters.ts): Función pura dedicada exclusivamente a normalización fonética, ordenamiento y filtrado multicriterio de eventos.
+- [`frontend/src/lib/cart.ts`](../../../frontend/src/lib/cart.ts): Lógica pura para cálculo de líneas, límites por sector y totales monetarios.
+- [`frontend/src/components/TicketPicker.tsx`](../../../frontend/src/components/TicketPicker.tsx): Componente visual que únicamente orquesta la interacción del usuario y delega el cálculo a las funciones puras anteriores.
 
 ---
 
@@ -130,9 +130,9 @@ AFORO segrega minuciosamente los puertos e interfaces en contratos específicos 
   En estricta consonancia con el [Diagrama C4](../../04-modelo-c4/Nivel4-DiagramadeCodigo.md), la fachada intermodular expone exclusivamente las tres operaciones requeridas por otros módulos del monolito:
   ```typescript
   interface IReservationsModuleFacade {
-    getReservationStatus(reservationId: string): ReservationDTO;
-    confirmReservationSold(reservationId: string): boolean;
-    cancelHoldManually(reservationId: string, reason: string): boolean;
+    getReservationStatus(reservationId: string): Promise<ReservationDTO>;
+    confirmReservationSold(reservationId: string, txContext: ITransactionContext): Promise<ReservationConfirmationStatus>;
+    cancelHoldManually(reservationId: string, reason: string): Promise<boolean>;
   }
   ```
   Los módulos externos (como Pagos) consumen únicamente esta fachada sin tener visibilidad ni acceso a métodos internos de recálculo de aforo, bloqueos de fila o consultas de infraestructura.

@@ -20,71 +20,113 @@ Para blindar las reglas de negocio de AFORO frente a dependencias tecnológicas 
    Las entidades y agregados (`SectorInventory`, `Reservation`, `Ticket`) se conciben como clases de TypeScript puras, libres de decoradores de ORM, clientes HTTP o librerías de bases de datos. Todas las invariantes críticas ($S + H \le C$, límite de 4 entradas por titular y sector, transiciones de estado) residen en el dominio.
 3. **Delimitación Transaccional Explícita**:  
    La consistencia de inventario y reservas se delega en el motor relacional PostgreSQL a través de puertos transaccionales (`IReservationUnitOfWork`), manteniendo a Redis exclusivamente como notificador auxiliar post-commit ([ADR-003](../complementos/adrs/ADR-003-concurrencia-integridad-inventario.md)).
+4. **Precisión Conceptual (Módulos Paralelos con Capas Concéntricas)**:
+   El contenedor `API Core Backend` no es un único hexágono cuyas seis caras sean los módulos de negocio, ni tampoco son "seis hexágonos anidados/concéntricos entre sí". Por el contrario, el monolito modular alberga **seis módulos independientes en paralelo** (`Catalog`, `Reservations`, `Payments`, `Tickets`, `Access`, `Identity`), donde **cada módulo aplica internamente tres capas concéntricas** (Dominio $\subset$ Aplicación $\subset$ Infraestructura) y se comunica con otros módulos exclusivamente mediante contratos de fachada en memoria (`I<Module>Facade`) o eventos persistidos en `outbox_events`.
+
+### 1.2. Matriz Compacta de Puertos y Adaptadores de los Seis Módulos (`[DISEÑO PROPUESTO]`)
+
+| Módulo | Dominio Puro (Entidades / Agregados / VOs) | Casos de Uso (Aplicación) | Puertos de Entrada (Inbound Ports / Fachadas) | Adaptadores Primarios (Inbound Adapters) | Puertos de Salida (Outbound Ports) | Adaptadores Secundarios (Outbound Adapters) |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **1. `Catalog`** | `Event`, `Venue`, `Sector`, `SectorCapacity` | `GetCatalogUseCase`, `GetEventDetailUseCase`, `ConfigureEventUseCase` | `ICatalogModuleFacade` (`CatalogModuleFacadeImpl`) | `CatalogController` (REST público y Studio) | `ICatalogRepository`, `ICatalogCache` | `PostgreSQLCatalogAdapter`, `RedisCatalogCacheAdapter` |
+| **2. `Reservations`** | `SectorInventory` (Aggregate Root), `Reservation`, `ReservationStatus` | `HoldTicketsUseCase`, `ReleaseExpiredHoldsUseCase` | `IReservationsModuleFacade` (`ReservationsModuleFacadeImpl`) | `ReservationsController` (REST), `ExpirationSweepTrigger` (Timer/Worker) | `IReservationUnitOfWork`, `ITimerNotifier` | `PostgreSQLReservationAdapter` (`SELECT FOR UPDATE`), `RedisTTLTimerAdapter` |
+| **3. `Payments`** | `Payment`, `PaymentStatus`, `IdempotencyRecord`, `OutboxEvent` | `ProcessPaymentUseCase`, `HandleGatewayWebhookUseCase`, `RefundExpiredPaymentUseCase` | *(Sin fachada síncrona entrante; publica vía Outbox)* | `PaymentsController` (REST), `WebhooksController` (REST) | `IPaymentRepository`, `IPaymentGateway`, `IOutboxRepository` | `PostgreSQLPaymentAdapter`, `CulqiPaymentAdapter`, `NiubizPaymentAdapter`, `StripePaymentAdapter` |
+| **4. `Tickets`** | `Ticket` (Aggregate Root), `TicketStatus`, `QrPayload`, `EventKeyPair` | `IssueTicketsUseCase`, `GetTicketDetailUseCase`, `ConsumeTicketUseCase` | `ITicketsModuleFacade` (`TicketsModuleFacadeImpl`) | `TicketIssuanceListener` (Outbox Consumer), `TicketsController` (REST) | `ITicketRepository`, `ISignatureService`, `INotificationService` | `PostgreSQLTicketAdapter`, `Ed25519SignatureAdapter`, `EmailNotificationAdapter` |
+| **5. `Access`** | `AccessLog`, `AccessCollisionAudit`, `ValidationResult` | `ValidateTicketOnlineUseCase`, `ReconcileGateLogsUseCase`, `GetGatePreloadUseCase` | *(Consumido por terminales AFORO Access vía HTTP)* | `AccessGateController` (REST Online y Reconciliación Batch) | `IAccessRepository` | `PostgreSQLAccessAdapter` |
+| **6. `Identity`** | `User`, `Role` (`FAN`, `ORGANIZER`, `GATE_OPERATOR`, `PLATFORM_ADMIN`), `SessionClaims` | `AuthenticateUserUseCase`, `VerifyTokenUseCase` | `IIdentityModuleFacade` (`IdentityModuleFacadeImpl`) | `AuthController` (REST) | `IUserRepository`, `ITokenProvider`, `IPasswordHasher` | `PostgreSQLUserAdapter`, `JwtTokenAdapter`, `Argon2PasswordAdapter` |
 
 ---
 
 ## 2. Arquitectura Hexagonal Aplicada al Módulo `Reservations` (`[DISEÑO PROPUESTO]`)
 
-El siguiente diagrama modela la aplicación concreta de la Arquitectura Hexagonal en el **Módulo Reservas e Inventario** (`Reservations`), mostrando sus adaptadores de entrada, puertos de entrada, casos de uso de aplicación, núcleo de dominio, puertos de salida y adaptadores secundarios de infraestructura, en correspondencia directa con el [Diagrama C4 de Código](../04-modelo-c4/Nivel4-DiagramadeCodigo.md):
+El siguiente diagrama modela la aplicación concreta de la Arquitectura Hexagonal en un único módulo del monolito (**Módulo `Reservations`**), separando a los consumidores externos (clientes HTTP y el módulo `Payments` que invoca su fachada pública en memoria) de sus tres capas internas (Adaptadores de Infraestructura, Aplicación/Puertos y Dominio Puro), en correspondencia directa con el [Diagrama C4 de Código](../04-modelo-c4/Nivel4-DiagramadeCodigo.md):
+
+![Diagrama de Arquitectura Hexagonal — Módulo Reservations](../diagramas-exportados/reservations-hexagonal.svg)
+
+> **Formatos exportados disponibles**: [SVG Vectorial (`reservations-hexagonal.svg`)](../diagramas-exportados/reservations-hexagonal.svg) | [PNG Alta Resolución (`reservations-hexagonal.png`)](../diagramas-exportados/reservations-hexagonal.png)
+
+<details>
+<summary><b>Ver código fuente Mermaid editable (reservations-hexagonal)</b></summary>
 
 ```mermaid
-flowchart TB
-    subgraph INBOUND_ADAPTERS["1. Adaptadores de Entrada (Inbound Adapters) [Infraestructura]"]
-        CTRL["<b>ReservationsController</b><br/><i>Adaptador Primario HTTP / REST</i><br/><code>POST /api/v1/reservations/hold</code>"]
-        SWEEP["<b>Timer / Sweep Trigger</b><br/><i>Invocador de Liberación de Vencidos</i>"]
-        EXT_MOD["<b>Módulo Payments (Consumidor Externo)</b><br/><i>Invocación en memoria dentro del monolito</i>"]
+flowchart TD
+    subgraph EXT_CONSUMERS["Consumidores Externos al Modulo Reservations"]
+        HTTP_CLI["<b>AFORO Web SPA (Cliente HTTP)</b><br/>Solicita hold temporal<br/>[IMPLEMENTADO EN WEB / COMPRA DEMO]"]
+        PAY_MOD["<b>Modulo Payments (Consumidor Intermodular)</b><br/>Invoca fachada en memoria con txContext<br/>[DISENO PROPUESTO]"]
     end
 
-    subgraph APPLICATION_LAYER["2. Capa de Aplicación (Application Core)"]
-        subgraph INBOUND_PORTS["Puertos de Entrada y Casos de Uso"]
-            UC_HOLD["<b>HoldTicketsUseCase</b><br/><i>Orquesta retención temporal (TTL 600s)</i>"]
-            UC_REL["<b>ReleaseExpiredHoldsUseCase</b><br/><i>Reincorpora cupos de reservas vencidas</i>"]
-            FAC_PORT["<b>&lt;&lt;interface&gt;&gt; IReservationsModuleFacade</b><br/><i>Contrato público intermodular</i>"]
-            FAC_IMPL["<b>ReservationsModuleFacadeImpl</b><br/><i>Implementación de fachada en aplicación</i>"]
+    subgraph RES_MODULE["Frontera del Modulo Reservations [DISENO PROPUESTO]"]
+        direction TB
+
+        subgraph INBOUND_ADAPTERS["1. Adaptadores Primarios de Entrada (Infraestructura)"]
+            CTRL["<b>ReservationsController</b><br/>Adaptador HTTP / REST<br/>POST /api/v1/reservations/hold"]
+            SWEEP["<b>ExpirationSweepTrigger</b><br/>Invocador de liberacion de vencidos"]
         end
 
-        subgraph DOMAIN_CORE["3. Capa de Dominio (Núcleo Puro)"]
-            INV["<b>SectorInventory (Aggregate Root)</b><br/>Invariante: <code>soldCount + activeHoldsCount &lt;= capacity</code><br/>Cuota: <code>validateHolderQuota(&lt;= 4)</code>"]
-            RES["<b>Reservation (Entity)</b><br/>Estados: <code>PENDING_PAYMENT | CONFIRMED | EXPIRED | CANCELLED</code><br/>Vigencia: <code>expiresAt = createdAt + 600s</code>"]
+        subgraph APPLICATION_LAYER["2. Capa de Aplicacion (Casos de Uso y Puertos)"]
+            direction TB
+            subgraph INBOUND_PORTS["Puertos de Entrada y Casos de Uso"]
+                FAC_PORT["<b>[Inbound Port] IReservationsModuleFacade</b><br/>confirmReservationSold(id, txContext)<br/>getReservationStatus(id)"]
+                FAC_IMPL["<b>ReservationsModuleFacadeImpl</b><br/>Servicio de aplicacion de fachada"]
+                UC_HOLD["<b>HoldTicketsUseCase</b><br/>Orquesta retencion temporal (TTL 600s)"]
+                UC_REL["<b>ReleaseExpiredHoldsUseCase</b><br/>Reincorpora cupos vencidos idempotentemente"]
+            end
+
+            subgraph DOMAIN_CORE["3. Capa de Dominio (Nucleo Puro)"]
+                INV["<b>SectorInventory (Aggregate Root)</b><br/>Invariante: soldCount + activeHoldsCount &lt;= capacity<br/>Cuota: validateHolderQuota(&lt;= 4)"]
+                RES["<b>Reservation (Entity)</b><br/>Estados: PENDING_PAYMENT | CONFIRMED | EXPIRED | CANCELLED<br/>Reloj: expiresAt = NOW() + 600s"]
+            end
+
+            subgraph OUTBOUND_PORTS["Puertos de Salida (Interfaces de Aplicacion)"]
+                PORT_UOW["<b>[Outbound Port] IReservationUnitOfWork</b><br/>executeInTransaction(work, txContext)<br/>findSectorInventoryWithLock(sectorId)<br/>countAccumulatedByHolder(sectorId, userId)<br/>saveHoldAndInventoryAtomic(inv, res)"]
+                PORT_TMR["<b>[Outbound Port] ITimerNotifier</b><br/>scheduleHoldExpirationKey(id, 600)<br/>cancelHoldExpirationKey(id)"]
+            end
         end
 
-        subgraph OUTBOUND_PORTS["Puertos de Salida (Outbound Ports)"]
-            PORT_UOW["<b>&lt;&lt;interface&gt;&gt; IReservationUnitOfWork</b><br/><code>executeInTransaction()</code><br/><code>findSectorInventoryWithLock()</code><br/><code>countAccumulatedByHolder()</code><br/><code>saveHoldAndInventoryAtomic()</code>"]
-            PORT_TMR["<b>&lt;&lt;interface&gt;&gt; ITimerNotifier</b><br/><code>scheduleHoldExpirationKey(id, 600)</code><br/><code>cancelHoldExpirationKey(id)</code>"]
+        subgraph OUTBOUND_ADAPTERS["4. Adaptadores Secundarios de Salida (Infraestructura)"]
+            ADAPT_PG["<b>PostgreSQLReservationAdapter</b><br/>Transaccion ACID + SELECT FOR UPDATE"]
+            ADAPT_RD["<b>RedisTTLTimerAdapter</b><br/>SET hold:ttl:{id} EX 600 (Auxiliar)"]
         end
     end
 
-    subgraph OUTBOUND_ADAPTERS["4. Adaptadores de Salida (Outbound Adapters) [Infraestructura]"]
-        ADAPT_PG["<b>PostgreSQLReservationAdapter</b><br/><i>Transacción ACID + SELECT ... FOR UPDATE</i>"]
-        ADAPT_RD["<b>RedisTTLTimerAdapter</b><br/><i>SET hold:ttl:{id} EX 600</i>"]
+    subgraph INFRA_ENGINES["Motores de Persistencia [DISENO PROPUESTO]"]
+        PG[("<b>PostgreSQL 16</b><br/>Tablas: sector_inventory, reservations<br/>(Unica Fuente de Verdad)")]
+        RD[("<b>Redis 7</b><br/>Alarma Auxiliar TTL (600s)")]
     end
 
-    subgraph INFRA_ENGINES["Motores de Persistencia [DISEÑO PROPUESTO]"]
-        PG[("🐘 PostgreSQL<br/>(Fuente de Verdad)")]
-        RD[("⚡ Redis<br/>(Alarma Auxiliar)")]
-    end
-
-    %% Flujo desde Adaptadores de Entrada hacia Aplicación
-    CTRL -->|"Traduce Request a HoldTicketsCommand"| UC_HOLD
+    %% Flujo desde Consumidores y Adaptadores de Entrada hacia Aplicacion
+    HTTP_CLI -->|"HTTPS / JSON"| CTRL
+    CTRL -->|"HoldTicketsCommand"| UC_HOLD
     SWEEP -->|"Dispara barrido"| UC_REL
-    EXT_MOD -->|"Consume fachada"| FAC_PORT
-    FAC_IMPL -.->|"Implementa"| FAC_PORT
+    PAY_MOD -->|"Invoca contrato publico"| FAC_PORT
+    FAC_PORT -.->|"Realizado por"| FAC_IMPL
 
-    %% Uso del Dominio y Puertos de Salida por Aplicación
-    UC_HOLD -->|"Valida invariantes y crea entidad"| INV & RES
-    UC_HOLD -->|"Delimita transacción única"| PORT_UOW
-    UC_HOLD -->|"Programa alarma post-commit"| PORT_TMR
-    UC_REL -->|"Libera condicionalmente"| PORT_UOW
-    FAC_IMPL -->|"Confirma o cancela reserva"| PORT_UOW
+    %% Uso del Dominio y Puertos de Salida por Aplicacion
+    UC_HOLD -->|"Valida invariantes"| INV & RES
+    UC_HOLD -->|"Delimita TX atomica"| PORT_UOW
+    UC_HOLD -->|"Alarma post-commit"| PORT_TMR
+    UC_REL -->|"Libera expirados"| PORT_UOW
+    FAC_IMPL -->|"Transacciona (txContext)"| PORT_UOW
     FAC_IMPL -->|"Cancela alarma"| PORT_TMR
 
-    %% Inversión de Dependencias en Adaptadores de Salida
-    ADAPT_PG -.->|"Implementa interfaz (DIP)"| PORT_UOW
-    ADAPT_RD -.->|"Implementa interfaz (DIP)"| PORT_TMR
+    %% Inversion de Dependencias en Adaptadores de Salida (DIP)
+    PORT_UOW -.->|"Implementado por (DIP)"| ADAPT_PG
+    PORT_TMR -.->|"Implementado por (DIP)"| ADAPT_RD
 
-    ADAPT_PG -->|"SQL"| PG
-    ADAPT_RD -->|"TCP"| RD
+    ADAPT_PG -->|"TCP / SQL"| PG
+    ADAPT_RD -->|"TCP / RESP"| RD
+
+    classDef client fill:#1e3a8a,stroke:#3b82f6,stroke-width:2px,color:#ffffff;
+    classDef app fill:#3b0764,stroke:#a855f7,stroke-width:2px,color:#ffffff;
+    classDef domain fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ffffff;
+    classDef infra fill:#1f2937,stroke:#64748b,stroke-width:2px,color:#ffffff;
+
+    class HTTP_CLI,PAY_MOD client;
+    class FAC_PORT,FAC_IMPL,UC_HOLD,UC_REL,PORT_UOW,PORT_TMR app;
+    class INV,RES domain;
+    class CTRL,SWEEP,ADAPT_PG,ADAPT_RD,PG,RD infra;
 ```
+
+</details>
 
 ---
 
@@ -115,7 +157,7 @@ Cuando un asistente solicita reservar entradas para un sector (`POST /api/v1/res
 
 ## 4. Ensamblaje Mediante *Composition Root* (`[DISEÑO PROPUESTO]`)
 
-Para que los casos de uso reciban las implementaciones concretas de sus puertos sin acoplarse a ellas con `new PostgreSQLReservationAdapter()`, la arquitectura contempla un **Composition Root (Raíz de Composición)** como parte del diseño propuesto del backend (no existente como archivo físico en el repositorio actual, dado que `src/` contiene únicamente el frontend AFORO Web):
+Para que los casos de uso reciban las implementaciones concretas de sus puertos sin acoplarse a ellas con `new PostgreSQLReservationAdapter()`, la arquitectura contempla un **Composition Root (Raíz de Composición)** como parte del diseño propuesto del backend (no existente como archivo físico en el repositorio actual, dado que [`frontend/src/`](../../frontend/src/) contiene únicamente el frontend AFORO Web):
 
 1. **Responsabilidad del Composition Root Proyectado**:  
    En la fase de inicialización del proceso del servidor backend, este componente central es el único lugar que conoce simultáneamente todas las capas para ensamblar el grafo de objetos:

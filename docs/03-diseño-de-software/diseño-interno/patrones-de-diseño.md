@@ -22,7 +22,7 @@ El presente documento especifica el catálogo de **patrones de diseño de softwa
 > **Declaración de Realidad Técnica**:  
 > Conforme al Principio IV de la Constitución del proyecto:  
 > - Los patrones vinculados al backend ([API Core](principios-de-diseño.md)) corresponden a un **`[DISEÑO PROPUESTO — NO IMPLEMENTADO]`**.  
-> - En el frontend ([AFORO Web SPA](../../../src/App.tsx)), ciertos patrones se encuentran **`[IMPLEMENTADO EN WEB]`** (como Adaptadores y provisión de contexto) o **`[DEMO / SIMULADO]`** (como el flujo simulado de pago y reserva en cliente).
+> - En el frontend ([AFORO Web SPA](../../../frontend/src/App.tsx)), ciertos patrones se encuentran **`[IMPLEMENTADO EN WEB]`** (como Adaptadores y provisión de contexto) o **`[DEMO / SIMULADO]`** (como el flujo simulado de pago y reserva en cliente).
 
 ---
 
@@ -94,7 +94,7 @@ El caso de uso invoca métodos con semántica de colección de dominio (ej. `cat
 - Conforme a [ADR-002 (Arquitectura Hexagonal)](../../complementos/adrs/ADR-002-adopcion-arquitectura-hexagonal.md) y visible en los seis módulos del [Diagrama C3 (Componentes)](../../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md).
 
 #### Estado Real de Implementación
-- **`[DISEÑO PROPUESTO — NO IMPLEMENTADO]`**: En el estado actual del repositorio, los eventos y sectores del catálogo web se cargan desde un archivo estático en cliente ([`src/data/events.ts`](../../../src/data/events.ts)).
+- **`[DISEÑO PROPUESTO — NO IMPLEMENTADO]`**: En el estado actual del repositorio, los eventos y sectores del catálogo web se cargan desde un archivo estático en cliente ([`frontend/src/data/events.ts`](../../../frontend/src/data/events.ts)).
 
 ---
 
@@ -150,7 +150,7 @@ Si todo el callback concluye sin errores, el adaptador ejecuta `COMMIT`; si ocur
 - Base fundamental de [ADR-003 (Concurrencia e Integridad de Inventario)](../../complementos/adrs/ADR-003-concurrencia-integridad-inventario.md) y centro del diseño en [C4 Código](../../04-modelo-c4/Nivel4-DiagramadeCodigo.md).
 
 #### Estado Real de Implementación
-- **`[DISEÑO PROPUESTO — NO IMPLEMENTADO]`**: En el estado actual del repositorio, la reserva opera como simulación en memoria del cliente ([`src/components/TicketPicker.tsx`](../../../src/components/TicketPicker.tsx)).
+- **`[DISEÑO PROPUESTO — NO IMPLEMENTADO]`**: En el estado actual del repositorio, la reserva opera como simulación en memoria del cliente ([`frontend/src/components/TicketPicker.tsx`](../../../frontend/src/components/TicketPicker.tsx)).
 
 ---
 
@@ -203,7 +203,7 @@ Los adaptadores primarios absorben las peculiaridades del protocolo HTTP (cabece
 - Pilar de [ADR-002 (Arquitectura Hexagonal)](../../complementos/adrs/ADR-002-adopcion-arquitectura-hexagonal.md) y visible en [C3 Componentes](../../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md) y [C4 Código](../../04-modelo-c4/Nivel4-DiagramadeCodigo.md).
 
 #### Estado Real de Implementación
-- **En Frontend**: **`[IMPLEMENTADO EN WEB]`**. Enrutador desacoplado ([`src/router.tsx`](../../../src/router.tsx)) que adapta la API nativa del navegador a componentes React, y almacén de estado persistente ([`src/lib/store.tsx`](../../../src/lib/store.tsx)) que adapta eventos nativos `storage`.
+- **En Frontend**: **`[IMPLEMENTADO EN WEB]`**. Enrutador desacoplado ([`frontend/src/router.tsx`](../../../frontend/src/router.tsx)) que adapta la API nativa del navegador a componentes React, y almacén de estado persistente ([`frontend/src/lib/store.tsx`](../../../frontend/src/lib/store.tsx)) que adapta eventos nativos `storage`.
 - **En Backend**: **`[DISEÑO PROPUESTO — NO IMPLEMENTADO]`**.
 
 ---
@@ -326,7 +326,7 @@ Módulo de Pagos & Facturación ([ADR-004](../../complementos/adrs/ADR-004-idemp
 - Conforme a [ADR-004 (Idempotencia en Pagos y Webhooks)](../../complementos/adrs/ADR-004-idempotencia-pagos-webhooks.md) y visible en [C3 Componentes](../../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md).
 
 #### Estado Real de Implementación
-- **En Frontend**: **`[DEMO / SIMULADO]`**. El selector visual de medios de pago en la pasarela simulada del cliente ([`src/components/TicketPicker.tsx`](../../../src/components/TicketPicker.tsx)) genera entradas con estado `ACTIVA_DEMO`.
+- **En Frontend**: **`[DEMO / SIMULADO]`**. El selector visual de medios de pago en la pasarela simulada del cliente ([`frontend/src/components/TicketPicker.tsx`](../../../frontend/src/components/TicketPicker.tsx)) genera entradas con estado `ACTIVA_DEMO`.
 - **En Backend**: **`[DISEÑO PROPUESTO — NO IMPLEMENTADO]`**.
 
 ---
@@ -477,7 +477,7 @@ flowchart TD
 El acoplamiento directo provocado por la instanciación de clases con la palabra reservada `new` dentro de la lógica de negocio, lo que impediría sustituir componentes de infraestructura, dificultaría la configuración centralizada y obstaculizaría las pruebas unitarias aisladas.
 
 #### Contexto dentro de AFORO
-Aplica como principio de diseño tanto en la arquitectura proyectada para API Core como en la provisión de estado en el frontend web ([`src/lib/store.tsx`](../../../src/lib/store.tsx)).
+Aplica como principio de diseño tanto en la arquitectura proyectada para API Core como en la provisión de estado en el frontend web ([`frontend/src/lib/store.tsx`](../../../frontend/src/lib/store.tsx)).
 
 #### Componentes Participantes
 - **Punto de Composición Proyectado (*Composition Root*)**: Archivo central de inicialización del backend (`src/server.ts` o `src/container.ts`, planificado para la construcción del backend), responsable de instanciar los clientes de PostgreSQL y Redis, cablear los adaptadores secundarios hacia los casos de uso y entregar estos a los adaptadores primarios.
@@ -498,7 +498,7 @@ Durante el arranque de la aplicación, el punto de composición instancia `Postg
 
 #### Diferenciación Frontend vs. Backend
 - **En Backend (`[DISEÑO PROPUESTO]`)**: Inyección de dependencias estricta por constructor a nivel de clases e interfaces tipadas.
-- **En Frontend (`[IMPLEMENTADO EN WEB]`)**: Se utiliza la API de React Context mediante el componente proveedor [`StoreProvider`](../../../src/lib/store.tsx). Este mecanismo resuelve la **provisión de dependencias y estado** a lo largo del árbol de componentes de la interfaz de usuario, compartiendo el carrito, los eventos guardados y los pases digitales simulados de forma declarativa, sin constituir una inyección por constructor de clases.
+- **En Frontend (`[IMPLEMENTADO EN WEB]`)**: Se utiliza la API de React Context mediante el componente proveedor [`StoreProvider`](../../../frontend/src/lib/store.tsx). Este mecanismo resuelve la **provisión de dependencias y estado** a lo largo del árbol de componentes de la interfaz de usuario, compartiendo el carrito, los eventos guardados y los pases digitales simulados de forma declarativa, sin constituir una inyección por constructor de clases.
 
 #### Ventajas y Compromisos
 - **Ventajas**: Grafo de dependencias explícito y tipado en tiempo de compilación; desacoplamiento estructural sin depender de frameworks de inyección invasivos o basados en metadatos y reflexión en tiempo de ejecución.
@@ -508,5 +508,5 @@ Durante el arranque de la aplicación, el punto de composición instancia `Postg
 - Base estructural de [ADR-002 (Arquitectura Hexagonal)](../../complementos/adrs/ADR-002-adopcion-arquitectura-hexagonal.md) y modelado en [C4 Código](../../04-modelo-c4/Nivel4-DiagramadeCodigo.md).
 
 #### Estado Real de Implementación
-- **En Frontend**: **`[IMPLEMENTADO EN WEB]`** (vía React Context en `src/lib/store.tsx`).
+- **En Frontend**: **`[IMPLEMENTADO EN WEB]`** (vía React Context en `frontend/src/lib/store.tsx`).
 - **En Backend**: **`[DISEÑO PROPUESTO — NO IMPLEMENTADO]`**.

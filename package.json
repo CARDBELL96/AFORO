@@ -1,28 +1,15 @@
 {
-  "name": "aforo-fusion",
+  "name": "aforo-root",
   "private": true,
   "version": "1.0.0",
-  "description": "AFORO Fusion — ticketera peruana. Fusión de las propuestas Aforo (Claude) y tf (Gemini). Datos de demostración, sin backend ni pagos.",
-  "type": "module",
+  "description": "AFORO — Plataforma integral de gestión y venta de entradas. Repositorio raíz y orquestación.",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc --noEmit && vite build",
-    "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test \"src/**/*.test.ts\"",
-    "check": "npm run typecheck && npm run test && npm run build"
-  },
-  "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
-  },
-  "devDependencies": {
-    "@types/node": "^22.10.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "@vitejs/plugin-react": "^4.3.4",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.2",
-    "vite": "^6.0.0"
+    "dev:web": "npm --prefix frontend run dev",
+    "test:web": "npm --prefix frontend run test",
+    "typecheck:web": "npm --prefix frontend run typecheck",
+    "build:web": "npm --prefix frontend run build",
+    "check:web": "npm --prefix frontend run check",
+    "check": "npm run check:web"
   }
 }
+

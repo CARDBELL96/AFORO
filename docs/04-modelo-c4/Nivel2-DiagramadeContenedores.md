@@ -13,89 +13,140 @@
 El **Diagrama de Contenedores (C2)** realiza una descomposición del sistema AFORO en sus unidades ejecutables de alto nivel (aplicaciones cliente, servicios de servidor y almacenes de datos). Muestra la topología global de software, las responsabilidades de cada contenedor y los protocolos de comunicación utilizados.
 
 ### Criterio de Honestidad Técnica (Principio IV de la Constitution)
-- **`[IMPLEMENTADO EN WEB]`**: [`AFORO Web`](../../src/App.tsx) desarrollada en React / Vite con estilos nativos fluidos y 30 pruebas automatizadas en `src/`.
+- **`[IMPLEMENTADO EN WEB]`**: [`AFORO Web`](../../frontend/src/App.tsx) desarrollada en React 19 / Vite 6 con estilos CSS nativos fluidos y 30 pruebas automatizadas en [`frontend/src/`](../../frontend/src/).
 - **`[PROCESO DEMO / SIMULADO]`**: Flujo de compra y emisión de pases QR simulados localmente en navegador con estado `ACTIVA_DEMO` y persistencia en `localStorage`.
 - **`[DISEÑO PROPUESTO]`**: Aplicaciones especializadas (`AFORO Studio`, `AFORO Access`), servicio de backend (`API Core`), base de datos relacional (`PostgreSQL`) y caché auxiliar (`Redis`).
 
 ---
 
-## 2. Diagrama de Contenedores de Software (Mermaid)
+## 2. Diagrama de Contenedores de Software (C2)
+
+### 2.1. Vista Principal C2: Contenedores Ejecutables y Almacenes de Servidor
+
+![Diagrama C2 — Contenedores del Sistema AFORO](../diagramas-exportados/C2-contenedores.svg)
+
+> **Formatos exportados disponibles**: [SVG Vectorial (`C2-contenedores.svg`)](../diagramas-exportados/C2-contenedores.svg) | [PNG Alta Resolución (`C2-contenedores.png`)](../diagramas-exportados/C2-contenedores.png)
+>
+> **Leyenda de Colores (C2):** **Azul**: Clientes web/móvil | **Violeta**: Contenedor de aplicación de backend | **Gris sólido**: Motores de datos de servidor | **Gris punteado**: Sistemas externos.
+
+<details>
+<summary><b>Ver código fuente Mermaid editable (C2-contenedores)</b></summary>
 
 ```mermaid
 flowchart TD
     %% Actores
-    FAN["👤 Asistente al Concierto"]
-    PROM["👤 Promotor / Organizador"]
-    GATE["👤 Operador de Molinete"]
+    FAN["<b>Asistente al Evento</b><br/><i>[Persona]</i>"]
+    PROM["<b>Promotor / Organizador</b><br/><i>[Persona]</i>"]
+    GATE["<b>Operador de Molinete</b><br/><i>[Persona]</i>"]
 
-    %% Límite de la Plataforma AFORO
+    %% Limite de la Plataforma AFORO
     subgraph AFORO_SYSTEM["Frontera del Sistema AFORO"]
 
         %% Clientes Frontend
         subgraph APPS["Aplicaciones Cliente (Frontend)"]
-            WEB_SPA["🌐 <b>AFORO Web (SPA)</b><br><i>[React / TypeScript / Vite]</i><br>Catálogo, búsqueda instantánea, mapa SVG propio<br>y selección de entradas no bloqueante.<br><b>[IMPLEMENTADO EN WEB]</b>"]
-            
-            STU_SPA["🖥️ <b>AFORO Studio (SPA)</b><br><i>[React / TypeScript]</i><br>Configuración de conciertos, recintos y aforos.<br><i>(Incluye visión futura conceptual de AFORO Creative AI)</i><br><b>[DISEÑO PROPUESTO]</b>"]
-            
-            subgraph ACCESS_CLIENT["Cliente Móvil de Acceso"]
-                ACC_PWA["📱 <b>AFORO Access (PWA)</b><br><i>[PWA Offline-First / TypeScript]</i><br>Lectura óptica de códigos QR y validación<br>en puertas conectadas o desconectadas.<br><b>[DISEÑO PROPUESTO]</b>"]
-                
-                ACC_IDB[("💾 <b>IndexedDB Local</b><br><i>[Almacenamiento Local en Navegador]</i><br>Listas precargadas, clave pública Ed25519<br>y bitácora local de ingresos.<br>Búsquedas B-Tree O(log N).<br><b>[DISEÑO PROPUESTO - ADR-006]</b>")]
-                
-                ACC_PWA <-->|"Lectura y registro local<br>[IndexedDB API]"| ACC_IDB
-            end
+            WEB_SPA["<b>AFORO Web (SPA)</b><br/><i>[React 19 / TypeScript / Vite 6]</i><br/>Catalogo editorial, mapa SVG propio<br/>y seleccion de entradas no bloqueante.<br/><b>[IMPLEMENTADO EN WEB / COMPRA DEMO]</b>"]
+
+            STU_SPA["<b>AFORO Studio (SPA)</b><br/><i>[React / TypeScript]</i><br/>Configuracion de conciertos, recintos,<br/>sectores y monitoreo de aforos.<br/><b>[DISENO PROPUESTO]</b>"]
+
+            ACC_PWA["<b>AFORO Access (PWA)</b><br/><i>[PWA Offline-First / TypeScript]</i><br/>Escaneo optico QR, verificacion Ed25519<br/>y persistencia local en navegador (IndexedDB).<br/><b>[DISENO PROPUESTO - Ver Vista 2.2]</b>"]
         end
 
-        %% Backend Central Monolítico Modular
+        %% Backend Central Monolitico Modular
         subgraph BACKEND_BOX["Servicios Centrales"]
-            API_CORE["⚙️ <b>API Core Backend</b><br><i>[Monolito Modular - Node.js / TypeScript]</i><br>Seis módulos internos con Arquitectura Hexagonal:<br>Catálogo, Reservas, Pagos, Tickets, Accesos e Identidad.<br><b>[DISEÑO PROPUESTO - ADR-001, ADR-002]</b>"]
+            API_CORE["<b>API Core Backend</b><br/><i>[Monolito Modular - Node.js / Fastify / TypeScript]</i><br/>Seis modulos independientes con Arquitectura Hexagonal:<br/>Catalog, Reservations, Payments, Tickets, Access, Identity.<br/><b>[DISENO PROPUESTO - ADR-001, ADR-002]</b>"]
         end
 
-        %% Almacenamiento Central
-        subgraph STORAGE_BOX["Almacenamiento y Caché Central"]
-            PG_DB[("🗄️ <b>Base de Datos Relacional</b><br><i>[PostgreSQL]</i><br><b>Única Fuente de Verdad</b> de aforos, disponibilidad,<br>vigencia efectiva de reservas y emisión de tickets.<br>Bloqueo pesimista SELECT ... FOR UPDATE.<br><b>[DISEÑO PROPUESTO - ADR-003]</b>")]
-            
-            REDIS_AUX[("⚡ <b>Caché y Temporizador Auxiliar</b><br><i>[Redis]</i><br>Caché de consultas públicas, limitador de tráfico<br>y alertas auxiliares de expiración TTL.<br><i>(Infraestructura auxiliar)</i><br><b>[DISEÑO PROPUESTO - ADR-003]</b>")]
+        %% Almacenamiento Central de Servidor
+        subgraph STORAGE_BOX["Persistencia y Cache Central de Servidor"]
+            PG_DB[("<b>PostgreSQL 16</b><br/><i>[Base de Datos Relacional]</i><br/><b>Unica Fuente de Verdad</b> transaccional:<br/>sector_inventory, reservations, payments,<br/>outbox_events, tickets y access_logs.<br/><b>[DISENO PROPUESTO - ADR-003]</b>")]
+
+            REDIS_AUX[("<b>Redis 7 Auxiliar</b><br/><i>[Almacen En Memoria Volatil]</i><br/>Cache de cartelera publica, rate limiting<br/>y timers auxiliares TTL (600s).<br/><i>(No autoritativo para inventario)</i><br/><b>[DISENO PROPUESTO - ADR-003]</b>")]
         end
 
     end
 
     %% Sistemas Externos
     subgraph EXT["Sistemas Externos"]
-        PAY_EXT["🏛️ <b>Pasarela de Pagos</b><br><i>[Culqi / Niubiz / Stripe]</i><br>Procesamiento bancario y webhooks.<br><b>[DISEÑO PROPUESTO - ADR-004]</b>"]
-        MAIL_EXT["📨 <b>Servicio de Correo</b><br><i>[Proveedor Transaccional]</i><br>Despacho de comprobantes.<br><b>[DISEÑO PROPUESTO]</b>"]
+        PAY_EXT["<b>Pasarela de Pagos</b><br/><i>[Culqi / Niubiz / Stripe]</i><br/>Cobros tokenizados, reembolsos y webhooks.<br/><b>[DISENO PROPUESTO - ADR-004]</b>"]
+        MAIL_EXT["<b>Servicio de Correo</b><br/><i>[Proveedor Transaccional]</i><br/>Entrega de boletos y comprobantes.<br/><b>[DISENO PROPUESTO]</b>"]
     end
 
-    %% Flujos de Actores
-    FAN -->|"Navega y selecciona entradas<br>[HTTPS]"| WEB_SPA
-    PROM -->|"Gestiona eventos y cupos<br>[HTTPS]"| STU_SPA
-    GATE -->|"Escanea entradas en puerta<br>[Cámara Móvil]"| ACC_PWA
+    %% Flujos de Actores a Clientes
+    FAN -->|"HTTPS"| WEB_SPA
+    PROM -->|"HTTPS"| STU_SPA
+    GATE -->|"Camara Movil / HTTPS"| ACC_PWA
 
     %% Interacciones Clientes -> Backend
-    WEB_SPA -->|"Consulta cartelera y solicita reserva temporal<br>[HTTPS / REST]"| API_CORE
-    STU_SPA -->|"Administra conciertos y aforos de recintos<br>[HTTPS / REST]"| API_CORE
-    ACC_PWA -->|"Descarga precarga y sincroniza bitácora de puerta<br>[HTTPS / REST]"| API_CORE
+    WEB_SPA -->|"Consulta cartelera y solicita hold<br/>[HTTPS / REST JSON]"| API_CORE
+    STU_SPA -->|"Administra eventos y capacidades<br/>[HTTPS / REST JSON]"| API_CORE
+    ACC_PWA -->|"Valida ingreso online y reconcilia lotes<br/>[HTTPS / REST JSON]"| API_CORE
 
     %% Backend -> Persistencia
-    API_CORE <-->|"Transacciones ACID de inventario y reservas<br>[TCP / SQL]"| PG_DB
-    API_CORE <-->|"Caché pública y notificaciones TTL<br>[TCP / Redis Protocol]"| REDIS_AUX
+    API_CORE <-->|"Transacciones ACID y SELECT FOR UPDATE<br/>[TCP / SQL]"| PG_DB
+    API_CORE <-->|"Cache publica y alarmas TTL 600s<br/>[TCP / RESP]"| REDIS_AUX
 
     %% Backend -> Sistemas Externos
-    API_CORE -->|"Envía cobros con Idempotency-Key<br>[HTTPS / REST]"| PAY_EXT
-    PAY_EXT -->|"Notifica resultado de cobro<br>[HTTPS / Webhooks]"| API_CORE
-    API_CORE -->|"Solicita envío de comprobantes<br>[HTTPS / REST]"| MAIL_EXT
+    API_CORE <-->|"Cargos con Idempotency-Key y Webhooks<br/>[HTTPS / REST]"| PAY_EXT
+    API_CORE -->|"Despacho de entradas emitidas<br/>[HTTPS / REST]"| MAIL_EXT
 
-    %% Estilos compatibles con GitHub
-    classDef client fill:#131c31,stroke:#00f5d4,stroke-width:2px,color:#ffffff;
-    classDef backend fill:#0e172a,stroke:#7928ca,stroke-width:3px,color:#ffffff;
-    classDef database fill:#1e1b4b,stroke:#06b6d4,stroke-width:2px,color:#ffffff;
-    classDef external fill:#1f2937,stroke:#64748b,stroke-width:2px,stroke-dasharray: 5 5,color:#cbd5e1;
+    %% Paleta Sobria Estandarizada (Sin emojis)
+    classDef client fill:#1e3a8a,stroke:#3b82f6,stroke-width:2px,color:#ffffff;
+    classDef backend fill:#3b0764,stroke:#a855f7,stroke-width:3px,color:#ffffff;
+    classDef infra fill:#1f2937,stroke:#64748b,stroke-width:2px,color:#ffffff;
+    classDef external fill:#1f2937,stroke:#64748b,stroke-width:2px,stroke-dasharray: 5 5,color:#e2e8f0;
 
     class WEB_SPA,STU_SPA,ACC_PWA client;
     class API_CORE backend;
-    class PG_DB,REDIS_AUX,ACC_IDB database;
+    class PG_DB,REDIS_AUX infra;
     class PAY_EXT,MAIL_EXT external;
 ```
+
+</details>
+
+### 2.2. Vista Complementaria C2-Offline: Detalle Interno de Contingencia en `AFORO Access (PWA)`
+
+Dado que `IndexedDB` reside en el *sandbox* del navegador del dispositivo móvil del operador y **no es un servidor de base de datos central**, su estructura interna para operación fuera de línea ([ADR-006](../complementos/adrs/ADR-006-persistencia-operacion-offline-access.md)) se desglosa en esta vista específica del contenedor `AFORO Access (PWA)`:
+
+![Diagrama C2-Offline — Contingencia Offline en AFORO Access PWA](../diagramas-exportados/C2-offline.svg)
+
+> **Formatos exportados disponibles**: [SVG Vectorial (`C2-offline.svg`)](../diagramas-exportados/C2-offline.svg) | [PNG Alta Resolución (`C2-offline.png`)](../diagramas-exportados/C2-offline.png)
+
+<details>
+<summary><b>Ver código fuente Mermaid editable (C2-offline)</b></summary>
+
+```mermaid
+flowchart LR
+    subgraph DEVICE["Dispositivo Movil en Puerta: Contenedor AFORO Access (PWA) [DISENO PROPUESTO]"]
+        UI_SCAN["<b>Lector Optico QR & UI</b><br/>Captura de camara y<br/>generacion de attemptId"]
+        CRYPTO_V["<b>Verificador Web Crypto API</b><br/>Comprobacion asimetrica local<br/>Ed25519 con clave publica PK_E"]
+        SW_SYNC["<b>Service Worker de Sincronizacion</b><br/>Conmutacion Online/Offline y<br/>reconciliacion por lotes"]
+
+        subgraph IDB_SANDBOX["IndexedDB Local del Navegador (B-Tree O(log N))"]
+            ST_KEYS[("<b>event_crypto_keys</b><br/>Clave publica Ed25519 (PK_E)")]
+            ST_PRE[("<b>preloaded_tickets</b><br/>Padron de entradas del sector")]
+            ST_LOG[("<b>gate_access_log</b><br/>Ingresos locales y cola PENDING")]
+        end
+
+        UI_SCAN --> CRYPTO_V
+        CRYPTO_V -->|"Lee PK_E"| ST_KEYS
+        CRYPTO_V -->|"Firma valida"| SW_SYNC
+        SW_SYNC <-->|"Sin red: verifica y marca USED local"| ST_PRE & ST_LOG
+    end
+
+    API_ACC["<b>API Core Backend (Modulo Access)</b><br/><code>POST /validate-entry</code> (Online)<br/><code>POST /reconcile-offline-batch</code> (Reconexion)"]
+
+    SW_SYNC <-->|"Con red: validacion atomica o envio de lote"| API_ACC
+
+    classDef client fill:#1e3a8a,stroke:#3b82f6,stroke-width:2px,color:#ffffff;
+    classDef backend fill:#3b0764,stroke:#a855f7,stroke-width:2px,color:#ffffff;
+    classDef localdb fill:#1f2937,stroke:#64748b,stroke-width:2px,color:#ffffff;
+
+    class UI_SCAN,CRYPTO_V,SW_SYNC client;
+    class ST_KEYS,ST_PRE,ST_LOG localdb;
+    class API_ACC backend;
+```
+
+</details>
 
 ---
 
@@ -104,19 +155,19 @@ flowchart TD
 ### 3.1 Contenedores de Clientes (Frontend)
 
 #### C2-01: AFORO Web (SPA)
-- **Tecnología**: React, TypeScript, Vite, CSS con Container Queries (`cqi`), React Context API.
+- **Tecnología**: React 19, TypeScript 5.7, Vite 6, CSS nativo modular con Cascade Layers y Container Queries (`cqi`), React Context API (`StoreProvider`).
 - **Responsabilidades**:
   - Catálogo editorial multicriterio (`RF-WEB-01`) y conmutación Mosaico / Ledger (`RF-WEB-02`).
   - Búsqueda modal con atajo `/` (`RF-WEB-03`).
   - Navegación segura con apertura diferenciada en nueva pestaña (`target="_blank" rel="noopener noreferrer"`, `RF-WEB-04`).
   - Desplazamiento y foco automático sobre `#entradas` (`RF-WEB-07`, medido en `33.64 ms`).
-  - Mapa interactivo SVG propio (`VenueStageMap.tsx`) sincronizado con la lista de sectores (`TicketPicker.tsx`, `RF-WEB-06`).
-  - Selección visual no bloqueante (`RN-02`, [`CartDrawer.tsx`](../../src/components/CartDrawer.tsx)) con tope de 4 entradas por zona (`RN-04`).
+  - Mapa interactivo SVG propio ([`VenueStageMap.tsx`](../../frontend/src/components/VenueStageMap.tsx)) sincronizado con la lista de sectores ([`TicketPicker.tsx`](../../frontend/src/components/TicketPicker.tsx), `RF-WEB-06`).
+  - Selección visual no bloqueante (`RN-02`, [`CartDrawer.tsx`](../../frontend/src/components/CartDrawer.tsx)) con tope de 4 entradas por zona (`RN-04`).
   - Sincronización multi-pestaña mediante eventos nativos `storage` (`RNF-PE-03`, medido en `36.2 ms`).
-- **Estado de Realidad Técnica**: **`[IMPLEMENTADO EN WEB]`** (30 pruebas automatizadas en `src/`). El flujo de compra y la billetera operan con pases de demostración (`ACTIVA_DEMO`) en `localStorage`.
+- **Estado de Realidad Técnica**: **`[IMPLEMENTADO EN WEB]`** (30 pruebas automatizadas en [`frontend/src/`](../../frontend/src/)). El flujo de compra y la billetera operan con pases de demostración (`ACTIVA_DEMO`) en `localStorage`.
 
 #### C2-02: AFORO Studio (SPA de Promotores)
-- **Tecnología Planificada**: React, TypeScript, Tailwind CSS, biblioteca de gráficos.
+- **Tecnología Planificada**: React, TypeScript, CSS modular y visualización de métricas.
 - **Responsabilidades**:
   - Autenticación y roles de promotor (`RF-STU-01`).
   - Creación y edición de eventos (`RF-STU-02`).

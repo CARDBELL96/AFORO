@@ -46,18 +46,18 @@ Se decide adoptar la **Alternativa D**:
    - Temporizador auxiliar de reservas mediante llaves con TTL de 10 minutos (600 s) escuchadas vía *keyspace notifications* o sincronizadas con un worker programado en base de datos (`RN-03`, `EAC-03`).
 3. **Estrategia Transaccional y Bloqueo de Fila**:
    - La reserva se procesa en PostgreSQL dentro de una transacción bajo el nivel de aislamiento `READ COMMITTED` (o alternativamente `REPEATABLE READ`).
-   - Se obtiene un bloqueo pesimista exclusivo sobre la fila del sector requerido:
+   - Se obtiene un bloqueo pesimista exclusivo sobre la fila del inventario del sector requerido (custodiada por el módulo `Reservations` en la tabla `sector_inventory`, ordenando ascendentemente por `sector_id` cuando una operación abarque más de un sector):
      ```sql
-     SELECT id, capacity, sold_count, held_count 
-     FROM sectors 
-     WHERE id = :sectorId 
+     SELECT sector_id, event_id, capacity, sold_count, active_holds_count
+     FROM sector_inventory
+     WHERE sector_id = :sectorId
      FOR UPDATE;
      ```
-   - **Comprobación y Actualización Atómicas en la Misma Transacción**:
-     El bloqueo pesimista garantiza la exclusión mutua para que ninguna otra transacción concurrentemente modifique la fila del sector, pero **no sustituye la comprobación de los invariantes de dominio**. Inmediatamente tras adquirir el lock y dentro de la misma transacción, se valida:
-     $$\text{Capacity} - (\text{Sold} + \text{ActiveHolds}) \ge \text{RequestedQty}$$
-     - Si la validación es satisfactoria: se actualiza el contador de reservas activas, se inserta la reserva temporal con timestamp y se confirma la transacción (`COMMIT`).
-     - Si la capacidad restante es insuficiente: la transacción emite el error controlado `SECTOR_CAPACITY_EXCEEDED` y ejecuta rollback inmediato (`ROLLBACK`), liberando el lock sin alterar datos.
+   - **Comprobación y Actualización Atómicas en la Misma Transacción (Reloj Autoritativo `NOW()`)**:
+     El bloqueo pesimista garantiza la exclusión mutua para que ninguna otra transacción concurrentemente modifique la fila del sector ni burle el tope de 4 entradas por comprador (`RN-04`), pero **no sustituye la comprobación de los invariantes de dominio**. Inmediatamente tras adquirir el lock y dentro de la misma transacción, se valida:
+     $$\text{capacity} - (\text{sold\_count} + \text{active\_holds\_count}) \ge \text{RequestedQty}$$
+     - Si la validación de capacidad y cuota es satisfactoria: se incrementa `active_holds_count`, se inserta la reserva temporal con vigencia determinista calculada por el reloj de PostgreSQL (`expires_at = NOW() + INTERVAL '600 seconds'`) y se confirma la transacción (`COMMIT`).
+     - Si la capacidad restante es insuficiente o se supera la cuota de 4 entradas: la transacción emite el error controlado (`SECTOR_CAPACITY_EXCEEDED` o `QUOTA_EXCEEDED`) y ejecuta rollback inmediato (`ROLLBACK`), liberando el lock sin alterar datos.
 
 ---
 
@@ -95,5 +95,14 @@ Se decide adoptar la **Alternativa D**:
 - **Requisitos Funcionales**: [`RF-COR-02`](../../01-analisis-de-sistema/03-requisitos-funcionales.md), [`RF-COR-03`](../../01-analisis-de-sistema/03-requisitos-funcionales.md), [`RF-WEB-08`](../../01-analisis-de-sistema/03-requisitos-funcionales.md).
 - **Requisitos No Funcionales**: [`RNF-PE-05`](../../01-analisis-de-sistema/04-atributos-de-calidad.md), [`RNF-RE-01`](../../01-analisis-de-sistema/04-atributos-de-calidad.md).
 - **Reglas de Negocio**: [`RN-01`](../03-reglas-de-negocio.md), [`RN-02`](../03-reglas-de-negocio.md), [`RN-03`](../03-reglas-de-negocio.md), [`RN-04`](../03-reglas-de-negocio.md).
-- **Escenarios de Calidad**: [`EAC-02`](../../01-analisis-de-sistema/../01-analisis-de-sistema/08-escenarios-atributos-calidad.md), [`EAC-03`](../../01-analisis-de-sistema/../01-analisis-de-sistema/08-escenarios-atributos-calidad.md).
+- **Escenarios de Calidad**: [`EAC-02`](../../01-analisis-de-sistema/08-escenarios-atributos-calidad.md), [`EAC-03`](../../01-analisis-de-sistema/08-escenarios-atributos-calidad.md).
 - **Constitution**: Principio II (Integridad Transaccional, No Sobreventa y Modelo de Dominio).
+
+---
+
+## 8. Registro de Revisiones (Trazabilidad Histórica)
+
+| Fecha | Versión | Descripción del Ajuste |
+| :--- | :---: | :--- |
+| `2026-10-21` | `1.0.0` | Formulación original de la decisión de concurrencia pesimista en PostgreSQL y Redis auxiliar. |
+| `2026-11-06` | `1.0.1` | Alineación de nombres de tabla y columnas en el ejemplo SQL (`sector_inventory`, `sector_id`, `active_holds_count`) y explicitación del reloj autoritativo `NOW()` de PostgreSQL, preservando intacta la decisión arquitectónica original. |

@@ -17,9 +17,9 @@
 El proyecto se encuentra formalmente en el **cierre del Sprint 01**. La realidad técnica del repositorio se compone de dos dimensiones estrictamente diferenciadas en apego al Principio IV de su Constitución (*Honestidad Técnica y Transparencia de Simulación*):
 
 1. **Frontend Implementado y Operativo (`AFORO Web SPA`)**:  
-   Construido en [`src/`](src/) con **React 19**, **TypeScript 5.7**, **Vite 6** y CSS nativo modular con *Container Queries*. Cuenta con navegación SPA propia sin librerías externas ([`src/router.tsx`](src/router.tsx)), catálogo editorial (*Pulso Nocturno*), mapas vectoriales interactivos de recintos en SVG nativo sin dependencias cartográficas ([`src/components/VenueStageMap.tsx`](src/components/VenueStageMap.tsx)), carrito lateral con sincronización multi-pestaña mediante eventos nativos `storage` ([`src/lib/store.tsx`](src/lib/store.tsx)) y una suite automatizada de **30 pruebas unitarias y de integración** pasando al 100 % (`npm run check`).
+   Construido en [`rontend/src/`](frontend/rontend/src/) con **React 19**, **TypeScript 5.7**, **Vite 6** y CSS nativo modular con *Container Queries*. Cuenta con navegación SPA propia sin librerías externas ([`rontend/src/router.tsx`](frontend/rontend/src/router.tsx)), catálogo editorial (*Pulso Nocturno*), mapas vectoriales interactivos de recintos en SVG nativo sin dependencias cartográficas ([`rontend/src/components/VenueStageMap.tsx`](frontend/rontend/src/components/VenueStageMap.tsx)), carrito lateral con sincronización multi-pestaña mediante eventos nativos `storage` ([`rontend/src/lib/store.tsx`](frontend/rontend/src/lib/store.tsx)) y una suite automatizada de **30 pruebas unitarias y de integración** pasando al 100 % (`npm run check`).
 2. **Backend, Persistencia y Clientes Especializados Propuestos (`[DISEÑO PROPUESTO]` / No implementados en código)**:  
-   El backend central (**`API Core Backend`**), los almacenes de datos (**`PostgreSQL`** relacional y **`Redis`** auxiliar volátil), las aplicaciones cliente complementarias (**`AFORO Studio SPA`** para promotores y **`AFORO Access PWA`** con IndexedDB para operadores de molinete) y las integraciones con pasarelas de pago reales (**Culqi, Niubiz, Stripe**) y servicios de correo (**SendGrid**) **no existen como código ejecutable en `src/`**. Han sido exhaustivamente formalizados y aprobados a nivel de especificación técnica, requisitos, reglas de negocio, decisiones arquitectónicas (6 ADRs), patrones de diseño (8 patrones), principios SOLID y diagramas C4 (Niveles C1, C2, C3 y C4) en la carpeta [`docs/`](docs/). En el frontend actual, el proceso de reserva, pasarela de pago y emisión de boletos QR opera como una **demostración interactiva en cliente (`[DEMO / SIMULADO]`)** con pases en estado `ACTIVA_DEMO` y almacenamiento en `localStorage`.
+   El backend central (**`API Core Backend`**), los almacenes de datos (**`PostgreSQL`** relacional y **`Redis`** auxiliar volátil), las aplicaciones cliente complementarias (**`AFORO Studio SPA`** para promotores y **`AFORO Access PWA`** con IndexedDB para operadores de molinete) y las integraciones con pasarelas de pago reales (**Culqi, Niubiz, Stripe**) y servicios de correo (**SendGrid**) **no existen como código ejecutable en `rontend/src/`**. Han sido exhaustivamente formalizados y aprobados a nivel de especificación técnica, requisitos, reglas de negocio, decisiones arquitectónicas (6 ADRs), patrones de diseño (8 patrones), principios SOLID y diagramas C4 (Niveles C1, C2, C3 y C4) en la carpeta [`docs/`](docs/). En el frontend actual, el proceso de reserva, pasarela de pago y emisión de boletos QR opera como una **demostración interactiva en cliente (`[DEMO / SIMULADO]`)** con pases en estado `ACTIVA_DEMO` y almacenamiento en `localStorage`.
 
 ---
 
@@ -56,13 +56,13 @@ Demostrar la concepción, especificación, modelado arquitectónico y prototipad
 
 | Funcionalidad | Aplicación / Componente | Estado de Realidad | Evidencia en el Repositorio |
 | :--- | :--- | :---: | :--- |
-| **Catálogo Editorial y Filtros Multicriterio** | AFORO Web | `IMPLEMENTADO` | [`src/components/PulseCatalogSection.tsx`](src/components/PulseCatalogSection.tsx), [`src/lib/filters.ts`](src/lib/filters.ts) |
-| **Búsqueda Instantánea con Atajo `/`** | AFORO Web | `IMPLEMENTADO` | [`src/components/SearchOverlay.tsx`](src/components/SearchOverlay.tsx), [`src/App.tsx`](src/App.tsx) |
-| **Navegación Segura en Nueva Pestaña** | AFORO Web | `IMPLEMENTADO` | [`src/router.tsx`](src/router.tsx) (`target="_blank" rel="noopener noreferrer"`) |
-| **Mapa Vectorial SVG de Sectores** | AFORO Web | `IMPLEMENTADO` | [`src/components/VenueStageMap.tsx`](src/components/VenueStageMap.tsx) (SVG interactivo nativo propio) |
-| **Selección Visual de Entradas (Tope 4)** | AFORO Web | `IMPLEMENTADO` | [`src/components/TicketPicker.tsx`](src/components/TicketPicker.tsx), [`src/lib/cart.ts`](src/lib/cart.ts) |
-| **Carrito Lateral Sincronizado Multi-Pestaña** | AFORO Web | `IMPLEMENTADO` | [`src/components/CartDrawer.tsx`](src/components/CartDrawer.tsx), [`src/lib/store.tsx`](src/lib/store.tsx) |
-| **Billetera Local de Entradas Demo con QR** | AFORO Web | `DEMO / SIMULADO` | [`src/components/TicketsModal.tsx`](src/components/TicketsModal.tsx), estado `ACTIVA_DEMO` |
+| **Catálogo Editorial y Filtros Multicriterio** | AFORO Web | `IMPLEMENTADO` | [`rontend/src/components/PulseCatalogSection.tsx`](frontend/rontend/src/components/PulseCatalogSection.tsx), [`rontend/src/lib/filters.ts`](frontend/rontend/src/lib/filters.ts) |
+| **Búsqueda Instantánea con Atajo `/`** | AFORO Web | `IMPLEMENTADO` | [`rontend/src/components/SearchOverlay.tsx`](frontend/rontend/src/components/SearchOverlay.tsx), [`rontend/src/App.tsx`](frontend/rontend/src/App.tsx) |
+| **Navegación Segura en Nueva Pestaña** | AFORO Web | `IMPLEMENTADO` | [`rontend/src/router.tsx`](frontend/rontend/src/router.tsx) (`target="_blank" rel="noopener noreferrer"`) |
+| **Mapa Vectorial SVG de Sectores** | AFORO Web | `IMPLEMENTADO` | [`rontend/src/components/VenueStageMap.tsx`](frontend/rontend/src/components/VenueStageMap.tsx) (SVG interactivo nativo propio) |
+| **Selección Visual de Entradas (Tope 4)** | AFORO Web | `IMPLEMENTADO` | [`rontend/src/components/TicketPicker.tsx`](frontend/rontend/src/components/TicketPicker.tsx), [`rontend/src/lib/cart.ts`](frontend/rontend/src/lib/cart.ts) |
+| **Carrito Lateral Sincronizado Multi-Pestaña** | AFORO Web | `IMPLEMENTADO` | [`rontend/src/components/CartDrawer.tsx`](frontend/rontend/src/components/CartDrawer.tsx), [`rontend/src/lib/store.tsx`](frontend/rontend/src/lib/store.tsx) |
+| **Billetera Local de Entradas Demo con QR** | AFORO Web | `DEMO / SIMULADO` | [`rontend/src/components/TicketsModal.tsx`](frontend/rontend/src/components/TicketsModal.tsx), estado `ACTIVA_DEMO` |
 | **Reserva Temporal Transaccional (TTL 10 min)** | API Core Backend | `DISEÑO PROPUESTO` | [`docs/04-modelo-c4/Nivel4-DiagramadeCodigo.md`](docs/04-modelo-c4/Nivel4-DiagramadeCodigo.md) (`HoldTicketsUseCase`) |
 | **Cobro Idempotente y Webhooks de Pago** | API Core Backend | `DISEÑO PROPUESTO` | [`docs/complementos/adrs/ADR-004-idempotencia-pagos-webhooks.md`](docs/complementos/adrs/ADR-004-idempotencia-pagos-webhooks.md) |
 | **Firma Criptográfica Asimétrica Ed25519** | API Core Backend | `DISEÑO PROPUESTO` | [`docs/complementos/adrs/ADR-005-criptografia-entradas-qr.md`](docs/complementos/adrs/ADR-005-criptografia-entradas-qr.md) |
@@ -94,15 +94,15 @@ Demostrar la concepción, especificación, modelado arquitectónico y prototipad
 - **Lenguaje**: TypeScript 5.7.2 (`tsconfig.json` con `target: "ES2022"`, `moduleResolution: "bundler"`, `strict: true`).
 - **Framework UI**: React 19.0.0 y React DOM 19.0.0.
 - **Herramienta de Construcción y DevServer**: Vite 6.0.0 con `@vitejs/plugin-react` 4.3.4.
-- **Enrutamiento**: Router minimalista propio en [`src/router.tsx`](src/router.tsx), basado en la History API nativa del navegador y sincronizado mediante `useSyncExternalStore` (cero dependencias de `react-router`).
-- **Estilos y Maquetación**: CSS nativo modular estructurado en 9 hojas de estilo bajo [`src/styles/`](src/styles/), utilizando CSS Variables, CSS Cascade Layers (`@layer base, layout, components, utilities`), *Container Queries* (`@container`, unidades `cqi`) y escalado fluido (`clamp()`). Sin Tailwind ni preprocesadores.
-- **Estado Global**: React Context API en [`src/lib/store.tsx`](src/lib/store.tsx) (`StoreProvider`), con persistencia en `localStorage` y sincronización entre pestañas mediante el evento nativo `storage` de la Web Storage API.
-- **Iconografía y Gráficos**: Iconos SVG incrustados en [`src/components/Icon.tsx`](src/components/Icon.tsx) y plano de recinto vectorial interactivo en [`src/components/VenueStageMap.tsx`](src/components/VenueStageMap.tsx).
+- **Enrutamiento**: Router minimalista propio en [`rontend/src/router.tsx`](frontend/rontend/src/router.tsx), basado en la History API nativa del navegador y sincronizado mediante `useSyncExternalStore` (cero dependencias de `react-router`).
+- **Estilos y Maquetación**: CSS nativo modular estructurado en 9 hojas de estilo bajo [`rontend/src/styles/`](frontend/rontend/src/styles/), utilizando CSS Variables, CSS Cascade Layers (`@layer base, layout, components, utilities`), *Container Queries* (`@container`, unidades `cqi`) y escalado fluido (`clamp()`). Sin Tailwind ni preprocesadores.
+- **Estado Global**: React Context API en [`rontend/src/lib/store.tsx`](frontend/rontend/src/lib/store.tsx) (`StoreProvider`), con persistencia en `localStorage` y sincronización entre pestañas mediante el evento nativo `storage` de la Web Storage API.
+- **Iconografía y Gráficos**: Iconos SVG incrustados en [`rontend/src/components/Icon.tsx`](frontend/rontend/src/components/Icon.tsx) y plano de recinto vectorial interactivo en [`rontend/src/components/VenueStageMap.tsx`](frontend/rontend/src/components/VenueStageMap.tsx).
 - **Tipografía**: Fuentes tipográficas autohospedadas en [`public/fonts/`](public/fonts/) (`CabinetGrotesk-Extrabold`, `ClashDisplay-Variable`, `GeneralSans-Variable`, `JetBrainsMono-Medium`).
 
 ### 3.2. Entorno de Ejecución, Herramientas y Pruebas
 - **Gestor de Paquetes**: `npm` (respaldado por `package-lock.json`).
-- **Runner de Pruebas**: Node.js Test Runner nativo (`node --import tsx --test "src/**/*.test.ts"`).
+- **Runner de Pruebas**: Node.js Test Runner nativo (`node --import tsx --test "rontend/src/**/*.test.ts"`).
 - **Ejecución TypeScript al Vuelo**: `tsx` 4.19.2.
 - **Tipos de Node**: `@types/node` 22.10.0.
 - **Scripts Disponibles en `package.json`**:
@@ -197,7 +197,7 @@ AFORO-Fusion/
 │       ├── plan.md                   # Plan de implementación SDD
 │       ├── spec.md                   # Especificación funcional con escenarios Given/When/Then
 │       └── tasks.md                  # Desglose de tareas completadas
-├── src/                              # Código fuente implementado (AFORO Web SPA)
+├── rontend/src/                              # Código fuente implementado (AFORO Web SPA)
 │   ├── components/                   # 19 Componentes React reutilizables
 │   │   ├── Brand.tsx                 # Isotipo y logotipo de AFORO
 │   │   ├── CartDrawer.tsx            # Carrito lateral deslizable
@@ -323,7 +323,7 @@ flowchart TD
 *(Detallados en [`docs/03-diseño-de-software/diseño-interno/patrones-de-diseño.md`](docs/03-diseño-de-software/diseño-interno/patrones-de-diseño.md))*
 1. **Repository**: Puertos abstractos de colección (`ICatalogRepository`, `ITicketRepository`) desacoplados de implementaciones SQL (`PostgreSQLCatalogAdapter`).
 2. **Unit of Work**: Delimitación transaccional estricta en `IReservationUnitOfWork` para que la adquisición del bloqueo de fila, comprobación de cuota y alta de reserva ocurran en la misma conexión SQL indivisible.
-3. **Adapter**: Adaptadores primarios (controladores REST) y secundarios (adaptadores PostgreSQL, Redis, Ed25519, pasarelas de pago). En el frontend: router desacoplado ([`src/router.tsx`](src/router.tsx)) y almacenamiento de estado ([`src/lib/store.tsx`](src/lib/store.tsx)).
+3. **Adapter**: Adaptadores primarios (controladores REST) y secundarios (adaptadores PostgreSQL, Redis, Ed25519, pasarelas de pago). En el frontend: router desacoplado ([`rontend/src/router.tsx`](frontend/rontend/src/router.tsx)) y almacenamiento de estado ([`rontend/src/lib/store.tsx`](frontend/rontend/src/lib/store.tsx)).
 4. **Facade**: Fachadas públicas en memoria (`IReservationsModuleFacade`, `ICatalogModuleFacade`) que comunican módulos sin llamadas de red internas ni acoplamiento a tablas ajenas.
 5. **Strategy**: Estrategias intercambiables de pago (`IPaymentGateway`: `CulqiPaymentAdapter`, `NiubizPaymentAdapter`, `StripePaymentAdapter`).
 6. **Transactional Outbox**: Despacho recuperable con *lease* que garantiza emisión idempotente de entradas sin riesgo de cobros huérfanos ni necesidad de Kafka/RabbitMQ.
@@ -335,12 +335,12 @@ flowchart TD
 ## 6. Frontend y Pantallas
 
 ### 6.1. Arquitectura y Enrutamiento del Frontend
-El frontend de AFORO Web SPA es un desarrollo a medida en React 19 sin librerías invasivas. El enrutamiento se resuelve mediante un router personalizado propio en [`src/router.tsx`](src/router.tsx), que escucha los eventos `popstate` y `hashchange`, resolviendo cuatro rutas canónicas:
+El frontend de AFORO Web SPA es un desarrollo a medida en React 19 sin librerías invasivas. El enrutamiento se resuelve mediante un router personalizado propio en [`rontend/src/router.tsx`](frontend/rontend/src/router.tsx), que escucha los eventos `popstate` y `hashchange`, resolviendo cuatro rutas canónicas:
 - `/`: Portada principal con Hero, cartelera destacada, mosaico de movimientos y dossier cultural.
 - `/eventos`: Explorador de eventos con filtros multicriterio en vivo.
 - `/eventos/:slug`: Ficha técnica y editorial completa del concierto.
 - `/eventos/:slug#entradas`: Ficha del concierto con foco automático suave a la taquilla sincronizada con el mapa del recinto.
-- Cualquier otra ruta: Página 404 personalizada ([`src/pages/NotFound.tsx`](src/pages/NotFound.tsx)).
+- Cualquier otra ruta: Página 404 personalizada ([`rontend/src/pages/NotFound.tsx`](frontend/rontend/src/pages/NotFound.tsx)).
 
 ### 6.2. Pantallas Operativas y Listas para Demostración
 
@@ -381,7 +381,7 @@ flowchart LR
 ## 7. Backend y APIs
 
 ### 7.1. Estado de Realidad: `[DISEÑO PROPUESTO — NO IMPLEMENTADO]`
-No existe código de servidor, controladores Express/Fastify ni endpoints activos desplegados en el repositorio. El frontend web interactúa exclusivamente con [`src/data/repository.ts`](src/data/repository.ts), el cual expone la función `fetchEvents()` que retorna los 12 eventos estáticos de [`src/data/events.ts`](src/data/events.ts) tras una latencia simulada de 500 ms.
+No existe código de servidor, controladores Express/Fastify ni endpoints activos desplegados en el repositorio. El frontend web interactúa exclusivamente con [`rontend/src/data/repository.ts`](frontend/rontend/src/data/repository.ts), el cual expone la función `fetchEvents()` que retorna los 12 eventos estáticos de [`rontend/src/data/events.ts`](frontend/rontend/src/data/events.ts) tras una latencia simulada de 500 ms.
 
 ### 7.2. Contratos de API Formalizados para el Backend
 El diseño arquitectónico de API Core Backend formaliza los siguientes endpoints REST:
@@ -414,7 +414,7 @@ POST   /api/v1/access/reconcile-batch  # Reconciliación diferida de ingresos fu
 ## 8. Base de Datos
 
 ### 8.1. Estado de Realidad: `[DISEÑO PROPUESTO]`
-No existen conexiones de base de datos activas en el código de ejecución. Los datos de demostración del frontend se mantienen en variables estáticas en memoria (`src/data/events.ts`) y se persisten en el navegador vía `localStorage` (`aforo.fusion.cart.v1`, `aforo.fusion.saved.v1`, `aforo.fusion.tickets.v1`).
+No existen conexiones de base de datos activas en el código de ejecución. Los datos de demostración del frontend se mantienen en variables estáticas en memoria (`rontend/src/data/events.ts`) y se persisten en el navegador vía `localStorage` (`aforo.fusion.cart.v1`, `aforo.fusion.saved.v1`, `aforo.fusion.tickets.v1`).
 
 ### 8.2. Modelo Relacional Formalizado en PostgreSQL
 PostgreSQL está especificado como la **Única Fuente de Verdad Transaccional (`ADR-003`)**, organizado en esquemas o partición lógica de tablas:
@@ -474,17 +474,17 @@ erDiagram
 
 | Módulo | Funcionalidad | Estado | Evidencia | Observaciones |
 | :--- | :--- | :---: | :--- | :--- |
-| **Web / Catálogo** | Exploración y filtrado de eventos | **Implementado y verificado** | [`src/components/PulseCatalogSection.tsx`](src/components/PulseCatalogSection.tsx) | Pruebas pasando en [`filters.test.ts`](src/lib/filters.test.ts). |
-| **Web / Catálogo** | Búsqueda instantánea con modal | **Implementado y verificado** | [`src/components/SearchOverlay.tsx`](src/components/SearchOverlay.tsx) | Atajo de teclado `/` verificado. |
-| **Web / UI** | Conmutación de vista Mosaico/Ledger | **Implementado y verificado** | [`src/components/PulseCatalogSection.tsx`](src/components/PulseCatalogSection.tsx) | Cambio dinámico de diseño visual. |
-| **Web / UI** | Composición Hero al 100 % de zoom | **Implementado y verificado** | [`src/styles/home.css`](src/styles/home.css), [`regression.test.ts`](src/styles/regression.test.ts) | Verificado contra regresiones DOM. |
-| **Web / Detalle** | Ficha de evento y ficha técnica | **Implementado y verificado** | [`src/pages/EventDetail.tsx`](src/pages/EventDetail.tsx) | Renderiza horarios, acústica y recinto. |
-| **Web / Detalle** | Mapa interactivo SVG sincronizado | **Implementado y verificado** | [`src/components/VenueStageMap.tsx`](src/components/VenueStageMap.tsx) | Sincronizado bidireccionalmente con taquilla. |
-| **Web / Carrito** | Selección con tope de 4 entradas | **Implementado y verificado** | [`src/lib/cart.ts`](src/lib/cart.ts), [`src/components/Stepper.tsx`](src/components/Stepper.tsx) | Pruebas pasando en [`cart.test.ts`](src/lib/cart.test.ts). |
-| **Web / Carrito** | Sincronización multi-pestaña | **Implementado y verificado** | [`src/lib/store.tsx`](src/lib/store.tsx), [`src/lib/store.test.ts`](src/lib/store.test.ts) | Verificado vía evento `storage` ($< 100\text{ ms}$). |
-| **Web / Compra** | Emisión local de pase QR | **Simulado / Mock** | [`src/components/TicketPicker.tsx`](src/components/TicketPicker.tsx) | Emite boletos en estado `ACTIVA_DEMO`. |
-| **Web / Billetera** | Visualización de entradas «Mis Entradas» | **Simulado / Mock** | [`src/components/TicketsModal.tsx`](src/components/TicketsModal.tsx) | Lee datos simulados desde `localStorage`. |
-| **Backend / Reservas** | Hold transaccional con `SELECT FOR UPDATE` | **Planificado** | [`docs/04-modelo-c4/Nivel4-DiagramadeCodigo.md`](docs/04-modelo-c4/Nivel4-DiagramadeCodigo.md) | Formalizado en ADR-003 y C4. No codificado en `src/`. |
+| **Web / Catálogo** | Exploración y filtrado de eventos | **Implementado y verificado** | [`rontend/src/components/PulseCatalogSection.tsx`](frontend/rontend/src/components/PulseCatalogSection.tsx) | Pruebas pasando en [`filters.test.ts`](frontend/rontend/src/lib/filters.test.ts). |
+| **Web / Catálogo** | Búsqueda instantánea con modal | **Implementado y verificado** | [`rontend/src/components/SearchOverlay.tsx`](frontend/rontend/src/components/SearchOverlay.tsx) | Atajo de teclado `/` verificado. |
+| **Web / UI** | Conmutación de vista Mosaico/Ledger | **Implementado y verificado** | [`rontend/src/components/PulseCatalogSection.tsx`](frontend/rontend/src/components/PulseCatalogSection.tsx) | Cambio dinámico de diseño visual. |
+| **Web / UI** | Composición Hero al 100 % de zoom | **Implementado y verificado** | [`rontend/src/styles/home.css`](frontend/rontend/src/styles/home.css), [`regression.test.ts`](frontend/rontend/src/styles/regression.test.ts) | Verificado contra regresiones DOM. |
+| **Web / Detalle** | Ficha de evento y ficha técnica | **Implementado y verificado** | [`rontend/src/pages/EventDetail.tsx`](frontend/rontend/src/pages/EventDetail.tsx) | Renderiza horarios, acústica y recinto. |
+| **Web / Detalle** | Mapa interactivo SVG sincronizado | **Implementado y verificado** | [`rontend/src/components/VenueStageMap.tsx`](frontend/rontend/src/components/VenueStageMap.tsx) | Sincronizado bidireccionalmente con taquilla. |
+| **Web / Carrito** | Selección con tope de 4 entradas | **Implementado y verificado** | [`rontend/src/lib/cart.ts`](frontend/rontend/src/lib/cart.ts), [`rontend/src/components/Stepper.tsx`](frontend/rontend/src/components/Stepper.tsx) | Pruebas pasando en [`cart.test.ts`](frontend/rontend/src/lib/cart.test.ts). |
+| **Web / Carrito** | Sincronización multi-pestaña | **Implementado y verificado** | [`rontend/src/lib/store.tsx`](frontend/rontend/src/lib/store.tsx), [`rontend/src/lib/store.test.ts`](frontend/rontend/src/lib/store.test.ts) | Verificado vía evento `storage` ($< 100\text{ ms}$). |
+| **Web / Compra** | Emisión local de pase QR | **Simulado / Mock** | [`rontend/src/components/TicketPicker.tsx`](frontend/rontend/src/components/TicketPicker.tsx) | Emite boletos en estado `ACTIVA_DEMO`. |
+| **Web / Billetera** | Visualización de entradas «Mis Entradas» | **Simulado / Mock** | [`rontend/src/components/TicketsModal.tsx`](frontend/rontend/src/components/TicketsModal.tsx) | Lee datos simulados desde `localStorage`. |
+| **Backend / Reservas** | Hold transaccional con `SELECT FOR UPDATE` | **Planificado** | [`docs/04-modelo-c4/Nivel4-DiagramadeCodigo.md`](docs/04-modelo-c4/Nivel4-DiagramadeCodigo.md) | Formalizado en ADR-003 y C4. No codificado en `rontend/src/`. |
 | **Backend / Reservas** | Expiración de reservas (TTL 600s) | **Planificado** | [`docs/03-diseño-de-software/diseño-interno/diseño-interno-de-modulos.md`](docs/03-diseño-de-software/diseño-interno/diseño-interno-de-modulos.md) | Diseñado con alarmas reactivas en Redis. |
 | **Backend / Pagos** | Procesamiento con Idempotency-Key | **Planificado** | [`docs/complementos/adrs/ADR-004-idempotencia-pagos-webhooks.md`](docs/complementos/adrs/ADR-004-idempotencia-pagos-webhooks.md) | Formalizado en ADR-004. |
 | **Backend / Pagos** | Despacho Transactional Outbox | **Planificado** | [`docs/02-arquitectura-software/componentes-arquitectonicos.md`](docs/02-arquitectura-software/componentes-arquitectonicos.md) | Diseñado con tabla `outbox_events` y worker. |
@@ -523,12 +523,12 @@ En AFORO, **Spec-Driven Development (SDD)** hace referencia a la **metodología 
 La suite de pruebas automatizadas está construida con el runner nativo de Node.js (`node --import tsx --test`) y se ejecuta limpiamente mediante `npm test` o `npm run check`.
 - **Resultado de Ejecución**: **30 pruebas ejecutadas, 30 aprobadas, 0 fallidas, 0 omitidas** en $\approx 4.0\text{ s}$.
 - **Desglose de Cobertura de Pruebas**:
-  1. [`src/lib/cart.test.ts`](src/lib/cart.test.ts) (6 pruebas): Adición de cantidades, tope máximo de 4 entradas (`MAX_PER_TIER`), eliminación por cantidad $\le 0$, cálculo de totales y sanitización de datos corruptos.
-  2. [`src/lib/filters.test.ts`](src/lib/filters.test.ts) (11 pruebas): Normalización fonética (sin tildes ni mayúsculas), búsqueda multicriterio, filtrado por género/ciudad, cálculo de precios mínimos, ordenamientos cronológicos y filtros de fecha en hora local de Lima.
-  3. [`src/lib/format.test.ts`](src/lib/format.test.ts) (4 pruebas): Formateo de precios en Soles (`S/`), formateo de fechas en huso peruano (UTC-5), límites de día y etiquetas para eventos de varios días.
-  4. [`src/lib/store.test.ts`](src/lib/store.test.ts) (1 prueba): Integración de reactividad y propagación de eventos `storage` entre pestañas en menos de $100\text{ ms}$.
-  5. [`src/router.test.ts`](src/router.test.ts) (4 pruebas): Resolución de rutas (`/`, `/eventos`, `/eventos/:slug`, 404), separación de path/hash/search y verificación de atributos de seguridad en nueva pestaña (`target="_blank" rel="noopener noreferrer"`).
-  6. [`src/styles/regression.test.ts`](src/styles/regression.test.ts) (4 pruebas): Pruebas de regresión DOM para asegurar proporciones nativas al 100 % de zoom, prohibición de `zoom: 0.7` o `transform: scale()`, inmutabilidad de secciones inferiores y márgenes seguros de `clip-path`.
+  1. [`rontend/src/lib/cart.test.ts`](frontend/rontend/src/lib/cart.test.ts) (6 pruebas): Adición de cantidades, tope máximo de 4 entradas (`MAX_PER_TIER`), eliminación por cantidad $\le 0$, cálculo de totales y sanitización de datos corruptos.
+  2. [`rontend/src/lib/filters.test.ts`](frontend/rontend/src/lib/filters.test.ts) (11 pruebas): Normalización fonética (sin tildes ni mayúsculas), búsqueda multicriterio, filtrado por género/ciudad, cálculo de precios mínimos, ordenamientos cronológicos y filtros de fecha en hora local de Lima.
+  3. [`rontend/src/lib/format.test.ts`](frontend/rontend/src/lib/format.test.ts) (4 pruebas): Formateo de precios en Soles (`S/`), formateo de fechas en huso peruano (UTC-5), límites de día y etiquetas para eventos de varios días.
+  4. [`rontend/src/lib/store.test.ts`](frontend/rontend/src/lib/store.test.ts) (1 prueba): Integración de reactividad y propagación de eventos `storage` entre pestañas en menos de $100\text{ ms}$.
+  5. [`rontend/src/router.test.ts`](frontend/rontend/src/router.test.ts) (4 pruebas): Resolución de rutas (`/`, `/eventos`, `/eventos/:slug`, 404), separación de path/hash/search y verificación de atributos de seguridad en nueva pestaña (`target="_blank" rel="noopener noreferrer"`).
+  6. [`rontend/src/styles/regression.test.ts`](frontend/rontend/src/styles/regression.test.ts) (4 pruebas): Pruebas de regresión DOM para asegurar proporciones nativas al 100 % de zoom, prohibición de `zoom: 0.7` o `transform: scale()`, inmutabilidad de secciones inferiores y márgenes seguros de `clip-path`.
 
 ### 11.2. Chequeo Estático de Tipos y Compilación
 - **TypeScript**: `npm run typecheck` (`tsc --noEmit`) finaliza con **cero errores de tipado** bajo modo estricto.
@@ -592,7 +592,7 @@ Las cinco prioridades más importantes para consolidar el Trabajo Final son:
 4. **Prioridad 4 — Implementación del Módulo `Reservations` en Backend**:  
    Programar `HoldTicketsUseCase` con conexión real a PostgreSQL ejecutando el bloqueo pesimista y el TTL de 10 minutos.
 5. **Prioridad 5 — Conexión del Frontend Web a la API Real**:  
-   Sustituir el mock de [`src/data/repository.ts`](src/data/repository.ts) por llamadas `fetch` reales hacia los endpoints de `API Core`.
+   Sustituir el mock de [`rontend/src/data/repository.ts`](frontend/rontend/src/data/repository.ts) por llamadas `fetch` reales hacia los endpoints de `API Core`.
 
 ---
 
@@ -609,7 +609,7 @@ Las cinco prioridades más importantes para consolidar el Trabajo Final son:
 Para que cualquier asistente de IA (ChatGPT GPT-6 u otro) continúe el trabajo de forma productiva y sin errores:
 
 ### 17.1. Qué Debe Saber ChatGPT Antes de Proponer Cambios
-- **No inventar un backend existente**: En el repositorio actual NO hay backend programado en `src/`. No intentes importar modelos de base de datos inexistentes ni asumas que existe un servidor Express corriendo.
+- **No inventar un backend existente**: En el repositorio actual NO hay backend programado en `rontend/src/`. No intentes importar modelos de base de datos inexistentes ni asumas que existe un servidor Express corriendo.
 - **El frontend está completo en su alcance de Sprint 01**: No toques la portada, estilos base ni componentes a menos que se solicite explícitamente una corrección de bugs.
 - **La suite de pruebas es sagrada**: Toda modificación debe mantener pasando los 30 tests de `npm run check`.
 
@@ -620,16 +620,16 @@ Para que cualquier asistente de IA (ChatGPT GPT-6 u otro) continúe el trabajo d
 - No introduzcas brokers de mensajería externos pesados (Kafka, RabbitMQ) para la comunicación interna; el monolito utiliza llamadas en memoria y el patrón Transactional Outbox en PostgreSQL.
 
 ### 17.3. Partes del Sistema que Requieren Especial Cuidado
-- [`src/styles/home.css`](src/styles/home.css): Contiene la calibración milimétrica del Hero al 100 % de zoom. Está protegido por pruebas de regresión DOM en [`src/styles/regression.test.ts`](src/styles/regression.test.ts).
-- [`src/lib/store.tsx`](src/lib/store.tsx): Maneja la sincronización multi-pestaña mediante eventos `storage`.
-- [`src/router.tsx`](src/router.tsx): Enrutador desacoplado que garantiza atributos de seguridad en nueva pestaña (`target="_blank" rel="noopener noreferrer"`).
+- [`rontend/src/styles/home.css`](frontend/rontend/src/styles/home.css): Contiene la calibración milimétrica del Hero al 100 % de zoom. Está protegido por pruebas de regresión DOM en [`rontend/src/styles/regression.test.ts`](frontend/rontend/src/styles/regression.test.ts).
+- [`rontend/src/lib/store.tsx`](frontend/rontend/src/lib/store.tsx): Maneja la sincronización multi-pestaña mediante eventos `storage`.
+- [`rontend/src/router.tsx`](frontend/rontend/src/router.tsx): Enrutador desacoplado que garantiza atributos de seguridad en nueva pestaña (`target="_blank" rel="noopener noreferrer"`).
 
 ### 17.4. Archivos que ChatGPT Debe Consultar Primero
 1. [`.specify/memory/constitution.md`](.specify/memory/constitution.md): La norma suprema de diseño del proyecto.
 2. [`docs/04-modelo-c4/Nivel3-Diagrama-de-Componentes.md`](docs/04-modelo-c4/Nivel3-Diagrama-de-Componentes.md): Estructura modular del backend.
 3. [`docs/04-modelo-c4/Nivel4-DiagramadeCodigo.md`](docs/04-modelo-c4/Nivel4-DiagramadeCodigo.md): Modelo de clases e interfaces del módulo de reservas.
 4. [`docs/tecnologia/boilerplate-clean-arquitectura/README.md`](docs/tecnologia/boilerplate-clean-arquitectura/README.md): Estructura canónica para cuando se inicie la codificación del backend.
-5. [`src/data/repository.ts`](src/data/repository.ts): El único punto de desacoplamiento de datos del frontend.
+5. [`rontend/src/data/repository.ts`](frontend/rontend/src/data/repository.ts): El único punto de desacoplamiento de datos del frontend.
 
 ### 17.5. Información No Verificada en Entorno Real
 - Rendimiento real bajo carga distribuida de 2500 req/s (constituye una meta de diseño a validar con k6 en fases futuras).

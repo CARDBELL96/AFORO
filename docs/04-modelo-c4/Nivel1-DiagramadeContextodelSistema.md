@@ -19,42 +19,52 @@ El **Diagrama de Contexto del Sistema (C1)** presenta la vista de más alto nive
 
 ---
 
-## 2. Diagrama de Contexto del Sistema (Mermaid)
+## 2. Diagrama de Contexto del Sistema (C1)
+
+![Diagrama C1 — Contexto del Sistema AFORO](../diagramas-exportados/C1-contexto.svg)
+
+> **Formatos exportados disponibles**: [SVG Vectorial (`C1-contexto.svg`)](../diagramas-exportados/C1-contexto.svg) | [PNG Alta Resolución (`C1-contexto.png`)](../diagramas-exportados/C1-contexto.png)
+>
+> **Leyenda de Colores (C1):** **Azul**: Actores humanos del dominio | **Violeta**: Sistema central en estudio (Caja negra) | **Gris punteado**: Sistemas externos de terceros.
+
+<details>
+<summary><b>Ver código fuente Mermaid editable (C1-contexto)</b></summary>
 
 ```mermaid
 flowchart TD
-    %% Actores
-    FAN["👤 Asistente al Evento<br><i>[Persona]</i><br>Consulta cartelera, selecciona entradas<br>y presenta pase digital."]
-    PROM["👤 Promotor / Organizador<br><i>[Persona]</i><br>Configura eventos, aforos de recintos<br>y supervisa ventas."]
-    GATE["👤 Operador de Molinete<br><i>[Persona]</i><br>Valida códigos QR en puertas de acceso."]
-    ADMIN["👤 Administrador de Plataforma<br><i>[Persona]</i><br>Supervisa operaciones, finanzas<br>y auditoría."]
+    %% Actores del Negocio
+    FAN["<b>Asistente al Evento</b><br/><i>[Persona / Actor Primario]</i><br/>Explora eventos, reserva entradas<br/>y presenta su pase digital."]
+    PROM["<b>Promotor / Organizador</b><br/><i>[Persona / Actor Primario]</i><br/>Configura espectaculos, recintos,<br/>sectores y supervisa ventas."]
+    GATE["<b>Operador de Molinete</b><br/><i>[Persona / Actor Operativo]</i><br/>Verifica pases de ingreso<br/>en puertas del recinto."]
+    ADMIN["<b>Administrador de Plataforma</b><br/><i>[Persona / Actor Interno]</i><br/>Audita operaciones, conciliaciones<br/>financieras y seguridad."]
 
-    %% Sistema Central
-    AFORO_SYS["📦 <b>Plataforma AFORO</b><br><i>[Sistema de Software]</i><br>Descubrimiento, gestión de inventario sin sobreventa,<br>reserva temporal con TTL, emisión de entradas<br>y validación de acceso."]
+    %% Sistema Central (Caja Negra)
+    AFORO_SYS["<b>Plataforma AFORO</b><br/><i>[Sistema de Software]</i><br/>Descubrimiento cultural, venta de entradas<br/>con control de aforo sin sobreventa,<br/>emision segura y control de acceso."]
 
     %% Sistemas Externos
-    PAY_GW["🏛️ <b>Pasarela de Pagos</b><br><i>[Sistema Externo]</i><br>Procesamiento bancario tokenizado<br>y confirmación de cobros.<br><i>[DISEÑO PROPUESTO]</i>"]
-    MAIL_SVC["📨 <b>Servicio de Correo</b><br><i>[Sistema Externo]</i><br>Despacho transaccional de comprobantes<br>y boletos emitidos.<br><i>[DISEÑO PROPUESTO]</i>"]
+    PAY_GW["<b>Pasarela de Pagos</b><br/><i>[Sistema Externo]</i><br/>Autorizacion bancaria de cobros,<br/>confirmaciones y reembolsos."]
+    MAIL_SVC["<b>Servicio de Correo Transaccional</b><br/><i>[Sistema Externo]</i><br/>Entrega de comprobantes de compra<br/>y notificaciones al asistente."]
 
-    %% Relaciones de Usuarios
-    FAN -->|"Explora cartelera, selecciona entradas y gestiona pases<br>[HTTPS]"| AFORO_SYS
-    PROM -->|"Gestiona conciertos y monitorea ocupación<br>[HTTPS]"| AFORO_SYS
-    GATE -->|"Escanea códigos QR de entradas<br>[HTTPS / Modo Offline]"| AFORO_SYS
-    ADMIN -->|"Supervisa auditoría y liquidaciones<br>[HTTPS]"| AFORO_SYS
+    %% Relaciones de Negocio
+    FAN -->|"Descubre conciertos, compra entradas y consulta pases"| AFORO_SYS
+    PROM -->|"Administra cartelera, capacidades y taquilla"| AFORO_SYS
+    GATE -->|"Valida admision de asistentes en puertas"| AFORO_SYS
+    ADMIN -->|"Supervisa auditoria, liquidaciones y colisiones"| AFORO_SYS
 
-    %% Relaciones con Sistemas Externos
-    AFORO_SYS -->|"Solicita cargos y procesa confirmaciones de pago<br>[HTTPS / Webhooks]"| PAY_GW
-    AFORO_SYS -->|"Despacha comprobantes y resúmenes de compra<br>[HTTPS / API]"| MAIL_SVC
+    AFORO_SYS <-->|"Solicita cobros/reembolsos y recibe confirmaciones"| PAY_GW
+    AFORO_SYS -->|"Envia boletos emitidos y comprobantes"| MAIL_SVC
 
-    %% Estilos compatibles con GitHub
-    classDef person fill:#1a2332,stroke:#00f5d4,stroke-width:2px,color:#ffffff;
-    classDef system fill:#0b1329,stroke:#7928ca,stroke-width:3px,color:#ffffff;
-    classDef external fill:#1e1e24,stroke:#64748b,stroke-width:2px,stroke-dasharray: 5 5,color:#cbd5e1;
+    %% Paleta Sobria Estandarizada (Sin emojis)
+    classDef actor fill:#1e3a8a,stroke:#3b82f6,stroke-width:2px,color:#ffffff;
+    classDef system fill:#3b0764,stroke:#a855f7,stroke-width:3px,color:#ffffff;
+    classDef external fill:#1f2937,stroke:#64748b,stroke-width:2px,stroke-dasharray: 5 5,color:#e2e8f0;
 
-    class FAN,PROM,GATE,ADMIN person;
+    class FAN,PROM,GATE,ADMIN actor;
     class AFORO_SYS system;
     class PAY_GW,MAIL_SVC external;
 ```
+
+</details>
 
 ---
 
@@ -74,7 +84,7 @@ flowchart TD
 ### 3.2 Límite del Sistema: Plataforma AFORO
 
 El sistema central engloba las capacidades necesarias para el ciclo de vida de los espectáculos masivos:
-1. **Frontend Web Público ([`src/App.tsx`](../../src/App.tsx))**: Implementado en React 18 con diseño fluido al 100 % de zoom (`RNF-US-01`), navegación en nueva pestaña segura (`target="_blank" rel="noopener noreferrer"`) y mapa interactivo propio desarrollado en SVG nativo sin servicios de mapas de terceros.
+1. **Frontend Web Público ([`frontend/src/App.tsx`](../../frontend/src/App.tsx))**: Implementado en React 19 con diseño fluido al 100 % de zoom (`RNF-US-01`), navegación en nueva pestaña segura (`target="_blank" rel="noopener noreferrer"`) y mapa interactivo propio desarrollado en SVG nativo sin servicios de mapas de terceros.
 2. **Proceso de Compra Simulado (Modo DEMO)**: El asistente completa la selección y emite boletos de prueba (`ACTIVA_DEMO`) en su navegador para validar la experiencia visual sin persistencia en servidor ni transacción financiera real.
 3. **Servicios Centrales Propuestos**: Monolito modular con aislamiento transaccional para aforo estricto (`RN-01`, `ADR-001`), reservas con TTL de 10 minutos (`RN-03`, `ADR-003`), cobros idempotentes (`RN-05`, `ADR-004`) y emisión criptográfica con firma asimétrica Ed25519 (`ADR-005`).
 
@@ -87,7 +97,7 @@ El sistema central engloba las capacidades necesarias para el ciclo de vida de l
 | **Pasarela de Pagos** (ej. Culqi, Niubiz o Stripe) | HTTPS / REST / Webhooks | Procesamiento financiero mediante formularios seguros tokenizados (PCI-DSS SAQ A). Cada pasarela emplea sus propios mecanismos de verificación (como firmas HMAC en cabeceras o tokens de evento), integrados mediante adaptadores específicos (`ADR-004`). | `[DISEÑO PROPUESTO]` *(Checkout actual opera en modo DEMO local)* |
 | **Servicio de Correo** (ej. SendGrid o AWS SES) | HTTPS / REST / API | Despacho asíncrono de confirmaciones de compra, comprobantes y enlaces de acceso a la billetera digital tras la confirmación de pago. | `[DISEÑO PROPUESTO]` |
 
-> *Aclaración sobre Servicios Cartográficos*: AFORO Web **no requiere ni utiliza servicios cartográficos de terceros** (como OpenStreetMap, Google Maps o Leaflet). La representación visual de los recintos y distribución de sectores se realiza mediante un componente interactivo vectorial en SVG desarrollado internamente ([`VenueStageMap.tsx`](../../src/components/VenueStageMap.tsx)), eliminando dependencias externas de red para la visualización espacial.
+> *Aclaración sobre Servicios Cartográficos*: AFORO Web **no requiere ni utiliza servicios cartográficos de terceros** (como OpenStreetMap, Google Maps o Leaflet). La representación visual de los recintos y distribución de sectores se realiza mediante un componente interactivo vectorial en SVG desarrollado internamente ([`VenueStageMap.tsx`](../../frontend/src/components/VenueStageMap.tsx)), eliminando dependencias externas de red para la visualización espacial.
 
 ---
 

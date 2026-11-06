@@ -9,7 +9,7 @@ Este documento establece las reglas operativas, arquitectónicas y de gobernanza
 - **Sistema**: AFORO — Plataforma integral de descubrimiento, compra, emisión y validación de entradas para eventos y conciertos en vivo en el Perú.
 - **Contexto**: Proyecto del curso de Arquitectura de Software (Universidad Nacional de San Cristóbal de Huamanga).
 - **Estado Actual**:
-  - **AFORO Web SPA**: Implementado y verificado en Sprint 01 ([`src/`](src/)). Opera en modo `[DEMO / SIMULADO]` con datos locales en [`src/data/repository.ts`](src/data/repository.ts).
+  - **AFORO Web SPA**: Implementado y verificado en Sprint 01 ([`frontend/src/`](frontend/src/)). Opera en modo `[DEMO / SIMULADO]` con datos locales en [`frontend/src/data/repository.ts`](frontend/src/data/repository.ts).
   - **API Core Backend**: Arquitectura formalmente especificada y aprobada en `docs/`; código pendiente de implementación.
   - **Base de Datos y Servicios Externos**: Diseñados formalmente; no conectados en producción.
 
@@ -20,6 +20,15 @@ Este documento establece las reglas operativas, arquitectónicas y de gobernanza
 ### Preferencia visual del usuario (2026-11-06)
 
 Para ilustraciones académicas de arquitectura, usar como referencia el estilo de la imagen AFORO compartida por el usuario: fondo claro, paneles delimitados, colores suaves por módulo, iconos y títulos legibles. Mantener la precisión del monolito modular y la arquitectura hexagonal; la preferencia visual no implica aprobar todas las relaciones de la imagen.
+
+### Contexto académico y referencias docentes (registrado el 2026-11-06)
+
+- AFORO es un proyecto de la asignatura **IS-488 Arquitectura de Software**. Las revisiones deben priorizar la comprensión, justificación y trazabilidad de la arquitectura y del diseño para su exposición académica.
+- La **GUIA 04: Análisis, Arquitectura y diseño de software. Documentación C4 en un sistema Marketplace**, de la docente Ing. Lizbeth Jaico Quispe (2026-II), establece como entregable del primer sprint la documentación completa del proyecto propio, versionada en el repositorio, y una exposición de 12 minutos por equipo. Cualquier integrante debe poder explicar de qué requisito procede cualquier componente del diagrama.
+- Referencias proporcionadas por la docente: [diseño interno del Marketplace](https://github.com/devlizbethjaico/Marketplace-arquitSoft-02/tree/main/docs/03-dise%C3%B1o-de-software/dise%C3%B1o-interno) y [modelo C4 del Marketplace](https://github.com/devlizbethjaico/Marketplace-arquitSoft-02/tree/main/docs/04-modelo-c4). Son modelos metodológicos para adaptar a AFORO; no sustituyen sus requisitos ni sus ADR aprobados.
+- Mantener una progresión comprensible: C1 (personas y sistemas), C2 (aplicaciones y almacenes), C3 (responsabilidades y relaciones de módulos dentro del backend) y C4 (clases, interfaces y colaboración de componentes seleccionados). El detalle interno complementario debe identificarse sin saturar la vista principal.
+- El ejemplo docente utiliza Clean Architecture. AFORO conserva su enfoque hexagonal aprobado: explicar sus puertos, adaptadores, núcleo de dominio y dirección de dependencias, justificando las diferencias de organización sin copiar el dominio del Marketplace.
+- Distinguir metas de calidad propuestas de resultados medidos, y diseño propuesto de implementación real. La documentación de arquitectura constituye un entregable académico aunque el backend siga pendiente de implementación.
 
 1. **Español (Obligatorio)**:
    - Toda la documentación académica y técnica ([`docs/`](docs/)).

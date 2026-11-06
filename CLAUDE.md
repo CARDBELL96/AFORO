@@ -21,17 +21,19 @@ Antes de proponer o modificar cualquier archivo, consulta obligatoriamente:
 ## 2. Comandos Principales de Verificación
 
 ```bash
-# Verificación integral obligatoria (tipos, pruebas y build)
-npm run check
+# Verificación integral del frontend desde la raíz
+npm run check:web
+# O directamente dentro de frontend/:
+cd frontend && npm run check
 
 # Chequeo estático de tipos
-npm run typecheck
+npm run typecheck:web
 
 # Suite de pruebas unitarias
-npm run test
+npm run test:web
 
 # Servidor de desarrollo frontend
-npm run dev
+npm run dev:web
 ```
 
 ---
@@ -40,6 +42,5 @@ npm run dev
 
 - **Idioma**: Respuestas, explicaciones y documentación académica exclusivamente en **español**. Código e identificadores en **inglés**.
 - **Arquitectura**: **Monolito Modular** con **Arquitectura Hexagonal**. No propongas microservicios ni desacoples el backend en servicios independientes.
-- **Frontend Protegido**: No modifiques los componentes ni las proporciones de [`src/`](src/) sin que esté explicitado en una tarea aprobada.
+- **Frontend Protegido**: No modifiques los componentes ni las proporciones de [`frontend/src/`](frontend/src/) sin que esté explicitado en una tarea aprobada.
 - **Transparencia**: Toda funcionalidad sin backend real debe identificarse explícitamente como `[DEMO]`.
-
