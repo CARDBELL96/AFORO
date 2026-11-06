@@ -43,48 +43,59 @@ flowchart TD
     subgraph CLIENTS["Clientes del Ecosistema"]
         WEB["AFORO Web SPA<br>[React 19 / TypeScript]<br>[IMPLEMENTADO - MODO DEMO]"]
         STU["AFORO Studio SPA<br>[React 19 / TypeScript]<br>[DISENO PROPUESTO]"]
-        ACC["AFORO Access PWA<br>[PWA / WebCrypto]<br>[DISENO PROPUESTO]"]
+        ACC["AFORO Access PWA<br>[PWA / Offline-First]<br>[DISENO PROPUESTO]"]
     end
 
-    subgraph API_CORE["Contenedor: API Core Backend [Node.js 20 LTS / TypeScript - Monolito Modular - DISENO PROPUESTO]"]
-        MOD_CAT["1. Modulo Catalog<br>CatalogController / GetCatalogUseCase<br>Puerto Inbound: ICatalogModuleFacade<br>Tablas: events, venues, sectors"]
-        MOD_RES["2. Modulo Reservations<br>ReservationsController / HoldTicketsUseCase<br>Puerto Inbound: IReservationsModuleFacade<br>Tablas: reservations, sector_inventory"]
-        MOD_PAY["3. Modulo Payments<br>PaymentsController / ProcessPaymentUseCase<br>Tablas: orders, payment_idempotency_keys,<br>outbox_events"]
-        OUTBOX_WORKER["OutboxProcessor Worker<br>[Despachador At-Least-Once]<br>Polling FOR UPDATE SKIP LOCKED"]
-        MOD_TCK["4. Modulo Tickets<br>TicketIssuanceListener / IssueTicketsUseCase<br>Puerto Inbound: ITicketsModuleFacade<br>Tabla: tickets + Firma Ed25519"]
-        MOD_ACC["5. Modulo Access<br>AccessGateController / ValidateTicketOnlineUseCase<br>Tabla: access_logs (attemptId)"]
-        MOD_IDN["6. Modulo Identity<br>AuthController / VerifyTokenUseCase<br>Tablas: users, roles (JWT / RBAC)"]
+    subgraph API_CORE["Contenedor: API Core Backend [Monolito Modular - DISENO PROPUESTO]"]
+        direction TB
+
+        subgraph MODULOS_NEGOCIO["Dominio Comercial: Catalogo, Reservas y Pagos"]
+            direction LR
+            MOD_CAT["1. Modulo Catalog<br>[Component: Catalogo y Recintos]<br>Fachada: ICatalogModuleFacade"]
+            MOD_RES["2. Modulo Reservations<br>[Component: Retencion Temporal]<br>Fachada: IReservationsModuleFacade"]
+            MOD_PAY["3. Modulo Payments<br>[Component: Cobro y Transacciones]<br>Publica en Outbox"]
+        end
+
+        OUTBOX_WORKER["OutboxProcessor Worker<br>[Component Auxiliar: Despachador At-Least-Once]"]
+
+        subgraph MODULOS_OPERATIVOS["Dominio Operativo y Transversal: Tickets, Accesos e Identidad"]
+            direction LR
+            MOD_TCK["4. Modulo Tickets<br>[Component: Emision y Firma QR]<br>Fachada: ITicketsModuleFacade"]
+            MOD_ACC["5. Modulo Access<br>[Component: Control de Molinete]<br>Valida ingresos"]
+            MOD_IDN["6. Modulo Identity<br>[Component: Autenticacion y RBAC]<br>Gestion de sesiones"]
+        end
     end
 
-    subgraph INFRA["Persistencia Central y Sistemas Externos [DISENO PROPUESTO]"]
-        PG[("PostgreSQL 16 Relacional<br>[Unica Fuente de Verdad ACID]<br>Tablas aisladas por modulo + ITransactionContext")]
-        RD[("Redis 7 Auxiliar<br>[Cache + Rate Limit + TTL 600s]")]
+    subgraph INFRA["Infraestructura Compartida y Servicios Externos (PostgreSQL, Redis, Pasarelas y Correo)"]
+        PG[("PostgreSQL 16 Relacional<br>[Persistencia ACID Compartida]")]
+        RD[("Redis 7 Auxiliar<br>[Cache y Temporizadores TTL]")]
         GATEWAY["Pasarelas de Pago<br>[Culqi / Niubiz / Stripe]"]
-        MAILER["Proveedor de Correo<br>[SendGrid / AWS SES]"]
+        MAILER["Proveedor de Correo<br>[Envio Transaccional]"]
     end
 
-    %% Entradas HTTP
-    STU -->|"HTTPS / REST (JWT)"| MOD_CAT
-    WEB -->|"HTTPS / REST"| MOD_CAT
-    WEB -->|"HTTPS / REST (Hold)"| MOD_RES
-    WEB -->|"HTTPS / REST (Idempotency-Key)"| MOD_PAY
-    WEB -->|"HTTPS / REST (Billetera)"| MOD_TCK
-    ACC -->|"HTTPS / REST (attemptId)"| MOD_ACC
-    WEB & STU & ACC -.->|"Middleware JWT"| MOD_IDN
+    %% Entradas desde Clientes hacia Modulos
+    WEB -->|"Consulta y reserva"| MOD_CAT
+    WEB -->|"Solicita hold"| MOD_RES
+    WEB -->|"Procesa compra"| MOD_PAY
+    STU -->|"Gestion de eventos"| MOD_CAT
+    ACC -->|"Validacion de ingreso"| MOD_ACC
+    WEB & STU & ACC -.->|"Verificacion de sesion"| MOD_IDN
 
-    %% Comunicacion Intermodular en Memoria (Fachadas y Outbox)
-    MOD_RES -->|"1. ICatalogModuleFacade.getSectorCapacity()"| MOD_CAT
-    MOD_PAY -->|"2. IReservationsModuleFacade.confirmReservationSold(id, txContext)"| MOD_RES
-    MOD_PAY -.->|"3. Registra PAYMENT_CONFIRMED en outbox_events"| OUTBOX_WORKER
-    OUTBOX_WORKER -->|"4. Polling FOR UPDATE SKIP LOCKED"| PG
-    OUTBOX_WORKER -->|"5. Despacha evento at-least-once"| MOD_TCK
-    MOD_ACC -->|"6. ITicketsModuleFacade.consumeTicketAtomically(..., txContext)"| MOD_TCK
+    %% Comunicacion Intermodular en Memoria (Fachadas Publicas)
+    MOD_RES -->|"ICatalogModuleFacade"| MOD_CAT
+    MOD_PAY -->|"IReservationsModuleFacade"| MOD_RES
+    MOD_ACC -->|"ITicketsModuleFacade"| MOD_TCK
 
-    %% Infraestructura
-    MOD_CAT & MOD_RES & MOD_PAY & MOD_TCK & MOD_ACC & MOD_IDN -->|"SQL Transaccional"| PG
-    MOD_CAT & MOD_RES -->|"TCP (Cache / TTL 600s)"| RD
-    MOD_PAY <-->|"HTTPS REST / Webhook HMAC"| GATEWAY
-    MOD_TCK -->|"HTTPS / SMTP"| MAILER
+    %% Procesamiento Asincrono y Recuperable con Outbox
+    MOD_PAY -.->|"Persiste evento"| OUTBOX_WORKER
+    OUTBOX_WORKER -->|"Polling eventos pendientes"| PG
+    OUTBOX_WORKER -->|"Despacha pago confirmado"| MOD_TCK
+
+    %% Persistencia Compartida y Servicios Externos
+    MOD_CAT & MOD_RES & MOD_PAY & MOD_TCK & MOD_ACC & MOD_IDN -->|"Persistencia de modulo"| PG
+    MOD_CAT & MOD_RES -->|"Cache / Alarma TTL"| RD
+    MOD_PAY <-->|"Autorizacion y webhooks"| GATEWAY
+    MOD_TCK -->|"Despacho de comprobantes"| MAILER
 
     classDef client fill:#1e3a8a,stroke:#3b82f6,stroke-width:2px,color:#ffffff;
     classDef appComp fill:#3b0764,stroke:#a855f7,stroke-width:2px,color:#ffffff;
@@ -103,9 +114,14 @@ flowchart TD
 
 ### 2.2 Vista C3-B: Estructura Hexagonal Interna por Módulo e Inversión de Dependencias (DIP)
 
-> **Convención Arquitectónica de Flechas**:
-> - `A --> B` indica dependencia funcional o invocación directa de `A` hacia `B`.
-> - `Port -.->|"implementado por (DIP)"| Adapter` indica **realización de interfaz (Principio de Inversión de Dependencias — DIP)**: el puerto es definido por la capa de aplicación y realizado por el adaptador secundario sin que la aplicación dependa de la infraestructura.
+> **Convención Arquitectónica de Flechas (Inversión de Dependencias y Tiempo de Ejecución)**:
+> - `A --> B` (línea continua): **Llamada o invocación en tiempo de ejecución** (`A` invoca a `B`).
+>   - El controlador primario invoca al caso de uso de aplicación (`Controller --> UseCase`).
+>   - El caso de uso invoca el puerto de salida tipado (`UseCase --> OutboundPort`).
+>   - Un módulo consume la fachada en memoria de otro módulo (`UseCase_A --> InboundPort_B`).
+> - `A -.-> B` (línea discontinua): **Realización de interfaces e Inversión de Dependencias (DIP)** (`A` implementa o realiza el contrato definido en `B`).
+>   - **Inversión de Dependencias (DIP)**: Los adaptadores secundarios de infraestructura implementan los puertos de salida definidos por el núcleo de la aplicación (`Adapter -.->|realiza (DIP)| OutboundPort`). La flecha apunta hacia el puerto en la capa de aplicación, demostrando que la infraestructura depende del dominio.
+>   - **Realización de Contrato Público**: El servicio de aplicación realiza la interfaz del puerto de entrada (`ApplicationService -.->|realiza contrato| InboundPort`).
 
 ![Diagrama C3-B — Estructura Hexagonal Interna por Módulo](../diagramas-exportados/C3-hexagonal.svg)
 
@@ -116,93 +132,107 @@ flowchart TD
 
 ```mermaid
 flowchart TB
-    subgraph MOD_CAT["1. Modulo Catalog"]
-        direction TB
-        CTRL_CAT["CatalogController<br>[Inbound Adapter]"]
-        FAC_CAT["[Inbound Port]<br>ICatalogModuleFacade"]
-        UC_CAT["GetCatalogUseCase /<br>CatalogModuleFacadeImpl"]
-        PORT_CAT_OUT["[Outbound Port]<br>ICatalogRepository / ICatalogCache"]
-        ADAPT_CAT["PostgreSQLCatalogAdapter /<br>RedisCatalogCacheAdapter"]
+    subgraph ROW_COMERCIAL["Dominio Comercial: Catalogo, Reservas y Pagos"]
+        direction LR
 
-        CTRL_CAT --> UC_CAT
-        FAC_CAT -.->|"realizado por"| UC_CAT
-        UC_CAT --> PORT_CAT_OUT
-        PORT_CAT_OUT -.->|"implementado por (DIP)"| ADAPT_CAT
+        subgraph MOD_CAT["1. Modulo Catalog"]
+            direction TB
+            CTRL_CAT["CatalogController<br>[Inbound Adapter]"]
+            FAC_CAT["[Inbound Port]<br>ICatalogModuleFacade"]
+            UC_CAT["GetCatalogUseCase /<br>CatalogFacadeImpl"]
+            PORT_CAT["[Outbound Port]<br>ICatalogRepository / Cache"]
+            ADAPT_CAT["CatalogAdapters<br>[PostgreSQL / Redis]"]
+
+            CTRL_CAT -->|"invoca"| UC_CAT
+            UC_CAT -.-> FAC_CAT
+            UC_CAT -->|"invoca puerto"| PORT_CAT
+            PORT_CAT ~~~ ADAPT_CAT
+            ADAPT_CAT -.->|"realiza (DIP)"| PORT_CAT
+        end
+
+        subgraph MOD_RES["2. Modulo Reservations"]
+            direction TB
+            CTRL_RES["ReservationsController<br>[Inbound Adapter]"]
+            FAC_RES["[Inbound Port]<br>IReservationsModuleFacade"]
+            UC_RES["HoldTicketsUseCase /<br>ReservationsFacadeImpl"]
+            PORT_RES["[Outbound Port]<br>IReservationUnitOfWork / Timer"]
+            ADAPT_RES["ReservationAdapters<br>[PostgreSQL / Redis]"]
+
+            CTRL_RES -->|"invoca"| UC_RES
+            UC_RES -.-> FAC_RES
+            UC_RES -->|"invoca puerto"| PORT_RES
+            PORT_RES ~~~ ADAPT_RES
+            ADAPT_RES -.->|"realiza (DIP)"| PORT_RES
+        end
+
+        subgraph MOD_PAY["3. Modulo Payments"]
+            direction TB
+            CTRL_PAY["PaymentsController /<br>WebhooksController"]
+            UC_PAY["ProcessPaymentUseCase /<br>HandleGatewayWebhookUseCase"]
+            PORT_PAY["[Outbound Port]<br>IPaymentRepository / Gateway"]
+            ADAPT_PAY["PaymentAdapters<br>[PostgreSQL / Pasarelas]"]
+
+            CTRL_PAY -->|"invoca"| UC_PAY
+            UC_PAY -->|"invoca puerto"| PORT_PAY
+            PORT_PAY ~~~ ADAPT_PAY
+            ADAPT_PAY -.->|"realiza (DIP)"| PORT_PAY
+        end
     end
 
-    subgraph MOD_RES["2. Modulo Reservations"]
-        direction TB
-        CTRL_RES["ReservationsController<br>[Inbound Adapter]"]
-        FAC_RES["[Inbound Port]<br>IReservationsModuleFacade"]
-        UC_RES["HoldTicketsUseCase /<br>ReleaseExpiredHoldsUseCase /<br>ReservationsModuleFacadeImpl"]
-        PORT_RES_OUT["[Outbound Port]<br>IReservationUnitOfWork / ITimerNotifier"]
-        ADAPT_RES["PostgreSQLReservationAdapter /<br>RedisTTLTimerAdapter"]
+    subgraph ROW_OPERATIVO["Dominio Operativo y Transversal: Tickets, Accesos e Identidad"]
+        direction LR
 
-        CTRL_RES --> UC_RES
-        FAC_RES -.->|"realizado por"| UC_RES
-        UC_RES --> PORT_RES_OUT
-        PORT_RES_OUT -.->|"implementado por (DIP)"| ADAPT_RES
+        subgraph MOD_TCK["4. Modulo Tickets"]
+            direction TB
+            SUB_TCK["TicketIssuanceListener /<br>TicketsController"]
+            FAC_TCK["[Inbound Port]<br>ITicketsModuleFacade"]
+            UC_TCK["IssueTicketsUseCase /<br>TicketsFacadeImpl"]
+            PORT_TCK["[Outbound Port]<br>ITicketRepository / Signature"]
+            ADAPT_TCK["TicketAdapters<br>[PostgreSQL / Ed25519]"]
+
+            SUB_TCK -->|"invoca"| UC_TCK
+            UC_TCK -.->|"realiza contrato"| FAC_TCK
+            UC_TCK -->|"invoca puerto"| PORT_TCK
+            PORT_TCK ~~~ ADAPT_TCK
+            ADAPT_TCK -.->|"realiza (DIP)"| PORT_TCK
+        end
+
+        subgraph MOD_ACC["5. Modulo Access"]
+            direction TB
+            CTRL_ACC["AccessGateController<br>[Inbound Adapter]"]
+            UC_ACC["ValidateTicketOnlineUseCase /<br>ReconcileGateLogsUseCase"]
+            PORT_ACC["[Outbound Port]<br>IAccessAuditRepository"]
+            ADAPT_ACC["PostgreSQLAccessAdapter<br>[Outbound Adapter]"]
+
+            CTRL_ACC -->|"invoca"| UC_ACC
+            UC_ACC -->|"invoca puerto"| PORT_ACC
+            PORT_ACC ~~~ ADAPT_ACC
+            ADAPT_ACC -.->|"realiza (DIP)"| PORT_ACC
+        end
+
+        subgraph MOD_IDN["6. Modulo Identity"]
+            direction TB
+            CTRL_IDN["AuthController<br>[Inbound Adapter]"]
+            FAC_IDN["[Inbound Port]<br>IIdentityModuleFacade"]
+            UC_IDN["AuthenticateUserUseCase /<br>IdentityFacadeImpl"]
+            PORT_IDN["[Outbound Port]<br>IUserRepository / TokenProvider"]
+            ADAPT_IDN["IdentityAdapters<br>[PostgreSQL / JWT]"]
+
+            CTRL_IDN -->|"invoca"| UC_IDN
+            UC_IDN -.->|"realiza contrato"| FAC_IDN
+            UC_IDN -->|"invoca puerto"| PORT_IDN
+            PORT_IDN ~~~ ADAPT_IDN
+            ADAPT_IDN -.->|"realiza (DIP)"| PORT_IDN
+        end
     end
 
-    subgraph MOD_PAY["3. Modulo Payments"]
-        direction TB
-        CTRL_PAY["PaymentsController /<br>WebhooksController"]
-        UC_PAY["ProcessPaymentUseCase /<br>HandleGatewayWebhookUseCase"]
-        PORT_PAY_OUT["[Outbound Port]<br>IPaymentRepository / IPaymentGateway /<br>IOutboxRepository"]
-        ADAPT_PAY["PostgreSQLPaymentAdapter /<br>PaymentGatewayAdapters"]
+    %% Disposicion en dos niveles estables
+    ROW_COMERCIAL -->|"invocaciones intermodulares"| ROW_OPERATIVO
 
-        CTRL_PAY --> UC_PAY
-        UC_PAY --> PORT_PAY_OUT
-        PORT_PAY_OUT -.->|"implementado por (DIP)"| ADAPT_PAY
-    end
-
-    subgraph MOD_TCK["4. Modulo Tickets"]
-        direction TB
-        SUB_TCK["TicketIssuanceListener /<br>TicketsController"]
-        FAC_TCK["[Inbound Port]<br>ITicketsModuleFacade"]
-        UC_TCK["IssueTicketsUseCase /<br>TicketsModuleFacadeImpl"]
-        PORT_TCK_OUT["[Outbound Port]<br>ITicketRepository / ISignatureService /<br>INotificationService"]
-        ADAPT_TCK["PostgreSQLTicketAdapter /<br>Ed25519SignatureAdapter /<br>EmailNotificationAdapter"]
-
-        SUB_TCK --> UC_TCK
-        FAC_TCK -.->|"realizado por"| UC_TCK
-        UC_TCK --> PORT_TCK_OUT
-        PORT_TCK_OUT -.->|"implementado por (DIP)"| ADAPT_TCK
-    end
-
-    subgraph MOD_ACC["5. Modulo Access"]
-        direction TB
-        CTRL_ACC["AccessGateController<br>[Inbound Adapter]"]
-        UC_ACC["ValidateTicketOnlineUseCase /<br>ReconcileGateLogsUseCase"]
-        PORT_ACC_OUT["[Outbound Port]<br>IAccessAuditRepository"]
-        ADAPT_ACC["PostgreSQLAccessAdapter<br>[Outbound Adapter]"]
-
-        CTRL_ACC --> UC_ACC
-        UC_ACC --> PORT_ACC_OUT
-        PORT_ACC_OUT -.->|"implementado por (DIP)"| ADAPT_ACC
-    end
-
-    subgraph MOD_IDN["6. Modulo Identity"]
-        direction TB
-        CTRL_IDN["AuthController<br>[Inbound Adapter]"]
-        UC_IDN["AuthenticateUserUseCase /<br>VerifyTokenUseCase"]
-        PORT_IDN_OUT["[Outbound Port]<br>IUserRepository / ITokenProvider"]
-        ADAPT_IDN["PostgreSQLUserAdapter /<br>JwtTokenAdapter"]
-
-        CTRL_IDN --> UC_IDN
-        UC_IDN --> PORT_IDN_OUT
-        PORT_IDN_OUT -.->|"implementado por (DIP)"| ADAPT_IDN
-    end
-
-    %% Disposicion en cuadricula 3x2
-    ADAPT_CAT ~~~ SUB_TCK
-    ADAPT_RES ~~~ CTRL_ACC
-    ADAPT_PAY ~~~ CTRL_IDN
-
-    %% Invocaciones Intermodulares via Puertos Inbound (Fachadas)
-    UC_RES -->|"getSectorCapacity()"| FAC_CAT
-    UC_PAY -->|"confirmReservationSold(id, txContext)"| FAC_RES
-    UC_ACC -->|"consumeTicketAtomically(..., txContext)"| FAC_TCK
+    %% Invocaciones entre fachadas en memoria
+    UC_RES -->|"invoca en memoria"| FAC_CAT
+    UC_PAY -->|"invoca en memoria"| FAC_RES
+    UC_ACC -->|"invoca en memoria"| FAC_TCK
 
     classDef inboundAdapter fill:#1e3a8a,stroke:#3b82f6,stroke-width:2px,color:#ffffff;
     classDef appLayer fill:#3b0764,stroke:#a855f7,stroke-width:2px,color:#ffffff;
@@ -211,7 +241,7 @@ flowchart TB
 
     class CTRL_CAT,CTRL_RES,CTRL_PAY,SUB_TCK,CTRL_ACC,CTRL_IDN inboundAdapter;
     class UC_CAT,UC_RES,UC_PAY,UC_TCK,UC_ACC,UC_IDN appLayer;
-    class FAC_CAT,FAC_RES,FAC_TCK,PORT_CAT_OUT,PORT_RES_OUT,PORT_PAY_OUT,PORT_TCK_OUT,PORT_ACC_OUT,PORT_IDN_OUT domainPort;
+    class FAC_CAT,FAC_RES,FAC_TCK,FAC_IDN,PORT_CAT,PORT_RES,PORT_PAY,PORT_TCK,PORT_ACC,PORT_IDN domainPort;
     class ADAPT_CAT,ADAPT_RES,ADAPT_PAY,ADAPT_TCK,ADAPT_ACC,ADAPT_IDN outboundAdapter;
 ```
 
