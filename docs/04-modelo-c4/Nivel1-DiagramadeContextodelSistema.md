@@ -19,7 +19,16 @@ El **Diagrama de Contexto del Sistema (C1)** presenta la vista de más alto nive
 
 ---
 
-## 2. Diagrama de Contexto del Sistema (Mermaid)
+## 2. Diagrama de Contexto del Sistema (C1)
+
+![Diagrama C1 — Contexto del Sistema AFORO](../diagramas-exportados/C1-contexto.svg)
+
+> **Formatos exportados disponibles**: [SVG Vectorial (`C1-contexto.svg`)](../diagramas-exportados/C1-contexto.svg) | [PNG Alta Resolución (`C1-contexto.png`)](../diagramas-exportados/C1-contexto.png)
+>
+> **Leyenda de Colores (C1):** **Azul**: Actores humanos del dominio | **Violeta**: Sistema central en estudio (Caja negra) | **Gris punteado**: Sistemas externos de terceros.
+
+<details>
+<summary><b>Ver código fuente Mermaid editable (C1-contexto)</b></summary>
 
 ```mermaid
 flowchart TD
@@ -55,7 +64,7 @@ flowchart TD
     class PAY_GW,MAIL_SVC external;
 ```
 
-> **Leyenda de Colores (C1):** **Azul**: Actores humanos del dominio | **Violeta**: Sistema central en estudio (Caja negra) | **Gris punteado**: Sistemas externos de terceros.
+</details>
 
 ---
 

@@ -19,9 +19,18 @@ El **Diagrama de Contenedores (C2)** realiza una descomposición del sistema AFO
 
 ---
 
-## 2. Diagrama de Contenedores de Software (Mermaid)
+## 2. Diagrama de Contenedores de Software (C2)
 
 ### 2.1. Vista Principal C2: Contenedores Ejecutables y Almacenes de Servidor
+
+![Diagrama C2 — Contenedores del Sistema AFORO](../diagramas-exportados/C2-contenedores.svg)
+
+> **Formatos exportados disponibles**: [SVG Vectorial (`C2-contenedores.svg`)](../diagramas-exportados/C2-contenedores.svg) | [PNG Alta Resolución (`C2-contenedores.png`)](../diagramas-exportados/C2-contenedores.png)
+>
+> **Leyenda de Colores (C2):** **Azul**: Clientes web/móvil | **Violeta**: Contenedor de aplicación de backend | **Gris sólido**: Motores de datos de servidor | **Gris punteado**: Sistemas externos.
+
+<details>
+<summary><b>Ver código fuente Mermaid editable (C2-contenedores)</b></summary>
 
 ```mermaid
 flowchart TD
@@ -92,11 +101,18 @@ flowchart TD
     class PAY_EXT,MAIL_EXT external;
 ```
 
-> **Leyenda de Colores (C2):** **Azul**: Clientes web/móvil | **Violeta**: Contenedor de aplicación de backend | **Gris sólido**: Motores de datos de servidor | **Gris punteado**: Sistemas externos.
+</details>
 
 ### 2.2. Vista Complementaria C2-Offline: Detalle Interno de Contingencia en `AFORO Access (PWA)`
 
 Dado que `IndexedDB` reside en el *sandbox* del navegador del dispositivo móvil del operador y **no es un servidor de base de datos central**, su estructura interna para operación fuera de línea ([ADR-006](../complementos/adrs/ADR-006-persistencia-operacion-offline-access.md)) se desglosa en esta vista específica del contenedor `AFORO Access (PWA)`:
+
+![Diagrama C2-Offline — Contingencia Offline en AFORO Access PWA](../diagramas-exportados/C2-offline.svg)
+
+> **Formatos exportados disponibles**: [SVG Vectorial (`C2-offline.svg`)](../diagramas-exportados/C2-offline.svg) | [PNG Alta Resolución (`C2-offline.png`)](../diagramas-exportados/C2-offline.png)
+
+<details>
+<summary><b>Ver código fuente Mermaid editable (C2-offline)</b></summary>
 
 ```mermaid
 flowchart LR
@@ -129,6 +145,8 @@ flowchart LR
     class ST_KEYS,ST_PRE,ST_LOG localdb;
     class API_ACC backend;
 ```
+
+</details>
 
 ---
 

@@ -23,7 +23,7 @@ El **Diagrama de Componentes (C3)** realiza un *zoom-in* sobre el contenedor cen
 
 ---
 
-## 2. Diagramas de Componentes de API Core (Mermaid)
+## 2. Diagramas de Componentes de API Core (C3)
 
 Para garantizar máxima legibilidad académica y evitar la saturación visual en un único lienzo, el Nivel 3 (C3) se estructura en dos vistas complementarias:
 - **Vista 2.1 (`C3-A` — Topología Intermodular y Custodia de Datos)**: Muestra la interacción entre los seis módulos del monolito a través de fachadas públicas en memoria (`I*ModuleFacade`), el flujo asíncrono mediante `OutboxProcessor` y la custodia estricta de tablas por módulo en PostgreSQL.
@@ -31,97 +31,73 @@ Para garantizar máxima legibilidad académica y evitar la saturación visual en
 
 ### 2.1 Vista C3-A: Topología Intermodular, Fachadas en Memoria y Custodia de Datos
 
+![Diagrama C3-A — Topología Intermodular y Custodia de Datos](../diagramas-exportados/C3-modulos.svg)
+
+> **Formatos exportados disponibles**: [SVG Vectorial (`C3-modulos.svg`)](../diagramas-exportados/C3-modulos.svg) | [PNG Alta Resolución (`C3-modulos.png`)](../diagramas-exportados/C3-modulos.png)
+
+<details>
+<summary><b>Ver código fuente Mermaid editable (C3-modulos)</b></summary>
+
 ```mermaid
 flowchart TD
     subgraph CLIENTS["Clientes del Ecosistema"]
-        WEB["AFORO Web SPA<br>[Container: React 19 / TypeScript]<br>[IMPLEMENTADO EN FRONTEND - MODO DEMO]"]
-        STU["AFORO Studio SPA<br>[Container: React 19 / TypeScript]<br>[DISENO PROPUESTO]"]
-        ACC["AFORO Access PWA<br>[Container: PWA / WebCrypto]<br>[DISENO PROPUESTO]"]
+        WEB["AFORO Web SPA<br>[React 19 / TypeScript]<br>[IMPLEMENTADO - MODO DEMO]"]
+        STU["AFORO Studio SPA<br>[React 19 / TypeScript]<br>[DISENO PROPUESTO]"]
+        ACC["AFORO Access PWA<br>[PWA / WebCrypto]<br>[DISENO PROPUESTO]"]
     end
 
     subgraph API_CORE["Contenedor: API Core Backend [Node.js 20 LTS / TypeScript - Monolito Modular - DISENO PROPUESTO]"]
-        direction TB
-
-        subgraph MOD_IDN["6. Modulo Identity"]
-            IDN_COMP["AuthController / VerifyTokenUseCase<br>[RBAC y Emision JWT]"]
-        end
-
-        subgraph MOD_CAT["1. Modulo Catalog"]
-            FAC_CAT["<<Inbound Port>><br>ICatalogModuleFacade"]
-            CAT_COMP["CatalogController / Casos de Uso<br>[Custodia: events, venues, sectors]"]
-            FAC_CAT --- CAT_COMP
-        end
-
-        subgraph MOD_RES["2. Modulo Reservations"]
-            FAC_RES["<<Inbound Port>><br>IReservationsModuleFacade"]
-            RES_COMP["ReservationsController / HoldTicketsUseCase<br>[Custodia: reservations, sector_inventory]"]
-            FAC_RES --- RES_COMP
-        end
-
-        subgraph MOD_PAY["3. Modulo Payments"]
-            PAY_COMP["PaymentsController / ProcessPaymentUseCase<br>[Custodia: orders, payment_idempotency_keys, outbox_events]"]
-        end
-
-        OUTBOX_WORKER["OutboxProcessor Worker<br>[Component: Despachador At-Least-Once]"]
-
-        subgraph MOD_TCK["4. Modulo Tickets"]
-            FAC_TCK["<<Inbound Port>><br>ITicketsModuleFacade"]
-            TCK_COMP["TicketIssuanceListener / IssueTicketsUseCase<br>[Custodia: tickets y firma Ed25519]"]
-            FAC_TCK --- TCK_COMP
-        end
-
-        subgraph MOD_ACC["5. Modulo Access"]
-            ACC_COMP["AccessGateController / ValidateTicketOnlineUseCase<br>[Custodia: access_logs y reconciliacion]"]
-        end
+        MOD_CAT["1. Modulo Catalog<br>CatalogController / GetCatalogUseCase<br>Puerto Inbound: ICatalogModuleFacade<br>Tablas: events, venues, sectors"]
+        MOD_RES["2. Modulo Reservations<br>ReservationsController / HoldTicketsUseCase<br>Puerto Inbound: IReservationsModuleFacade<br>Tablas: reservations, sector_inventory"]
+        MOD_PAY["3. Modulo Payments<br>PaymentsController / ProcessPaymentUseCase<br>Tablas: orders, payment_idempotency_keys,<br>outbox_events"]
+        OUTBOX_WORKER["OutboxProcessor Worker<br>[Despachador At-Least-Once]<br>Polling FOR UPDATE SKIP LOCKED"]
+        MOD_TCK["4. Modulo Tickets<br>TicketIssuanceListener / IssueTicketsUseCase<br>Puerto Inbound: ITicketsModuleFacade<br>Tabla: tickets + Firma Ed25519"]
+        MOD_ACC["5. Modulo Access<br>AccessGateController / ValidateTicketOnlineUseCase<br>Tabla: access_logs (attemptId)"]
+        MOD_IDN["6. Modulo Identity<br>AuthController / VerifyTokenUseCase<br>Tablas: users, roles (JWT / RBAC)"]
     end
 
     subgraph INFRA["Persistencia Central y Sistemas Externos [DISENO PROPUESTO]"]
-        PG[("PostgreSQL 16 Relacional<br>[Unica Fuente de Verdad ACID]<br>Tablas aisladas por modulo + Contexto ITransactionContext")]
+        PG[("PostgreSQL 16 Relacional<br>[Unica Fuente de Verdad ACID]<br>Tablas aisladas por modulo + ITransactionContext")]
         RD[("Redis 7 Auxiliar<br>[Cache + Rate Limit + TTL 600s]")]
         GATEWAY["Pasarelas de Pago<br>[Culqi / Niubiz / Stripe]"]
         MAILER["Proveedor de Correo<br>[SendGrid / AWS SES]"]
     end
 
     %% Entradas HTTP
-    WEB -->|"HTTPS / REST"| CAT_COMP
-    WEB -->|"HTTPS / REST"| RES_COMP
-    WEB -->|"HTTPS / REST (Idempotency-Key)"| PAY_COMP
-    WEB -->|"HTTPS / REST"| TCK_COMP
-    STU -->|"HTTPS / REST (JWT)"| CAT_COMP
-    ACC -->|"HTTPS / REST (attemptId)"| ACC_COMP
+    STU -->|"HTTPS / REST (JWT)"| MOD_CAT
+    WEB -->|"HTTPS / REST"| MOD_CAT
+    WEB -->|"HTTPS / REST (Hold)"| MOD_RES
+    WEB -->|"HTTPS / REST (Idempotency-Key)"| MOD_PAY
+    WEB -->|"HTTPS / REST (Billetera)"| MOD_TCK
+    ACC -->|"HTTPS / REST (attemptId)"| MOD_ACC
+    WEB & STU & ACC -.->|"Middleware JWT"| MOD_IDN
 
     %% Comunicacion Intermodular en Memoria (Fachadas y Outbox)
-    RES_COMP -->|"1. Consulta capacidad nominal (en memoria)"| FAC_CAT
-    PAY_COMP -->|"2. confirmReservationSold(id, txContext)"| FAC_RES
-    PAY_COMP -->|"3. Persiste orden y evento en outbox_events (misma TX)"| PG
-    PG -.->|"4. Polling FOR UPDATE SKIP LOCKED"| OUTBOX_WORKER
-    OUTBOX_WORKER -->|"5. Despacha PAYMENT_CONFIRMED"| TCK_COMP
-    ACC_COMP -->|"6. consumeTicketAtomically(..., txContext)"| FAC_TCK
+    MOD_RES -->|"1. ICatalogModuleFacade.getSectorCapacity()"| MOD_CAT
+    MOD_PAY -->|"2. IReservationsModuleFacade.confirmReservationSold(id, txContext)"| MOD_RES
+    MOD_PAY -.->|"3. Registra PAYMENT_CONFIRMED en outbox_events"| OUTBOX_WORKER
+    OUTBOX_WORKER -->|"4. Polling FOR UPDATE SKIP LOCKED"| PG
+    OUTBOX_WORKER -->|"5. Despacha evento at-least-once"| MOD_TCK
+    MOD_ACC -->|"6. ITicketsModuleFacade.consumeTicketAtomically(..., txContext)"| MOD_TCK
 
     %% Infraestructura
-    CAT_COMP -->|"SQL / Cache"| PG
-    CAT_COMP -->|"TCP"| RD
-    RES_COMP -->|"SQL (SELECT FOR UPDATE)"| PG
-    RES_COMP -->|"TCP (TTL 600s)"| RD
-    PAY_COMP -->|"HTTPS REST"| GATEWAY
-    GATEWAY -->|"Webhook HMAC"| PAY_COMP
-    TCK_COMP -->|"SQL"| PG
-    TCK_COMP -->|"HTTPS / SMTP"| MAILER
-    ACC_COMP -->|"SQL (access_logs)"| PG
-    IDN_COMP -->|"SQL"| PG
+    MOD_CAT & MOD_RES & MOD_PAY & MOD_TCK & MOD_ACC & MOD_IDN -->|"SQL Transaccional"| PG
+    MOD_CAT & MOD_RES -->|"TCP (Cache / TTL 600s)"| RD
+    MOD_PAY <-->|"HTTPS REST / Webhook HMAC"| GATEWAY
+    MOD_TCK -->|"HTTPS / SMTP"| MAILER
 
     classDef client fill:#1e3a8a,stroke:#3b82f6,stroke-width:2px,color:#ffffff;
-    classDef moduleBox fill:#0f172a,stroke:#64748b,stroke-width:2px,color:#f8fafc;
     classDef appComp fill:#3b0764,stroke:#a855f7,stroke-width:2px,color:#ffffff;
-    classDef facadePort fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ffffff;
+    classDef workerComp fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ffffff;
     classDef infraNode fill:#1f2937,stroke:#64748b,stroke-width:2px,color:#e2e8f0;
 
     class WEB,STU,ACC client;
-    class MOD_CAT,MOD_RES,MOD_PAY,MOD_TCK,MOD_ACC,MOD_IDN moduleBox;
-    class CAT_COMP,RES_COMP,PAY_COMP,TCK_COMP,ACC_COMP,IDN_COMP,OUTBOX_WORKER appComp;
-    class FAC_CAT,FAC_RES,FAC_TCK facadePort;
+    class MOD_CAT,MOD_RES,MOD_PAY,MOD_TCK,MOD_ACC,MOD_IDN appComp;
+    class OUTBOX_WORKER workerComp;
     class PG,RD,GATEWAY,MAILER infraNode;
 ```
+
+</details>
 
 ---
 
@@ -129,99 +105,99 @@ flowchart TD
 
 > **Convención Arquitectónica de Flechas**:
 > - `A --> B` indica dependencia funcional o invocación directa de `A` hacia `B`.
-> - `Adapter -.->|"implementa (DIP)"| Port` indica **realización/implementación de interfaz (Principio de Inversión de Dependencias — DIP)**: el adaptador de infraestructura depende del puerto de aplicación, apuntando siempre hacia adentro del hexágono.
+> - `Port -.->|"implementado por (DIP)"| Adapter` indica **realización de interfaz (Principio de Inversión de Dependencias — DIP)**: el puerto es definido por la capa de aplicación y realizado por el adaptador secundario sin que la aplicación dependa de la infraestructura.
+
+![Diagrama C3-B — Estructura Hexagonal Interna por Módulo](../diagramas-exportados/C3-hexagonal.svg)
+
+> **Formatos exportados disponibles**: [SVG Vectorial (`C3-hexagonal.svg`)](../diagramas-exportados/C3-hexagonal.svg) | [PNG Alta Resolución (`C3-hexagonal.png`)](../diagramas-exportados/C3-hexagonal.png)
+
+<details>
+<summary><b>Ver código fuente Mermaid editable (C3-hexagonal)</b></summary>
 
 ```mermaid
-flowchart TD
+flowchart TB
     subgraph MOD_CAT["1. Modulo Catalog"]
+        direction TB
         CTRL_CAT["CatalogController<br>[Inbound Adapter]"]
-        UC_CAT["GetCatalogUseCase /<br>GetEventDetailUseCase"]
-        FAC_CAT_IMPL["CatalogModuleFacadeImpl<br>[Application Service]"]
-        FAC_CAT["<<Inbound Port>><br>ICatalogModuleFacade"]
-        PORT_CAT_OUT["<<Outbound Port>><br>ICatalogRepository / ICatalogCache"]
-        ADAPT_CAT_PG["PostgreSQLCatalogAdapter<br>[Outbound Adapter]"]
-        ADAPT_CAT_RD["RedisCatalogCacheAdapter<br>[Outbound Adapter]"]
+        FAC_CAT["[Inbound Port]<br>ICatalogModuleFacade"]
+        UC_CAT["GetCatalogUseCase /<br>CatalogModuleFacadeImpl"]
+        PORT_CAT_OUT["[Outbound Port]<br>ICatalogRepository / ICatalogCache"]
+        ADAPT_CAT["PostgreSQLCatalogAdapter /<br>RedisCatalogCacheAdapter"]
 
         CTRL_CAT --> UC_CAT
-        FAC_CAT_IMPL -.->|"implementa (DIP)"| FAC_CAT
-        FAC_CAT_IMPL --> PORT_CAT_OUT
+        FAC_CAT -.->|"realizado por"| UC_CAT
         UC_CAT --> PORT_CAT_OUT
-        ADAPT_CAT_PG -.->|"implementa (DIP)"| PORT_CAT_OUT
-        ADAPT_CAT_RD -.->|"implementa (DIP)"| PORT_CAT_OUT
+        PORT_CAT_OUT -.->|"implementado por (DIP)"| ADAPT_CAT
     end
 
     subgraph MOD_RES["2. Modulo Reservations"]
+        direction TB
         CTRL_RES["ReservationsController<br>[Inbound Adapter]"]
-        UC_RES["HoldTicketsUseCase /<br>ReleaseExpiredHoldsUseCase"]
-        FAC_RES_IMPL["ReservationsModuleFacadeImpl<br>[Application Service]"]
-        FAC_RES["<<Inbound Port>><br>IReservationsModuleFacade"]
-        PORT_RES_OUT["<<Outbound Port>><br>IReservationUnitOfWork / ITimerNotifier"]
-        ADAPT_RES_PG["PostgreSQLReservationAdapter<br>[Outbound Adapter]"]
-        ADAPT_RES_RD["RedisTTLTimerAdapter<br>[Outbound Adapter]"]
+        FAC_RES["[Inbound Port]<br>IReservationsModuleFacade"]
+        UC_RES["HoldTicketsUseCase /<br>ReleaseExpiredHoldsUseCase /<br>ReservationsModuleFacadeImpl"]
+        PORT_RES_OUT["[Outbound Port]<br>IReservationUnitOfWork / ITimerNotifier"]
+        ADAPT_RES["PostgreSQLReservationAdapter /<br>RedisTTLTimerAdapter"]
 
         CTRL_RES --> UC_RES
-        FAC_RES_IMPL -.->|"implementa (DIP)"| FAC_RES
-        FAC_RES_IMPL --> PORT_RES_OUT
+        FAC_RES -.->|"realizado por"| UC_RES
         UC_RES --> PORT_RES_OUT
-        ADAPT_RES_PG -.->|"implementa (DIP)"| PORT_RES_OUT
-        ADAPT_RES_RD -.->|"implementa (DIP)"| PORT_RES_OUT
+        PORT_RES_OUT -.->|"implementado por (DIP)"| ADAPT_RES
     end
 
     subgraph MOD_PAY["3. Modulo Payments"]
+        direction TB
         CTRL_PAY["PaymentsController /<br>WebhooksController"]
         UC_PAY["ProcessPaymentUseCase /<br>HandleGatewayWebhookUseCase"]
-        PORT_PAY_OUT["<<Outbound Port>><br>IPaymentRepository / IPaymentGateway /<br>IOutboxRepository"]
-        ADAPT_PAY_PG["PostgreSQLPaymentAdapter<br>[Outbound Adapter]"]
-        ADAPT_PAY_GW["PaymentGatewayAdapters<br>[Outbound Adapter]"]
+        PORT_PAY_OUT["[Outbound Port]<br>IPaymentRepository / IPaymentGateway /<br>IOutboxRepository"]
+        ADAPT_PAY["PostgreSQLPaymentAdapter /<br>PaymentGatewayAdapters"]
 
         CTRL_PAY --> UC_PAY
         UC_PAY --> PORT_PAY_OUT
-        ADAPT_PAY_PG -.->|"implementa (DIP)"| PORT_PAY_OUT
-        ADAPT_PAY_GW -.->|"implementa (DIP)"| PORT_PAY_OUT
+        PORT_PAY_OUT -.->|"implementado por (DIP)"| ADAPT_PAY
     end
 
     subgraph MOD_TCK["4. Modulo Tickets"]
+        direction TB
         SUB_TCK["TicketIssuanceListener /<br>TicketsController"]
-        UC_TCK["IssueTicketsUseCase /<br>GetTicketDetailUseCase"]
-        FAC_TCK_IMPL["TicketsModuleFacadeImpl<br>[Application Service]"]
-        FAC_TCK["<<Inbound Port>><br>ITicketsModuleFacade"]
-        PORT_TCK_OUT["<<Outbound Port>><br>ITicketRepository / ISignatureService /<br>INotificationService"]
-        ADAPT_TCK_PG["PostgreSQLTicketAdapter<br>[Outbound Adapter]"]
-        ADAPT_TCK_CRYPTO["Ed25519SignatureAdapter<br>[Outbound Adapter]"]
-        ADAPT_TCK_MAIL["EmailNotificationAdapter<br>[Outbound Adapter]"]
+        FAC_TCK["[Inbound Port]<br>ITicketsModuleFacade"]
+        UC_TCK["IssueTicketsUseCase /<br>TicketsModuleFacadeImpl"]
+        PORT_TCK_OUT["[Outbound Port]<br>ITicketRepository / ISignatureService /<br>INotificationService"]
+        ADAPT_TCK["PostgreSQLTicketAdapter /<br>Ed25519SignatureAdapter /<br>EmailNotificationAdapter"]
 
         SUB_TCK --> UC_TCK
-        FAC_TCK_IMPL -.->|"implementa (DIP)"| FAC_TCK
-        FAC_TCK_IMPL --> PORT_TCK_OUT
+        FAC_TCK -.->|"realizado por"| UC_TCK
         UC_TCK --> PORT_TCK_OUT
-        ADAPT_TCK_PG -.->|"implementa (DIP)"| PORT_TCK_OUT
-        ADAPT_TCK_CRYPTO -.->|"implementa (DIP)"| PORT_TCK_OUT
-        ADAPT_TCK_MAIL -.->|"implementa (DIP)"| PORT_TCK_OUT
+        PORT_TCK_OUT -.->|"implementado por (DIP)"| ADAPT_TCK
     end
 
     subgraph MOD_ACC["5. Modulo Access"]
+        direction TB
         CTRL_ACC["AccessGateController<br>[Inbound Adapter]"]
         UC_ACC["ValidateTicketOnlineUseCase /<br>ReconcileGateLogsUseCase"]
-        PORT_ACC_OUT["<<Outbound Port>><br>IAccessAuditRepository"]
-        ADAPT_ACC_PG["PostgreSQLAccessAdapter<br>[Outbound Adapter]"]
+        PORT_ACC_OUT["[Outbound Port]<br>IAccessAuditRepository"]
+        ADAPT_ACC["PostgreSQLAccessAdapter<br>[Outbound Adapter]"]
 
         CTRL_ACC --> UC_ACC
         UC_ACC --> PORT_ACC_OUT
-        ADAPT_ACC_PG -.->|"implementa (DIP)"| PORT_ACC_OUT
+        PORT_ACC_OUT -.->|"implementado por (DIP)"| ADAPT_ACC
     end
 
     subgraph MOD_IDN["6. Modulo Identity"]
+        direction TB
         CTRL_IDN["AuthController<br>[Inbound Adapter]"]
         UC_IDN["AuthenticateUserUseCase /<br>VerifyTokenUseCase"]
-        PORT_IDN_OUT["<<Outbound Port>><br>IUserRepository / ITokenProvider"]
-        ADAPT_IDN_PG["PostgreSQLUserAdapter<br>[Outbound Adapter]"]
-        ADAPT_IDN_JWT["JwtTokenAdapter<br>[Outbound Adapter]"]
+        PORT_IDN_OUT["[Outbound Port]<br>IUserRepository / ITokenProvider"]
+        ADAPT_IDN["PostgreSQLUserAdapter /<br>JwtTokenAdapter"]
 
         CTRL_IDN --> UC_IDN
         UC_IDN --> PORT_IDN_OUT
-        ADAPT_IDN_PG -.->|"implementa (DIP)"| PORT_IDN_OUT
-        ADAPT_IDN_JWT -.->|"implementa (DIP)"| PORT_IDN_OUT
+        PORT_IDN_OUT -.->|"implementado por (DIP)"| ADAPT_IDN
     end
+
+    %% Disposicion en cuadricula 3x2
+    ADAPT_CAT ~~~ SUB_TCK
+    ADAPT_RES ~~~ CTRL_ACC
+    ADAPT_PAY ~~~ CTRL_IDN
 
     %% Invocaciones Intermodulares via Puertos Inbound (Fachadas)
     UC_RES -->|"getSectorCapacity()"| FAC_CAT
@@ -234,10 +210,12 @@ flowchart TD
     classDef outboundAdapter fill:#1f2937,stroke:#64748b,stroke-width:2px,color:#e2e8f0;
 
     class CTRL_CAT,CTRL_RES,CTRL_PAY,SUB_TCK,CTRL_ACC,CTRL_IDN inboundAdapter;
-    class UC_CAT,UC_RES,UC_PAY,UC_TCK,UC_ACC,UC_IDN,FAC_CAT_IMPL,FAC_RES_IMPL,FAC_TCK_IMPL appLayer;
+    class UC_CAT,UC_RES,UC_PAY,UC_TCK,UC_ACC,UC_IDN appLayer;
     class FAC_CAT,FAC_RES,FAC_TCK,PORT_CAT_OUT,PORT_RES_OUT,PORT_PAY_OUT,PORT_TCK_OUT,PORT_ACC_OUT,PORT_IDN_OUT domainPort;
-    class ADAPT_CAT_PG,ADAPT_CAT_RD,ADAPT_RES_PG,ADAPT_RES_RD,ADAPT_PAY_PG,ADAPT_PAY_GW,ADAPT_TCK_PG,ADAPT_TCK_CRYPTO,ADAPT_TCK_MAIL,ADAPT_ACC_PG,ADAPT_IDN_PG,ADAPT_IDN_JWT outboundAdapter;
+    class ADAPT_CAT,ADAPT_RES,ADAPT_PAY,ADAPT_TCK,ADAPT_ACC,ADAPT_IDN outboundAdapter;
 ```
+
+</details>
 
 ---
 
@@ -269,16 +247,16 @@ Para garantizar que jamás se cobre a un asistente sin emitir sus entradas ni se
    - **Caso A (`CONFIRMED`)**: La reserva estaba en `PENDING_PAYMENT` con `expires_at > NOW()`. `Reservations` actualiza `reservations.status = 'CONFIRMED'` y transiciona `sector_inventory` (`active_holds_count - Q`, `sold_count + Q`). `Payments` registra la orden como `PAID`, marca `payment_idempotency_keys = 'SUCCEEDED'` e inserta el evento `PAYMENT_CONFIRMED` en `outbox_events`.
    - **Caso B (`EXPIRED` — Pago tardío tras vencimiento del hold)**: Si el hold ya había expirado y su aforo fue liberado, `confirmReservationSold` retorna `'EXPIRED'`. `Payments` **jamás fuerza la venta ni emite entradas**; en la misma transacción registra el pago con estado `REQUIRES_REFUND` e inserta en `outbox_events` el evento `PAYMENT_EXPIRED_REFUND_REQUIRED` para que el worker ejecute el extorno automático ante la pasarela.
 3. **Procesamiento Recuperable (`OutboxProcessor`)**: Un worker en segundo plano dentro del mismo proceso del monolito extrae los eventos pendientes de `outbox_events` mediante `SELECT ... FOR UPDATE SKIP LOCKED`.
-4. **Emisión Idempotente en `Tickets`**: Para eventos `PAYMENT_CONFIRMED`, el despachador invoca `TicketIssuanceListener` $\rightarrow$ `IssueTicketsUseCase`, el cual verifica la unicidad por `order_id`, genera las entradas con estado inicial `ISSUED` y las firma con `Ed25519SignatureAdapter`.
+4. **Emisión Idempotente en `Tickets` y Ciclo de Vida (`RN-07`)**: Para eventos `PAYMENT_CONFIRMED`, el despachador invoca `TicketIssuanceListener` $\rightarrow$ `IssueTicketsUseCase`, el cual verifica la unicidad por `order_id`, genera las entradas con estado inicial `ISSUED` y las firma con `Ed25519SignatureAdapter`. Conforme a [`RN-07`](../complementos/03-reglas-de-negocio.md#rn-07-máquina-de-estados-del-ticket), las entradas emitidas transicionan de `ISSUED` a `ACTIVE` 24 horas antes del concierto (habilitando su descarga en el padrón de puertas `RF-ACC-02`).
 5. **Cierre del Outbox**: El evento en `outbox_events` transiciona a `PROCESSED`.
 
 ---
 
-### 3.4 Control de Accesos: Transición Atómica `ISSUED → USED`, Idempotencia de Escaneo y Separación de Auditoría
-Para prevenir el doble ingreso concurrente en molinetes online, respetar las fronteras modulares y tolerar pérdidas de respuesta HTTP en la red del recinto:
+### 3.4 Control de Accesos: Transición Atómica `ACTIVE → USED`, Idempotencia de Escaneo y Separación de Auditoría
+Para prevenir el doble ingreso concurrente en molinetes online, respetar las fronteras modulares, cumplir la máquina de estados `ISSUED → ACTIVE → USED` ([`RN-07`](../complementos/03-reglas-de-negocio.md#rn-07-máquina-de-estados-del-ticket)) y tolerar pérdidas de respuesta HTTP en la red del recinto:
 1. **Idempotencia por Intento de Escaneo (`attemptId`)**: Cada lectura en el molinete envía un `attemptId` (UUIDv4) único por intento físico. Dentro de una transacción `txContext` iniciada por `ValidateTicketOnlineUseCase` (`Access`), `PostgreSQLAccessAdapter` verifica primero si `attempt_id` ya existe en `access_logs`. Si existe (reintento automático de la PWA porque se perdió la respuesta HTTP tras un commit previo), retorna inmediatamente el resultado original (`GRANTED` o el motivo de rechazo) sin re-ejecutar el consumo del ticket.
 2. **Consumo Atómico Delegado al Módulo `Tickets`**:
-   Si el `attemptId` es nuevo, `ValidateTicketOnlineUseCase` invoca `ticketsFacade.consumeTicketAtomically(ticketId, gateId, operatorId, txContext)`. El adaptador `PostgreSQLTicketAdapter` (único propietario de la tabla `tickets`) ejecuta en la misma transacción `txContext`:
+   Si el `attemptId` es nuevo, `ValidateTicketOnlineUseCase` invoca `ticketsFacade.consumeTicketAtomically(ticketId, gateId, operatorId, txContext)`. El adaptador `PostgreSQLTicketAdapter` (único propietario de la tabla `tickets`) ejecuta en la misma transacción `txContext` la transición desde `ACTIVE` hacia `USED`:
    ```sql
    UPDATE tickets 
    SET status = 'USED', 
@@ -286,7 +264,7 @@ Para prevenir el doble ingreso concurrente en molinetes online, respetar las fro
        used_gate = :gateId, 
        used_operator = :operatorId
    WHERE id = :ticketId 
-     AND status = 'ISSUED'
+     AND status = 'ACTIVE'
    RETURNING id, event_id, sector_id, holder_dni;
    ```
 3. **Registro de Auditoría y Regla de Actuación Física del Molinete**:

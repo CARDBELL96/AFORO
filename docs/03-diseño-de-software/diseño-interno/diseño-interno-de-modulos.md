@@ -34,37 +34,37 @@ Cada uno de los seis módulos del monolito (`catalog`, `reservations`, `payments
 ```mermaid
 flowchart TB
     subgraph MODULE_BOUNDARY["Estructura Interna de un Modulo (ej. modules/reservations/) [DISENO PROPUESTO]"]
-        PUBLIC_API["<b>Frontera Publica (index.ts)</b><br/>Expone unicamente <code>IReservationsModuleFacade</code> y DTOs publicos<br/><i>(Oculta entidades, casos de uso, implementaciones y repositorios internos)</i>"]
+        PUBLIC_API["Frontera Publica (index.ts)<br>Expone unicamente IReservationsModuleFacade y DTOs publicos<br>(Oculta entidades, casos de uso, implementaciones y repositorios internos)"]
 
         subgraph ADAPTERS_IN["presentation/ (Adaptadores Primarios Inbound)"]
-            CTRL["<b>Controllers / Listeners</b><br/><code>ReservationsController</code><br/><i>Validacion HTTP y mapeo a Commands</i>"]
+            CTRL["Controllers / Listeners<br>ReservationsController<br>(Validacion HTTP y mapeo a Commands)"]
         end
 
         subgraph APPLICATION["application/ (Casos de Uso y Puertos)"]
-            PORTS_IN["<b>ports/in/</b><br/><code>IReservationsModuleFacade</code>"]
-            FAC_IMPL["<b>facades/</b><br/><code>ReservationsModuleFacadeImpl</code>"]
-            UC["<b>use-cases/</b><br/><code>HoldTicketsUseCase</code><br/><code>ReleaseExpiredHoldsUseCase</code>"]
-            PORTS_OUT["<b>ports/out/</b><br/><code>IReservationUnitOfWork</code><br/><code>ITimerNotifier</code>"]
+            PORTS_IN["ports/in/<br>IReservationsModuleFacade"]
+            FAC_IMPL["facades/<br>ReservationsModuleFacadeImpl"]
+            UC["use-cases/<br>HoldTicketsUseCase<br>ReleaseExpiredHoldsUseCase"]
+            PORTS_OUT["ports/out/<br>IReservationUnitOfWork<br>ITimerNotifier"]
         end
 
         subgraph DOMAIN["domain/ (Nucleo Puro de Negocio)"]
-            ENT["<b>entities/ & aggregates/</b><br/><code>SectorInventory</code><br/><code>Reservation</code>"]
-            VO["<b>value-objects/ & enums/</b><br/><code>ReservationStatus</code>"]
+            ENT["entities/ & aggregates/<br>SectorInventory<br>Reservation"]
+            VO["value-objects/ & enums/<br>ReservationStatus"]
         end
 
         subgraph ADAPTERS_OUT["infrastructure/ (Adaptadores Secundarios Outbound)"]
-            PG_ADAPT["<b>persistence/</b><br/><code>PostgreSQLReservationAdapter</code>"]
-            RD_ADAPT["<b>timers/</b><br/><code>RedisTTLTimerAdapter</code>"]
+            PG_ADAPT["persistence/<br>PostgreSQLReservationAdapter"]
+            RD_ADAPT["timers/<br>RedisTTLTimerAdapter"]
         end
 
         PUBLIC_API -->|"Exporta solo interfaz"| PORTS_IN
-        FAC_IMPL -.->|"implements"| PORTS_IN
+        FAC_IMPL -.->|"implements (DIP)"| PORTS_IN
         CTRL --> UC
         FAC_IMPL --> PORTS_OUT
         UC --> ENT & VO
         UC --> PORTS_OUT
-        PG_ADAPT -.->|"implements"| PORTS_OUT
-        RD_ADAPT -.->|"implements"| PORTS_OUT
+        PG_ADAPT -.->|"implements (DIP)"| PORTS_OUT
+        RD_ADAPT -.->|"implements (DIP)"| PORTS_OUT
     end
 
     classDef app fill:#3b0764,stroke:#a855f7,stroke-width:2px,color:#ffffff;
@@ -133,20 +133,20 @@ stateDiagram-v2
 sequenceDiagram
     autonumber
     actor CLI as Asistente (AFORO Web SPA)<br/>[IMPLEMENTADO EN WEB / DEMO EN COMPRA]
-    participant CTRL as ReservationsController<br/>[DISEÑO PROPUESTO]
-    participant UC as HoldTicketsUseCase<br/>[DISEÑO PROPUESTO]
-    participant UOW as IReservationUnitOfWork<br/>(PostgreSQLAdapter) [DISEÑO PROPUESTO]
-    participant DOM as SectorInventory / Reservation<br/>[DISEÑO PROPUESTO]
-    participant REDIS as RedisTTLTimerAdapter<br/>[DISEÑO PROPUESTO]
+    participant CTRL as ReservationsController<br/>[DISENO PROPUESTO]
+    participant UC as HoldTicketsUseCase<br/>[DISENO PROPUESTO]
+    participant UOW as IReservationUnitOfWork<br/>(PostgreSQLAdapter) [DISENO PROPUESTO]
+    participant DOM as SectorInventory / Reservation<br/>[DISENO PROPUESTO]
+    participant REDIS as RedisTTLTimerAdapter<br/>[DISENO PROPUESTO]
 
     CLI->>CTRL: POST /api/v1/reservations/hold<br/>{eventId, sectorId, quantity, Idempotency-Key}
     CTRL->>UC: execute(HoldTicketsCommand)
     
     UC->>UOW: executeInTransaction(callback)
     activate UOW
-    Note over UOW: Conexión dedicada del pool<br/>BEGIN TRANSACTION (READ COMMITTED)
+    Note over UOW: Conexion dedicada del pool<br/>BEGIN TRANSACTION (READ COMMITTED)
     
-    UOW->>UC: Inicia ejecución transaccional (txContext)
+    UOW->>UC: Inicia ejecucion transaccional (txContext)
     
     UC->>UOW: txContext.findSectorInventoryWithLock(sectorId)
     Note over UOW: SELECT sector_id, event_id, capacity, sold_count, active_holds_count<br/>FROM sector_inventory WHERE sector_id = $1 FOR UPDATE
@@ -161,8 +161,8 @@ sequenceDiagram
         DOM-->>UC: InvariantViolationException / QuotaExceededException
         UC-->>UOW: Propaga error de dominio
         Note over UOW: ROLLBACK TRANSACTION<br/>(Libera lock de fila)
-        UOW-->>UC: Transacción abortada
-        UC-->>CTRL: Error de dominio (Aforo agotado o límite superado)
+        UOW-->>UC: Transaccion abortada
+        UC-->>CTRL: Error de dominio (Aforo agotado o limite superado)
         CTRL-->>CLI: 409 Conflict { errorCode: "QUOTA_EXCEEDED" | "SECTOR_SOLD_OUT" }
     else Aforo disponible Y Cuota autorizada (<= 4 entradas)
         UC->>DOM: registerHold(quantity)
@@ -174,11 +174,11 @@ sequenceDiagram
         Note over UOW: UPDATE sector_inventory SET active_holds_count = active_holds_count + $qty WHERE sector_id = $1<br/>INSERT INTO reservations (id, status, created_at, expires_at = NOW() + INTERVAL '600s', ...)
         
         UOW->>UOW: COMMIT TRANSACTION
-        Note over UOW: Persistencia atómica completada.<br/>Se liberan bloqueos de fila de PostgreSQL.
+        Note over UOW: Persistencia atomica completada.<br/>Se liberan bloqueos de fila de PostgreSQL.
         deactivate UOW
-        UOW-->>UC: Transacción confirmada
+        UOW-->>UC: Transaccion confirmada
         
-        Note over UC,REDIS: Operación auxiliar asíncrona post-commit (sin bloquear DB)
+        Note over UC,REDIS: Operacion auxiliar asincrona post-commit (sin bloquear DB)
         UC->>REDIS: scheduleHoldExpirationKey(reservationId, ttlSeconds=600)
         Note over REDIS: SET hold:ttl:{id} "active" EX 600<br/>(Alarma reactiva secundaria)
         
@@ -244,14 +244,14 @@ sequenceDiagram
             PAY_UC->>RES_FAC: confirmReservationSold(reservationId, txContext)
             Note over RES_FAC,DB: En la MISMA conexion SQL (txContext):<br/>1. Lock sector_inventory FOR UPDATE<br/>2. UPDATE reservations SET status='CONFIRMED' WHERE status='PENDING_PAYMENT' AND expires_at > NOW()<br/>3. UPDATE sector_inventory SET active_holds_count = H - Q, sold_count = S + Q
             
-            alt Retorno: CONFIRMED_NOW (Reserva vigente confirmada)
+            alt Retorno: CONFIRMED (Reserva vigente confirmada)
                 PAY_UC->>DB: INSERT INTO payments (id, reservation_id, amount, status='CONFIRMED', ...)
                 PAY_UC->>DB: INSERT INTO outbox_events (id, type='PAYMENT_CONFIRMED', payload, status='PENDING')
                 PAY_UC->>DB: UPDATE payment_idempotency_keys SET status='SUCCEEDED' WHERE key=gateway_event_id
                 PAY_UC->>DB: COMMIT TRANSACTION (Unico commit atomico para Payments + Reservations)
                 PAY_UC-->>WH_CTRL: Confirmacion persistida
                 WH_CTRL-->>GW: 200 OK (Recibido y asegurado)
-            else Retorno: EXPIRED o CANCELLED (La reserva ya vencio en t >= 600s y libero su cupo)
+            else Retorno: EXPIRED (La reserva ya vencio en t >= 600s y libero su cupo)
                 PAY_UC->>DB: INSERT INTO payments (id, reservation_id, amount, status='REQUIRES_REFUND', ...)
                 PAY_UC->>DB: INSERT INTO outbox_events (id, type='PAYMENT_EXPIRED_REFUND_REQUIRED', payload, status='PENDING')
                 PAY_UC->>DB: UPDATE payment_idempotency_keys SET status='SUCCEEDED' WHERE key=gateway_event_id
@@ -293,9 +293,9 @@ sequenceDiagram
 1. **Coordinación Transaccional mediante `ITransactionContext` (Un Solo Commit/Rollback)**:
    `HandleGatewayWebhookUseCase` inicia la unidad de trabajo transaccional en PostgreSQL obteniendo un token opaco `txContext: ITransactionContext` y lo pasa a `IReservationsModuleFacade.confirmReservationSold(reservationId, txContext)`. De este modo, tanto `PostgreSQLReservationAdapter` como `PostgreSQLPaymentAdapter` ejecutan sus sentencias SQL sobre **la misma conexión física de PostgreSQL y un único `COMMIT` o `ROLLBACK`**, sin exponer repositorios ni tablas privadas entre módulos y evitando *commits* parciales independientes.
 2. **Retorno Tipado (`ReservationConfirmationStatus`) y Reembolso por Expiración**:
-   `confirmReservationSold` retorna `'CONFIRMED_NOW' | 'ALREADY_CONFIRMED' | 'EXPIRED' | 'CANCELLED' | 'NOT_FOUND'`. Si retorna `'EXPIRED'` o `'CANCELLED'` (webhook tardío recibido en $t \ge 600\text{ s}$ tras la liberación del hold), jamás se emiten entradas; en la misma transacción se registra el pago como `REQUIRES_REFUND` y se inserta `PAYMENT_EXPIRED_REFUND_REQUIRED` en `outbox_events` para que `RefundExpiredPaymentUseCase` ejecute el reembolso automático con la pasarela.
-3. **Consumidores Outbox Idempotentes**:
-   Tanto `IssueTicketsUseCase` (`order_id` / `outbox_event_id` único en `tickets`) como `RefundExpiredPaymentUseCase` son estrictamente idempotentes frente a entregas repetidas (*at-least-once*) del `OutboxProcessor Worker`.
+   `confirmReservationSold` retorna `'CONFIRMED' | 'ALREADY_CONFIRMED' | 'EXPIRED' | 'NOT_FOUND'`. Si retorna `'EXPIRED'` (webhook tardío recibido en $t \ge 600\text{ s}$ tras la liberación del hold), jamás se emiten entradas; en la misma transacción se registra el pago como `REQUIRES_REFUND` y se inserta `PAYMENT_EXPIRED_REFUND_REQUIRED` en `outbox_events` para que `RefundExpiredPaymentUseCase` ejecute el reembolso automático con la pasarela.
+3. **Consumidores Outbox Idempotentes y Ciclo de Vida `ISSUED → ACTIVE`**:
+   Tanto `IssueTicketsUseCase` (`order_id` / `outbox_event_id` único en `tickets`) como `RefundExpiredPaymentUseCase` son estrictamente idempotentes frente a entregas repetidas (*at-least-once*) del `OutboxProcessor Worker`. Conforme a `RN-07`, el ticket nace en estado `ISSUED` al confirmarse el pago y transiciona a `ACTIVE` 24 horas antes del concierto.
 
 ---
 
@@ -334,7 +334,7 @@ sequenceDiagram
                 APP-->>OPER: ACCESO CONCEDIDO (Recuperado sin re-consumir ticket)
             else Primer procesamiento de este attemptId
                 API->>TCK_FAC: consumeTicketAtomically(ticketId, gateId, operatorId, txContext)
-                Note over TCK_FAC,DB: En la MISMA transaccion SQL (txContext):<br/>UPDATE tickets SET status='USED', used_at=NOW()<br/>WHERE id=$1 AND status='ISSUED' RETURNING *
+                Note over TCK_FAC,DB: En la MISMA transaccion SQL (txContext):<br/>UPDATE tickets SET status='USED', used_at=NOW()<br/>WHERE id=$1 AND status='ACTIVE' RETURNING *
 
                 alt Cero filas afectadas (Rechazo de Negocio: USED, REVOKED, EXPIRED o sector invalido)
                     TCK_FAC-->>API: TicketConsumptionResultDTO { success: false, reason, usedAt }
@@ -342,7 +342,7 @@ sequenceDiagram
                     API->>DB: COMMIT TRANSACTION (Persiste auditoria del rechazo)
                     API-->>APP: 409 Conflict { status: "ALREADY_USED" | "REVOKED", usedAt }
                     APP-->>OPER: ACCESO DENEGADO (Molinete permanece cerrado)
-                else Una fila actualizada (Transicion atomica ISSUED -> USED exitosa)
+                else Una fila actualizada (Transicion atomica ACTIVE -> USED exitosa)
                     TCK_FAC-->>API: TicketConsumptionResultDTO { success: true, sectorName }
                     API->>DB: INSERT INTO access_logs (attempt_id, ticket_id, gate_id, result='GRANTED', mode='ONLINE')
                     API->>DB: COMMIT TRANSACTION (Unico commit: tickets.USED + access_logs.GRANTED)
@@ -388,7 +388,7 @@ sequenceDiagram
 
 ### 6.2. Coherencia Transaccional `Tickets` $\leftrightarrow$ `Access`, Idempotencia de Escaneo y Hardware de Molinete
 1. **Atomicidad entre Consumo de Ticket y Auditoría (`ITransactionContext`)**:
-   `ValidateTicketOnlineUseCase` inicia una transacción SQL (`txContext`) y la propaga a `ITicketsModuleFacade.consumeTicketAtomically(ticketId, gateId, operatorId, txContext)`. Tanto el `UPDATE tickets SET status = 'USED'` (en `Tickets`) como el `INSERT INTO access_logs` (en `Access`) se confirman en **un único `COMMIT`**. Si ocurre un fallo técnico de base de datos, se ejecuta `ROLLBACK` de ambos cambios y el boleto conserva su estado `ACTIVE`.
+   `ValidateTicketOnlineUseCase` inicia una transacción SQL (`txContext`) y la propaga a `ITicketsModuleFacade.consumeTicketAtomically(ticketId, gateId, operatorId, txContext)`. Tanto el `UPDATE tickets SET status = 'USED' WHERE id = $1 AND status = 'ACTIVE'` (en `Tickets`) como el `INSERT INTO access_logs` (en `Access`) se confirman en **un único `COMMIT`**. Si ocurre un fallo técnico de base de datos, se ejecuta `ROLLBACK` de ambos cambios y el boleto conserva su estado `ACTIVE`.
 2. **Diferenciación entre Rechazo de Negocio y Error Técnico (Regla de Apertura Segura)**:
    - **Rechazo de Negocio (`409 Conflict` / `403 Forbidden`):** El boleto ya fue usado, está revocado o no pertenece al sector. No se modifica `tickets`, pero **sí se hace `COMMIT` del intento rechazado en `access_logs`** para auditoría de seguridad. El molinete jamás se abre.
    - **Fallo Técnico (`5xx` / Error SQL):** Se revierte la transacción (`ROLLBACK`). **Jamás se abre físicamente una puerta antes de tener confirmación suficiente de la operación** (confirmación `200 OK` online o validación criptográfica + commit local en `IndexedDB` cuando la terminal opera en modo de contingencia offline).

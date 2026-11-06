@@ -40,36 +40,45 @@ Para blindar las reglas de negocio de AFORO frente a dependencias tecnológicas 
 
 El siguiente diagrama modela la aplicación concreta de la Arquitectura Hexagonal en un único módulo del monolito (**Módulo `Reservations`**), separando a los consumidores externos (clientes HTTP y el módulo `Payments` que invoca su fachada pública en memoria) de sus tres capas internas (Adaptadores de Infraestructura, Aplicación/Puertos y Dominio Puro), en correspondencia directa con el [Diagrama C4 de Código](../04-modelo-c4/Nivel4-DiagramadeCodigo.md):
 
+![Diagrama de Arquitectura Hexagonal — Módulo Reservations](../diagramas-exportados/reservations-hexagonal.svg)
+
+> **Formatos exportados disponibles**: [SVG Vectorial (`reservations-hexagonal.svg`)](../diagramas-exportados/reservations-hexagonal.svg) | [PNG Alta Resolución (`reservations-hexagonal.png`)](../diagramas-exportados/reservations-hexagonal.png)
+
+<details>
+<summary><b>Ver código fuente Mermaid editable (reservations-hexagonal)</b></summary>
+
 ```mermaid
-flowchart TB
+flowchart TD
     subgraph EXT_CONSUMERS["Consumidores Externos al Modulo Reservations"]
-        HTTP_CLI["<b>AFORO Web SPA (Cliente HTTP)</b><br/>Solicita hold temporal<br/><i>[IMPLEMENTADO EN WEB / COMPRA DEMO]</i>"]
-        PAY_MOD["<b>Modulo Payments (Consumidor Intermodular)</b><br/>Invoca fachada en memoria con txContext<br/><i>[DISENO PROPUESTO]</i>"]
+        HTTP_CLI["<b>AFORO Web SPA (Cliente HTTP)</b><br/>Solicita hold temporal<br/>[IMPLEMENTADO EN WEB / COMPRA DEMO]"]
+        PAY_MOD["<b>Modulo Payments (Consumidor Intermodular)</b><br/>Invoca fachada en memoria con txContext<br/>[DISENO PROPUESTO]"]
     end
 
     subgraph RES_MODULE["Frontera del Modulo Reservations [DISENO PROPUESTO]"]
+        direction TB
 
         subgraph INBOUND_ADAPTERS["1. Adaptadores Primarios de Entrada (Infraestructura)"]
-            CTRL["<b>ReservationsController</b><br/>Adaptador HTTP / REST<br/><code>POST /api/v1/reservations/hold</code>"]
+            CTRL["<b>ReservationsController</b><br/>Adaptador HTTP / REST<br/>POST /api/v1/reservations/hold"]
             SWEEP["<b>ExpirationSweepTrigger</b><br/>Invocador de liberacion de vencidos"]
         end
 
         subgraph APPLICATION_LAYER["2. Capa de Aplicacion (Casos de Uso y Puertos)"]
-            subgraph INBOUND_PORTS["Puertos de Entrada y Orquestacion"]
-                FAC_PORT["<b>&lt;&lt;interface&gt;&gt; IReservationsModuleFacade</b><br/><code>confirmReservationSold(id, txContext)</code><br/><code>getReservationStatus(id)</code>"]
-                FAC_IMPL["<b>ReservationsModuleFacadeImpl</b><br/>Implementacion de fachada en aplicacion"]
+            direction TB
+            subgraph INBOUND_PORTS["Puertos de Entrada y Casos de Uso"]
+                FAC_PORT["<b>[Inbound Port] IReservationsModuleFacade</b><br/>confirmReservationSold(id, txContext)<br/>getReservationStatus(id)"]
+                FAC_IMPL["<b>ReservationsModuleFacadeImpl</b><br/>Servicio de aplicacion de fachada"]
                 UC_HOLD["<b>HoldTicketsUseCase</b><br/>Orquesta retencion temporal (TTL 600s)"]
                 UC_REL["<b>ReleaseExpiredHoldsUseCase</b><br/>Reincorpora cupos vencidos idempotentemente"]
             end
 
             subgraph DOMAIN_CORE["3. Capa de Dominio (Nucleo Puro)"]
-                INV["<b>SectorInventory (Aggregate Root)</b><br/>Invariante: <code>soldCount + activeHoldsCount &lt;= capacity</code><br/>Cuota: <code>validateHolderQuota(&lt;= 4)</code>"]
-                RES["<b>Reservation (Entity)</b><br/>Estados: <code>PENDING_PAYMENT | CONFIRMED | EXPIRED | CANCELLED</code><br/>Reloj: <code>expiresAt = NOW() + 600s</code>"]
+                INV["<b>SectorInventory (Aggregate Root)</b><br/>Invariante: soldCount + activeHoldsCount &lt;= capacity<br/>Cuota: validateHolderQuota(&lt;= 4)"]
+                RES["<b>Reservation (Entity)</b><br/>Estados: PENDING_PAYMENT | CONFIRMED | EXPIRED | CANCELLED<br/>Reloj: expiresAt = NOW() + 600s"]
             end
 
             subgraph OUTBOUND_PORTS["Puertos de Salida (Interfaces de Aplicacion)"]
-                PORT_UOW["<b>&lt;&lt;interface&gt;&gt; IReservationUnitOfWork</b><br/><code>executeInTransaction(work, txContext?)</code><br/><code>findSectorInventoryWithLock(sectorId)</code><br/><code>countAccumulatedByHolder(sectorId, userId)</code><br/><code>saveHoldAndInventoryAtomic(inv, res)</code>"]
-                PORT_TMR["<b>&lt;&lt;interface&gt;&gt; ITimerNotifier</b><br/><code>scheduleHoldExpirationKey(id, 600)</code><br/><code>cancelHoldExpirationKey(id)</code>"]
+                PORT_UOW["<b>[Outbound Port] IReservationUnitOfWork</b><br/>executeInTransaction(work, txContext)<br/>findSectorInventoryWithLock(sectorId)<br/>countAccumulatedByHolder(sectorId, userId)<br/>saveHoldAndInventoryAtomic(inv, res)"]
+                PORT_TMR["<b>[Outbound Port] ITimerNotifier</b><br/>scheduleHoldExpirationKey(id, 600)<br/>cancelHoldExpirationKey(id)"]
             end
         end
 
@@ -80,28 +89,28 @@ flowchart TB
     end
 
     subgraph INFRA_ENGINES["Motores de Persistencia [DISENO PROPUESTO]"]
-        PG[("<b>PostgreSQL 16</b><br/>Tablas: sector_inventory, reservations<br/>(Fuente de Verdad)")]
-        RD[("<b>Redis 7</b><br/>Alarma Auxiliar TTL")]
+        PG[("<b>PostgreSQL 16</b><br/>Tablas: sector_inventory, reservations<br/>(Unica Fuente de Verdad)")]
+        RD[("<b>Redis 7</b><br/>Alarma Auxiliar TTL (600s)")]
     end
 
     %% Flujo desde Consumidores y Adaptadores de Entrada hacia Aplicacion
     HTTP_CLI -->|"HTTPS / JSON"| CTRL
-    CTRL -->|"Traduce Request a HoldTicketsCommand"| UC_HOLD
+    CTRL -->|"HoldTicketsCommand"| UC_HOLD
     SWEEP -->|"Dispara barrido"| UC_REL
-    PAY_MOD -->|"Depende solo del contrato publico"| FAC_PORT
-    FAC_IMPL -.->|"Implementa contrato"| FAC_PORT
+    PAY_MOD -->|"Invoca contrato publico"| FAC_PORT
+    FAC_PORT -.->|"Realizado por"| FAC_IMPL
 
     %% Uso del Dominio y Puertos de Salida por Aplicacion
     UC_HOLD -->|"Valida invariantes"| INV & RES
     UC_HOLD -->|"Delimita TX atomica"| PORT_UOW
-    UC_HOLD -->|"Programa alarma post-commit"| PORT_TMR
-    UC_REL -->|"Libera condicionalmente"| PORT_UOW
-    FAC_IMPL -->|"Transacciona con txContext"| PORT_UOW
+    UC_HOLD -->|"Alarma post-commit"| PORT_TMR
+    UC_REL -->|"Libera expirados"| PORT_UOW
+    FAC_IMPL -->|"Transacciona (txContext)"| PORT_UOW
     FAC_IMPL -->|"Cancela alarma"| PORT_TMR
 
-    %% Inversion de Dependencias en Adaptadores de Salida
-    ADAPT_PG -.->|"Implementa interfaz (DIP)"| PORT_UOW
-    ADAPT_RD -.->|"Implementa interfaz (DIP)"| PORT_TMR
+    %% Inversion de Dependencias en Adaptadores de Salida (DIP)
+    PORT_UOW -.->|"Implementado por (DIP)"| ADAPT_PG
+    PORT_TMR -.->|"Implementado por (DIP)"| ADAPT_RD
 
     ADAPT_PG -->|"TCP / SQL"| PG
     ADAPT_RD -->|"TCP / RESP"| RD
@@ -116,6 +125,8 @@ flowchart TB
     class INV,RES domain;
     class CTRL,SWEEP,ADAPT_PG,ADAPT_RD,PG,RD infra;
 ```
+
+</details>
 
 ---
 

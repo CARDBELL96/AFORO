@@ -118,7 +118,7 @@ La siguiente matriz resume las únicas colaboraciones permitidas entre los seis 
 Cada fachada actúa como una barrera de encapsulamiento que oculta las entidades de dominio y los detalles de persistencia del módulo proveedor. Para que dos módulos puedan participar atómicamente en **una única transacción PostgreSQL** (un solo `PoolClient` y un único `COMMIT`/`ROLLBACK`) sin exponer conexiones SQL ni repositorios privados, el núcleo compartido define un token opaco `ITransactionContext` (`shared/application/ITransactionContext.ts`):
 - **`IReservationsModuleFacade`** (definida en [C4 Código](../04-modelo-c4/Nivel4-DiagramadeCodigo.md)):
   - `getReservationStatus(reservationId: string): Promise<ReservationDTO>`
-  - `confirmReservationSold(reservationId: string, txContext: ITransactionContext): Promise<ReservationConfirmationStatus>` *(retorna `'CONFIRMED_NOW' | 'ALREADY_CONFIRMED' | 'EXPIRED' | 'CANCELLED' | 'NOT_FOUND'`, ejecutando la transición de la reserva y el ajuste $H \leftarrow H - Q, S \leftarrow S + Q$ en `sector_inventory` dentro de la misma transacción iniciada por `Payments`)*.
+  - `confirmReservationSold(reservationId: string, txContext: ITransactionContext): Promise<ReservationConfirmationStatus>` *(retorna `'CONFIRMED' | 'ALREADY_CONFIRMED' | 'EXPIRED' | 'NOT_FOUND'`, ejecutando la transición de la reserva y el ajuste $H \leftarrow H - Q, S \leftarrow S + Q$ en `sector_inventory` dentro de la misma transacción iniciada por `Payments`)*.
   - `cancelHoldManually(reservationId: string, reason: string): Promise<boolean>`
 - **`ICatalogModuleFacade`**:
   - `getSectorConfiguration(eventId: string, sectorId: string): Promise<SectorConfigDTO>`
