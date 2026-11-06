@@ -3,7 +3,9 @@
 **Sistema**: Plataforma de Descubrimiento, Venta y Validación de Entradas para Eventos y Conciertos en Vivo  
 **Contenedor**: `API Core Backend` (Monolito Modular) & Clientes (`AFORO Web`, `AFORO Access`)  
 **Documento**: `docs/03-diseño-de-software/diseño-interno/diseño-interno-de-modulos.md`  
-**Versión**: `1.1.0` | **Fecha**: `2026-10-29`  
+**Versión**: `1.2.0` | **Actualización**: `2026-11-06`
+
+**Cambios de esta revisión**: se aclara que presentation/ organiza los adaptadores primarios de infraestructura; se conserva el diseño anterior en Git.
 **Referencia Metodológica**: Guía 04 de Arquitectura de Software, Diseño Hexagonal de Módulos & Diagramas de Interacción UML  
 **Alineación Arquitectónica**: Conforme a la [Constitution](../../../.specify/memory/constitution.md), las [Decisiones Arquitectónicas (ADRs 001 al 006)](../../01-analisis-de-sistema/07-decisiones-arquitectonicas.md) y el [Modelo C4](../../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md)
 
@@ -75,6 +77,8 @@ flowchart TB
     class ENT,VO domain;
     class CTRL,PG_ADAPT,RD_ADAPT infra;
 ```
+
+La carpeta presentation/ agrupa adaptadores primarios y forma parte de la frontera de infraestructura desde el punto de vista arquitectónico. No introduce una capa de negocio adicional ni modifica ADR-002.
 
 ### 2.1. Reglas de Organización Interna
 - **`domain/`**: Contiene exclusivamente agregados, entidades, objetos de valor y excepciones de dominio en TypeScript puro. No importa nada de `application/`, `infrastructure/` ni `presentation/`.

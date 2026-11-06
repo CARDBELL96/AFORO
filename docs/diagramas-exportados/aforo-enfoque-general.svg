@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1030" viewBox="0 0 1600 1030" role="img" aria-labelledby="title desc"><title id="title">AFORO | Arquitectura hexagonal en un monolito modular</title><desc id="desc">Vista conceptual del enfoque · DISEÑO PROPUESTO — BACKEND NO IMPLEMENTADO</desc><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#405576"/></marker><marker id="realization" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="10" markerHeight="10" orient="auto"><path d="M1 1 L11 6 L1 11 Z" fill="white" stroke="#405576"/></marker></defs><rect width="1600" height="1030" fill="white"/>
+<text x="45" y="48" text-anchor="start" font-family="Arial, sans-serif" font-size="32" font-weight="700" fill="#18243b"><tspan x="45" dy="0">AFORO | Arquitectura hexagonal en un monolito modular</tspan></text>
+<text x="45" y="80" text-anchor="start" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18243b"><tspan x="45" dy="0">Vista conceptual del enfoque · DISEÑO PROPUESTO — BACKEND NO IMPLEMENTADO</tspan></text>
+<rect x="320" y="130" width="950" height="700" rx="22" fill="#faf8ff" stroke="#7852b7" stroke-width="2"/>
+<text x="795" y="163" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#18243b"><tspan x="795" dy="0">API Core · Seis módulos independientes en el mismo proceso</tspan></text>
+<rect x="35" y="240" width="245" height="155" rx="16" fill="#e8f2ff" stroke="#8b9ab2" stroke-width="1.5"/>
+<text x="157.5" y="271" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18243b"><tspan x="157.5" dy="0">Clientes</tspan></text>
+<text x="157.5" y="302" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#18243b"><tspan x="157.5" dy="0">AFORO Web</tspan><tspan x="157.5" dy="23.799999999999997">AFORO Studio</tspan><tspan x="157.5" dy="23.799999999999997">AFORO Access</tspan></text>
+<rect x="35" y="480" width="245" height="155" rx="16" fill="#e8f2ff" stroke="#8b9ab2" stroke-width="1.5"/>
+<text x="157.5" y="511" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18243b"><tspan x="157.5" dy="0">Entrada</tspan></text>
+<text x="157.5" y="542" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#18243b"><tspan x="157.5" dy="0">Controladores REST</tspan><tspan x="157.5" dy="23.799999999999997">Validación de solicitudes</tspan><tspan x="157.5" dy="23.799999999999997">Autenticación y RBAC</tspan></text>
+<rect x="350" y="210" width="280" height="225" rx="16" fill="#e8f2ff" stroke="#8b9ab2" stroke-width="1.5"/>
+<text x="490" y="241" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18243b"><tspan x="490" dy="0">Catalog</tspan></text>
+<text x="490" y="272" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#18243b"><tspan x="490" dy="0">Eventos, recintos y sectores</tspan></text>
+<text x="490" y="320" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#18243b"><tspan x="490" dy="0">Puertos de entrada y salida</tspan></text>
+<text x="490" y="355" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#18243b"><tspan x="490" dy="0">Aplicación · casos de uso</tspan></text>
+<rect x="370" y="376" width="240" height="40" rx="12" fill="white" stroke="#7852b7"/>
+<text x="490" y="402" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#18243b"><tspan x="490" dy="0">Dominio propio · reglas</tspan></text>
+<rect x="650" y="210" width="280" height="225" rx="16" fill="#fdeaf2" stroke="#8b9ab2" stroke-width="1.5"/>
+<text x="790" y="241" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18243b"><tspan x="790" dy="0">Reservations</tspan></text>
+<text x="790" y="272" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#18243b"><tspan x="790" dy="0">Holds, cuota y aforo</tspan></text>
+<text x="790" y="320" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#18243b"><tspan x="790" dy="0">Puertos de entrada y salida</tspan></text>
+<text x="790" y="355" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#18243b"><tspan x="790" dy="0">Aplicación · casos de uso</tspan></text>
+<rect x="670" y="376" width="240" height="40" rx="12" fill="white" stroke="#7852b7"/>
+<text x="790" y="402" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#18243b"><tspan x="790" dy="0">Dominio propio · reglas</tspan></text>
+<rect x="950" y="210" width="280" height="225" rx="16" fill="#fff4d6" stroke="#8b9ab2" stroke-width="1.5"/>
+<text x="1090" y="241" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18243b"><tspan x="1090" dy="0">Payments</tspan></text>
+<text x="1090" y="272" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#18243b"><tspan x="1090" dy="0">Cobros e idempotencia</tspan></text>
+<text x="1090" y="320" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#18243b"><tspan x="1090" dy="0">Puertos de entrada y salida</tspan></text>
+<text x="1090" y="355" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#18243b"><tspan x="1090" dy="0">Aplicación · casos de uso</tspan></text>
+<rect x="970" y="376" width="240" height="40" rx="12" fill="white" stroke="#7852b7"/>
+<text x="1090" y="402" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#18243b"><tspan x="1090" dy="0">Dominio propio · reglas</tspan></text>
+<rect x="350" y="490" width="280" height="225" rx="16" fill="#f0eaff" stroke="#8b9ab2" stroke-width="1.5"/>
+<text x="490" y="521" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18243b"><tspan x="490" dy="0">Identity</tspan></text>
+<text x="490" y="552" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#18243b"><tspan x="490" dy="0">Usuarios y permisos</tspan></text>
+<text x="490" y="600" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#18243b"><tspan x="490" dy="0">Puertos de entrada y salida</tspan></text>
+<text x="490" y="635" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#18243b"><tspan x="490" dy="0">Aplicación · casos de uso</tspan></text>
+<rect x="370" y="656" width="240" height="40" rx="12" fill="white" stroke="#7852b7"/>
+<text x="490" y="682" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#18243b"><tspan x="490" dy="0">Dominio propio · reglas</tspan></text>
+<rect x="650" y="490" width="280" height="225" rx="16" fill="#e6f5ed" stroke="#8b9ab2" stroke-width="1.5"/>
+<text x="790" y="521" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18243b"><tspan x="790" dy="0">Access</tspan></text>
+<text x="790" y="552" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#18243b"><tspan x="790" dy="0">Ingresos y auditoría</tspan></text>
+<text x="790" y="600" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#18243b"><tspan x="790" dy="0">Puertos de entrada y salida</tspan></text>
+<text x="790" y="635" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#18243b"><tspan x="790" dy="0">Aplicación · casos de uso</tspan></text>
+<rect x="670" y="656" width="240" height="40" rx="12" fill="white" stroke="#7852b7"/>
+<text x="790" y="682" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#18243b"><tspan x="790" dy="0">Dominio propio · reglas</tspan></text>
+<rect x="950" y="490" width="280" height="225" rx="16" fill="#f0eaff" stroke="#8b9ab2" stroke-width="1.5"/>
+<text x="1090" y="521" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18243b"><tspan x="1090" dy="0">Tickets</tspan></text>
+<text x="1090" y="552" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#18243b"><tspan x="1090" dy="0">Emisión y firma QR</tspan></text>
+<text x="1090" y="600" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#18243b"><tspan x="1090" dy="0">Puertos de entrada y salida</tspan></text>
+<text x="1090" y="635" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#18243b"><tspan x="1090" dy="0">Aplicación · casos de uso</tspan></text>
+<rect x="970" y="656" width="240" height="40" rx="12" fill="white" stroke="#7852b7"/>
+<text x="1090" y="682" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#18243b"><tspan x="1090" dy="0">Dominio propio · reglas</tspan></text>
+<rect x="1310" y="210" width="255" height="160" rx="16" fill="#f0f4f8" stroke="#8b9ab2" stroke-width="1.5"/>
+<text x="1437.5" y="241" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18243b"><tspan x="1437.5" dy="0">Persistencia</tspan></text>
+<text x="1437.5" y="272" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#18243b"><tspan x="1437.5" dy="0">PostgreSQL 16</tspan><tspan x="1437.5" dy="23.799999999999997">Única fuente de verdad</tspan><tspan x="1437.5" dy="23.799999999999997">Redis 7 auxiliar</tspan></text>
+<rect x="1310" y="440" width="255" height="155" rx="16" fill="#fff4d6" stroke="#8b9ab2" stroke-width="1.5"/>
+<text x="1437.5" y="471" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18243b"><tspan x="1437.5" dy="0">Sistemas externos</tspan></text>
+<text x="1437.5" y="502" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#18243b"><tspan x="1437.5" dy="0">Pasarelas de pago</tspan><tspan x="1437.5" dy="23.799999999999997">Servicio de correo</tspan></text>
+<polyline points="155,395 155,480" fill="none" stroke="#405576" stroke-width="2"  marker-end="url(#arrow)"/>
+<rect x="163" y="422" width="114" height="25" rx="5" fill="white"/>
+<text x="220" y="440" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="400" fill="#18243b"><tspan x="220" dy="0">HTTPS / JSON</tspan></text>
+<polyline points="280,560 320,560" fill="none" stroke="#405576" stroke-width="2"  marker-end="url(#arrow)"/>
+<polyline points="1270,290 1310,290" fill="none" stroke="#405576" stroke-width="2"  marker-end="url(#arrow)"/>
+<polyline points="1270,525 1310,525" fill="none" stroke="#405576" stroke-width="2"  marker-end="url(#arrow)"/>
+<text x="800" y="785" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#18243b"><tspan x="800" dy="0">Cada módulo tiene adaptadores propios; los módulos colaboran mediante fachadas públicas.</tspan><tspan x="800" dy="23.799999999999997">Outbox: evento persistido y worker interno recuperable entre Payments y Tickets.</tspan></text>
+<text x="800" y="890" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="400" fill="#18243b"><tspan x="800" dy="0">Estilo: monolito modular. Enfoque interno: puertos y adaptadores en cada módulo.</tspan><tspan x="800" dy="28">Los seis módulos no son capas ni caras de un único dominio compartido.</tspan><tspan x="800" dy="28">Web implementada en modo DEMO; Studio, Access e integraciones corresponden al diseño propuesto.</tspan></text></svg>

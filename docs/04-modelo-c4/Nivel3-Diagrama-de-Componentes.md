@@ -3,7 +3,9 @@
 **Sistema**: Plataforma de Descubrimiento, Venta y Validación de Entradas para Eventos y Conciertos en Vivo  
 **Contenedor Analizado**: `API Core Backend` (Monolito Modular)  
 **Documento**: `docs/04-modelo-c4/Nivel3-Diagrama-de-Componentes.md`  
-**Versión**: `1.1.0` | **Fecha**: `2026-10-21`  
+**Versión**: `1.2.0` | **Actualización**: `2026-11-06`
+
+**Cambios de esta revisión**: simplificación de C3, vista hexagonal representativa con dominio explícito y exportaciones con fondo claro. La versión anterior se conserva en Git.
 **Referencia Metodológica**: C4 Model (Simon Brown) & Guía 04 de Arquitectura de Software  
 **Alineación Arquitectónica**: Conforme a la [Constitution](../../.specify/memory/constitution.md), el [Capítulo 01](../01-analisis-de-sistema/) y los [ADRs 001 al 006](../01-analisis-de-sistema/07-decisiones-arquitectonicas.md)
 
@@ -11,7 +13,7 @@
 
 ## 1. Propósito y Alcance del Diagrama C3
 
-El **Diagrama de Componentes (C3)** realiza un *zoom-in* sobre el contenedor central **API Core Backend**, ilustrado en el [Diagrama C2](Nivel2-DiagramadeContenedores.md). Muestra la organización interna del proceso monolítico en sus seis módulos de dominio cohesivos, detallando el flujo estricto de **Arquitectura Hexagonal (Casos de Uso $\rightarrow$ Puertos de Salida $\rightarrow$ Adaptadores $\rightarrow$ Infraestructura)**, los contratos de fachada inter-módulo, el procesamiento recuperable mediante **Transactional Outbox** y la emisión criptográfica asimétrica.
+El **Diagrama de Componentes (C3)** abre el contenedor **API Core Backend** de C2 y presenta los seis módulos, sus responsabilidades y sus relaciones. La vista complementaria muestra cómo se aplica el enfoque hexagonal en `Reservations`; las clases, métodos y secuencias se desarrollan en C4 y en diseño interno.
 
 ### Principios Arquitectónicos Fundamentales
 1. **Monolito Modular (ADR-001)**: Los seis módulos coexisten dentro de un **único artefacto ejecutable** en Node.js/TypeScript. No existen llamadas de red inter-módulo ni microservicios.
@@ -25,236 +27,110 @@ El **Diagrama de Componentes (C3)** realiza un *zoom-in* sobre el contenedor cen
 
 ## 2. Diagramas de Componentes de API Core (C3)
 
-Para garantizar máxima legibilidad académica y evitar la saturación visual en un único lienzo, el Nivel 3 (C3) se estructura en dos vistas complementarias:
-- **Vista 2.1 (`C3-A` — Topología Intermodular y Custodia de Datos)**: Muestra la interacción entre los seis módulos del monolito a través de fachadas públicas en memoria (`I*ModuleFacade`), el flujo asíncrono mediante `OutboxProcessor` y la custodia estricta de tablas por módulo en PostgreSQL.
-- **Vista 2.2 (`C3-B` — Estructura Hexagonal Interna e Inversión de Dependencias)**: Detalla los componentes internos de cada módulo (controladores, casos de uso, implementaciones de fachada, puertos de salida y adaptadores secundarios) respetando la dirección de las flechas de realización (`..|>`) del Principio de Inversión de Dependencias (DIP).
+La vista principal responde cómo se divide API Core. La vista complementaria utiliza Reservations como módulo representativo para explicar puertos, adaptadores y dominio, siguiendo la progresión de la Guía 04 docente.
 
-### 2.1 Vista C3-A: Topología Intermodular, Fachadas en Memoria y Custodia de Datos
+### 2.1 Vista C3-A: Módulos y relaciones
 
-![Diagrama C3-A — Topología Intermodular y Custodia de Datos](../diagramas-exportados/C3-modulos.svg)
+![C3: módulos pares dentro de API Core](../diagramas-exportados/C3-modulos.svg)
 
-> **Formatos exportados disponibles**: [SVG Vectorial (`C3-modulos.svg`)](../diagramas-exportados/C3-modulos.svg) | [PNG Alta Resolución (`C3-modulos.png`)](../diagramas-exportados/C3-modulos.png)
+[PNG para exposición](../diagramas-exportados/C3-modulos.png). Composición vectorial reproducible en [render-architecture.mjs](../../scripts/render-architecture.mjs).
+
+Las relaciones de infraestructura se resumen para evitar cruces visuales: cada módulo utiliza sus propios adaptadores y tablas. La persistencia compartida no autoriza acceso a las tablas de otro módulo.
 
 <details>
-<summary><b>Ver código fuente Mermaid editable (C3-modulos)</b></summary>
+<summary>Relaciones editables en Mermaid</summary>
 
 ```mermaid
-flowchart TD
-    subgraph CLIENTS["Clientes del Ecosistema"]
-        WEB["AFORO Web SPA<br>[React 19 / TypeScript]<br>[IMPLEMENTADO - MODO DEMO]"]
-        STU["AFORO Studio SPA<br>[React 19 / TypeScript]<br>[DISENO PROPUESTO]"]
-        ACC["AFORO Access PWA<br>[PWA / Offline-First]<br>[DISENO PROPUESTO]"]
+flowchart LR
+    subgraph API["API Core · Monolito modular · DISEÑO PROPUESTO"]
+        CAT["Catalog · Eventos y sectores"]
+        RES["Reservations · Hold 600 s y cuota 4"]
+        PAY["Payments · Cobros idempotentes"]
+        TCK["Tickets · Emisión y firma QR"]
+        ACC["Access · Validación y auditoría"]
+        IDN["Identity · JWT y RBAC transversal"]
+        WORKER["OutboxProcessor · Worker interno"]
+        RES -->|ICatalogModuleFacade| CAT
+        PAY -->|IReservationsModuleFacade| RES
+        ACC -->|ITicketsModuleFacade| TCK
+        WORKER -->|TicketIssuanceListener| TCK
     end
-
-    subgraph API_CORE["Contenedor: API Core Backend [Monolito Modular - DISENO PROPUESTO]"]
-        direction TB
-
-        subgraph MODULOS_NEGOCIO["Dominio Comercial: Catalogo, Reservas y Pagos"]
-            direction LR
-            MOD_CAT["1. Modulo Catalog<br>[Component: Catalogo y Recintos]<br>Fachada: ICatalogModuleFacade"]
-            MOD_RES["2. Modulo Reservations<br>[Component: Retencion Temporal]<br>Fachada: IReservationsModuleFacade"]
-            MOD_PAY["3. Modulo Payments<br>[Component: Cobro y Transacciones]<br>Publica en Outbox"]
-        end
-
-        OUTBOX_WORKER["OutboxProcessor Worker<br>[Component Auxiliar: Despachador At-Least-Once]"]
-
-        subgraph MODULOS_OPERATIVOS["Dominio Operativo y Transversal: Tickets, Accesos e Identidad"]
-            direction LR
-            MOD_TCK["4. Modulo Tickets<br>[Component: Emision y Firma QR]<br>Fachada: ITicketsModuleFacade"]
-            MOD_ACC["5. Modulo Access<br>[Component: Control de Molinete]<br>Valida ingresos"]
-            MOD_IDN["6. Modulo Identity<br>[Component: Autenticacion y RBAC]<br>Gestion de sesiones"]
-        end
-    end
-
-    subgraph INFRA["Infraestructura Compartida y Servicios Externos (PostgreSQL, Redis, Pasarelas y Correo)"]
-        PG[("PostgreSQL 16 Relacional<br>[Persistencia ACID Compartida]")]
-        RD[("Redis 7 Auxiliar<br>[Cache y Temporizadores TTL]")]
-        GATEWAY["Pasarelas de Pago<br>[Culqi / Niubiz / Stripe]"]
-        MAILER["Proveedor de Correo<br>[Envio Transaccional]"]
-    end
-
-    %% Entradas desde Clientes hacia Modulos
-    WEB -->|"Consulta y reserva"| MOD_CAT
-    WEB -->|"Solicita hold"| MOD_RES
-    WEB -->|"Procesa compra"| MOD_PAY
-    STU -->|"Gestion de eventos"| MOD_CAT
-    ACC -->|"Validacion de ingreso"| MOD_ACC
-    WEB & STU & ACC -.->|"Verificacion de sesion"| MOD_IDN
-
-    %% Comunicacion Intermodular en Memoria (Fachadas Publicas)
-    MOD_RES -->|"ICatalogModuleFacade"| MOD_CAT
-    MOD_PAY -->|"IReservationsModuleFacade"| MOD_RES
-    MOD_ACC -->|"ITicketsModuleFacade"| MOD_TCK
-
-    %% Procesamiento Asincrono y Recuperable con Outbox
-    MOD_PAY -.->|"Persiste evento"| OUTBOX_WORKER
-    OUTBOX_WORKER -->|"Polling eventos pendientes"| PG
-    OUTBOX_WORKER -->|"Despacha pago confirmado"| MOD_TCK
-
-    %% Persistencia Compartida y Servicios Externos
-    MOD_CAT & MOD_RES & MOD_PAY & MOD_TCK & MOD_ACC & MOD_IDN -->|"Persistencia de modulo"| PG
-    MOD_CAT & MOD_RES -->|"Cache / Alarma TTL"| RD
-    MOD_PAY <-->|"Autorizacion y webhooks"| GATEWAY
-    MOD_TCK -->|"Despacho de comprobantes"| MAILER
-
-    classDef client fill:#1e3a8a,stroke:#3b82f6,stroke-width:2px,color:#ffffff;
-    classDef appComp fill:#3b0764,stroke:#a855f7,stroke-width:2px,color:#ffffff;
-    classDef workerComp fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ffffff;
-    classDef infraNode fill:#1f2937,stroke:#64748b,stroke-width:2px,color:#e2e8f0;
-
-    class WEB,STU,ACC client;
-    class MOD_CAT,MOD_RES,MOD_PAY,MOD_TCK,MOD_ACC,MOD_IDN appComp;
-    class OUTBOX_WORKER workerComp;
-    class PG,RD,GATEWAY,MAILER infraNode;
+    PG[("PostgreSQL 16 · Tablas privadas por módulo")]
+    RD[("Redis 7 · Caché y señal TTL auxiliar")]
+    GW["Pasarela de pago"]
+    MAIL["Correo"]
+    PAY -->|"Pago y evento en la misma transacción"| PG
+    WORKER -->|"Recupera y reclama eventos persistidos"| PG
+    CAT & RES & TCK & ACC & IDN -->|"Adaptadores de cada módulo"| PG
+    CAT & RES -->|"Caché / señal de expiración"| RD
+    PAY <-->|"Cobros y webhooks"| GW
+    TCK -->|"Envío de entradas"| MAIL
 ```
 
 </details>
 
----
+### 2.2 Vista C3-B: Enfoque hexagonal del módulo Reservations
 
-### 2.2 Vista C3-B: Estructura Hexagonal Interna por Módulo e Inversión de Dependencias (DIP)
+![Vista representativa de puertos, aplicación, dominio y adaptadores](../diagramas-exportados/C3-hexagonal.svg)
 
-> **Convención Arquitectónica de Flechas (Inversión de Dependencias y Tiempo de Ejecución)**:
-> - `A --> B` (línea continua): **Llamada o invocación en tiempo de ejecución** (`A` invoca a `B`).
->   - El controlador primario invoca al caso de uso de aplicación (`Controller --> UseCase`).
->   - El caso de uso invoca el puerto de salida tipado (`UseCase --> OutboundPort`).
->   - Un módulo consume la fachada en memoria de otro módulo (`UseCase_A --> InboundPort_B`).
-> - `A -.-> B` (línea discontinua): **Realización de interfaces e Inversión de Dependencias (DIP)** (`A` implementa o realiza el contrato definido en `B`).
->   - **Inversión de Dependencias (DIP)**: Los adaptadores secundarios de infraestructura implementan los puertos de salida definidos por el núcleo de la aplicación (`Adapter -.->|realiza (DIP)| OutboundPort`). La flecha apunta hacia el puerto en la capa de aplicación, demostrando que la infraestructura depende del dominio.
->   - **Realización de Contrato Público**: El servicio de aplicación realiza la interfaz del puerto de entrada (`ApplicationService -.->|realiza contrato| InboundPort`).
+[PNG para exposición](../diagramas-exportados/C3-hexagonal.png). Esta vista complementa C3; no sustituye el diagrama de clases de C4 ni pretende detallar los seis módulos a la vez.
 
-![Diagrama C3-B — Estructura Hexagonal Interna por Módulo](../diagramas-exportados/C3-hexagonal.svg)
-
-> **Formatos exportados disponibles**: [SVG Vectorial (`C3-hexagonal.svg`)](../diagramas-exportados/C3-hexagonal.svg) | [PNG Alta Resolución (`C3-hexagonal.png`)](../diagramas-exportados/C3-hexagonal.png)
+- Las flechas continuas indican uso o invocación.
+- Las flechas discontinuas con triángulo hueco indican realización: la implementación apunta al contrato que implementa.
+- Los puertos pertenecen a aplicación; el dominio permanece independiente de aplicación e infraestructura.
+- Los adaptadores primarios pueden organizarse en una carpeta presentation/; arquitectónicamente pertenecen a infraestructura, igual que los adaptadores secundarios.
 
 <details>
-<summary><b>Ver código fuente Mermaid editable (C3-hexagonal)</b></summary>
+<summary>Relaciones editables en Mermaid</summary>
 
 ```mermaid
-flowchart TB
-    subgraph ROW_COMERCIAL["Dominio Comercial: Catalogo, Reservas y Pagos"]
-        direction LR
-
-        subgraph MOD_CAT["1. Modulo Catalog"]
-            direction TB
-            CTRL_CAT["CatalogController<br>[Inbound Adapter]"]
-            FAC_CAT["[Inbound Port]<br>ICatalogModuleFacade"]
-            UC_CAT["GetCatalogUseCase /<br>CatalogFacadeImpl"]
-            PORT_CAT["[Outbound Port]<br>ICatalogRepository / Cache"]
-            ADAPT_CAT["CatalogAdapters<br>[PostgreSQL / Redis]"]
-
-            CTRL_CAT -->|"invoca"| UC_CAT
-            UC_CAT -.-> FAC_CAT
-            UC_CAT -->|"invoca puerto"| PORT_CAT
-            PORT_CAT ~~~ ADAPT_CAT
-            ADAPT_CAT -.->|"realiza (DIP)"| PORT_CAT
-        end
-
-        subgraph MOD_RES["2. Modulo Reservations"]
-            direction TB
-            CTRL_RES["ReservationsController<br>[Inbound Adapter]"]
-            FAC_RES["[Inbound Port]<br>IReservationsModuleFacade"]
-            UC_RES["HoldTicketsUseCase /<br>ReservationsFacadeImpl"]
-            PORT_RES["[Outbound Port]<br>IReservationUnitOfWork / Timer"]
-            ADAPT_RES["ReservationAdapters<br>[PostgreSQL / Redis]"]
-
-            CTRL_RES -->|"invoca"| UC_RES
-            UC_RES -.-> FAC_RES
-            UC_RES -->|"invoca puerto"| PORT_RES
-            PORT_RES ~~~ ADAPT_RES
-            ADAPT_RES -.->|"realiza (DIP)"| PORT_RES
-        end
-
-        subgraph MOD_PAY["3. Modulo Payments"]
-            direction TB
-            CTRL_PAY["PaymentsController /<br>WebhooksController"]
-            UC_PAY["ProcessPaymentUseCase /<br>HandleGatewayWebhookUseCase"]
-            PORT_PAY["[Outbound Port]<br>IPaymentRepository / Gateway"]
-            ADAPT_PAY["PaymentAdapters<br>[PostgreSQL / Pasarelas]"]
-
-            CTRL_PAY -->|"invoca"| UC_PAY
-            UC_PAY -->|"invoca puerto"| PORT_PAY
-            PORT_PAY ~~~ ADAPT_PAY
-            ADAPT_PAY -.->|"realiza (DIP)"| PORT_PAY
-        end
+flowchart LR
+    CTRL["ReservationsController · Adaptador primario"]
+    SWEEP["ExpirationSweepTrigger · Adaptador primario"]
+    PAY["Payments · Consumidor en memoria"]
+    subgraph RES["Reservations · DISEÑO PROPUESTO"]
+        FAC["IReservationsModuleFacade · Puerto de entrada"]
+        IMPL["ReservationsModuleFacadeImpl · Aplicación"]
+        HOLD["HoldTicketsUseCase · Aplicación"]
+        REL["ReleaseExpiredHoldsUseCase · Aplicación"]
+        DOMAIN["SectorInventory / Reservation · Dominio puro"]
+        UOW["IReservationUnitOfWork · Puerto de salida"]
+        TIMER["ITimerNotifier · Puerto de salida"]
+        IMPL -.->|implementa| FAC
+        HOLD & REL --> DOMAIN
+        HOLD & REL & IMPL --> UOW
+        HOLD & IMPL --> TIMER
     end
-
-    subgraph ROW_OPERATIVO["Dominio Operativo y Transversal: Tickets, Accesos e Identidad"]
-        direction LR
-
-        subgraph MOD_TCK["4. Modulo Tickets"]
-            direction TB
-            SUB_TCK["TicketIssuanceListener /<br>TicketsController"]
-            FAC_TCK["[Inbound Port]<br>ITicketsModuleFacade"]
-            UC_TCK["IssueTicketsUseCase /<br>TicketsFacadeImpl"]
-            PORT_TCK["[Outbound Port]<br>ITicketRepository / Signature"]
-            ADAPT_TCK["TicketAdapters<br>[PostgreSQL / Ed25519]"]
-
-            SUB_TCK -->|"invoca"| UC_TCK
-            UC_TCK -.->|"realiza contrato"| FAC_TCK
-            UC_TCK -->|"invoca puerto"| PORT_TCK
-            PORT_TCK ~~~ ADAPT_TCK
-            ADAPT_TCK -.->|"realiza (DIP)"| PORT_TCK
-        end
-
-        subgraph MOD_ACC["5. Modulo Access"]
-            direction TB
-            CTRL_ACC["AccessGateController<br>[Inbound Adapter]"]
-            UC_ACC["ValidateTicketOnlineUseCase /<br>ReconcileGateLogsUseCase"]
-            PORT_ACC["[Outbound Port]<br>IAccessAuditRepository"]
-            ADAPT_ACC["PostgreSQLAccessAdapter<br>[Outbound Adapter]"]
-
-            CTRL_ACC -->|"invoca"| UC_ACC
-            UC_ACC -->|"invoca puerto"| PORT_ACC
-            PORT_ACC ~~~ ADAPT_ACC
-            ADAPT_ACC -.->|"realiza (DIP)"| PORT_ACC
-        end
-
-        subgraph MOD_IDN["6. Modulo Identity"]
-            direction TB
-            CTRL_IDN["AuthController<br>[Inbound Adapter]"]
-            FAC_IDN["[Inbound Port]<br>IIdentityModuleFacade"]
-            UC_IDN["AuthenticateUserUseCase /<br>IdentityFacadeImpl"]
-            PORT_IDN["[Outbound Port]<br>IUserRepository / TokenProvider"]
-            ADAPT_IDN["IdentityAdapters<br>[PostgreSQL / JWT]"]
-
-            CTRL_IDN -->|"invoca"| UC_IDN
-            UC_IDN -.->|"realiza contrato"| FAC_IDN
-            UC_IDN -->|"invoca puerto"| PORT_IDN
-            PORT_IDN ~~~ ADAPT_IDN
-            ADAPT_IDN -.->|"realiza (DIP)"| PORT_IDN
-        end
-    end
-
-    %% Disposicion en dos niveles estables
-    ROW_COMERCIAL -->|"invocaciones intermodulares"| ROW_OPERATIVO
-
-    %% Invocaciones entre fachadas en memoria
-    UC_RES -->|"invoca en memoria"| FAC_CAT
-    UC_PAY -->|"invoca en memoria"| FAC_RES
-    UC_ACC -->|"invoca en memoria"| FAC_TCK
-
-    classDef inboundAdapter fill:#1e3a8a,stroke:#3b82f6,stroke-width:2px,color:#ffffff;
-    classDef appLayer fill:#3b0764,stroke:#a855f7,stroke-width:2px,color:#ffffff;
-    classDef domainPort fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ffffff;
-    classDef outboundAdapter fill:#1f2937,stroke:#64748b,stroke-width:2px,color:#e2e8f0;
-
-    class CTRL_CAT,CTRL_RES,CTRL_PAY,SUB_TCK,CTRL_ACC,CTRL_IDN inboundAdapter;
-    class UC_CAT,UC_RES,UC_PAY,UC_TCK,UC_ACC,UC_IDN appLayer;
-    class FAC_CAT,FAC_RES,FAC_TCK,FAC_IDN,PORT_CAT,PORT_RES,PORT_PAY,PORT_TCK,PORT_ACC,PORT_IDN domainPort;
-    class ADAPT_CAT,ADAPT_RES,ADAPT_PAY,ADAPT_TCK,ADAPT_ACC,ADAPT_IDN outboundAdapter;
+    CTRL --> HOLD
+    SWEEP --> REL
+    PAY --> FAC
+    PG["PostgreSQLReservationAdapter"] -.->|implementa| UOW
+    RD["RedisTTLTimerAdapter"] -.->|implementa| TIMER
 ```
 
 </details>
+
+### 2.3 Contratos y trazabilidad
+
+| Módulo | Responsabilidad / requisito | Contratos y mecanismos principales |
+|---|---|---|
+| Catalog | Consulta de eventos, recintos y sectores | ICatalogModuleFacade |
+| Reservations | RN-01, RN-03 y RN-04: aforo, TTL y cuota | IReservationsModuleFacade, IReservationUnitOfWork, ITimerNotifier |
+| Payments | RN-05: cobros idempotentes | IPaymentRepository, IPaymentGateway, IOutboxRepository |
+| Tickets | RN-06 y RN-07: emisión y estados | ITicketsModuleFacade, ITicketRepository, ISignatureService, INotificationService |
+| Access | RN-08: validación y reconciliación | ITicketsModuleFacade como consumidor; repositorio de auditoría propio |
+| Identity | Autenticación y permisos de operaciones protegidas | IIdentityModuleFacade, IUserRepository, ITokenProvider, IPasswordHasher |
+
+Las implementaciones de fachada conservan el nombre canónico *ModuleFacadeImpl. El detalle completo se mantiene en [enfoque arquitectónico](../02-arquitectura-software/enfoque-aquitectonico.md), [componentes](../02-arquitectura-software/componentes-arquitectonicos.md) y [C4](Nivel4-DiagramadeCodigo.md).
 
 ---
 
 ## 3. Especificación Arquitectónica y Flujos de Dominio
 
 ### 3.1 Flujo Hexagonal Estricto por Módulo
-Cada módulo implementa de forma rigurosa la separación en tres planos concéntricos:
-1. **Adaptadores de Entrada (Inbound)**: Controladores HTTP REST (`*Controller`) y suscriptores de eventos que reciben las peticiones de clientes o tareas programadas y las traducen a DTOs de comando para la capa de aplicación.
-2. **Capa de Aplicación y Dominio Puro**: Casos de uso (`*UseCase`) y servicios de fachada (`*ModuleFacadeImpl`) que orquestan las políticas e invariantes de negocio. **No contienen imports de clientes de base de datos ni SDKs de pasarelas**. Toda dependencia externa se modela como un **Puerto de Salida (Outbound Port)** mediante una interfaz TypeScript pura.
+Cada módulo separa el núcleo de dominio, la aplicación y los adaptadores externos:
+1. **Infraestructura — Adaptadores de Entrada (Inbound)**: Controladores HTTP REST (`*Controller`) y suscriptores de eventos que reciben las peticiones de clientes o tareas programadas y las traducen a DTOs de comando para la capa de aplicación.
+2. **Aplicación y Dominio**: La aplicación contiene casos de uso (`*UseCase`) y servicios de fachada (`*ModuleFacadeImpl`) que orquestan operaciones sobre entidades y objetos de valor del dominio, donde residen las invariantes de negocio. **No contienen imports de clientes de base de datos ni SDKs de pasarelas**. Toda dependencia externa se modela como un **Puerto de Salida (Outbound Port)** mediante una interfaz TypeScript pura.
 3. **Adaptadores de Salida (Outbound)**: Implementaciones concretas de los puertos (`PostgreSQL*Adapter`, `Redis*Adapter`) que realizan las interfaces de salida (`..|>`) conforme al Principio de Inversión de Dependencias (DIP).
 
 ---

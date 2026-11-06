@@ -2,7 +2,9 @@
 
 **Sistema**: Plataforma de Descubrimiento, Venta y Validación de Entradas para Eventos y Conciertos en Vivo  
 **Documento**: `docs/02-arquitectura-software/enfoque-aquitectonico.md`  
-**Versión**: `1.1.0` | **Fecha**: `2026-10-29`  
+**Versión**: `1.2.0` | **Actualización**: `2026-11-06`
+
+**Cambios de esta revisión**: vista conceptual general, convención DIP uniforme y composición visual clara. La versión anterior se conserva en Git.
 **Referencia Metodológica**: Guía 04 de Arquitectura de Software, Arquitectura Hexagonal (Alistair Cockburn) & Clean Architecture  
 **Alineación**: Conforme a [ADR-002](../complementos/adrs/ADR-002-adopcion-arquitectura-hexagonal.md), [Nivel 3 (Componentes)](../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md) y [Nivel 4 (Código)](../04-modelo-c4/Nivel4-DiagramadeCodigo.md)  
 **Estado de Implementación**: **`[DISEÑO PROPUESTO — NO IMPLEMENTADO]`**
@@ -12,6 +14,14 @@
 ## 1. El Enfoque Hexagonal (Puertos y Adaptadores)
 
 Para blindar las reglas de negocio de AFORO frente a dependencias tecnológicas volátiles y cambios en frameworks externos, cada uno de los seis módulos de `API Core Backend` adopta estrictamente la **Arquitectura Hexagonal (Puertos y Adaptadores)** ([ADR-002](../complementos/adrs/ADR-002-adopcion-arquitectura-hexagonal.md)).
+
+### 1.0. Vista conceptual del enfoque
+
+![AFORO: arquitectura hexagonal dentro de cada módulo](../diagramas-exportados/aforo-enfoque-general.svg)
+
+[PNG para exposición](../diagramas-exportados/aforo-enfoque-general.png). Cada módulo tiene su propio dominio, aplicación, puertos y adaptadores. Esta ilustración explica el enfoque; las relaciones formales entre módulos se detallan en C3. No representa un dominio compartido ni seis capas alrededor de un único núcleo.
+
+**Adaptación del modelo docente**: el Marketplace utiliza Clean Architecture con interfaces en dominio y presentación separada. AFORO mantiene ADR-002: puertos en aplicación y adaptadores primarios/secundarios en infraestructura. La carpeta presentation/ usada en diseño interno es una separación organizativa para adaptadores primarios, no una capa adicional del núcleo.
 
 ### 1.1. Principios Rectores del Enfoque
 1. **Inversión de Dependencias (DIP)**:  
@@ -98,7 +108,7 @@ flowchart TD
     CTRL -->|"HoldTicketsCommand"| UC_HOLD
     SWEEP -->|"Dispara barrido"| UC_REL
     PAY_MOD -->|"Invoca contrato publico"| FAC_PORT
-    FAC_PORT -.->|"Realizado por"| FAC_IMPL
+    FAC_IMPL -.->|"Implementa contrato"| FAC_PORT
 
     %% Uso del Dominio y Puertos de Salida por Aplicacion
     UC_HOLD -->|"Valida invariantes"| INV & RES
@@ -109,8 +119,8 @@ flowchart TD
     FAC_IMPL -->|"Cancela alarma"| PORT_TMR
 
     %% Inversion de Dependencias en Adaptadores de Salida (DIP)
-    PORT_UOW -.->|"Implementado por (DIP)"| ADAPT_PG
-    PORT_TMR -.->|"Implementado por (DIP)"| ADAPT_RD
+    ADAPT_PG -.->|"Implementa (DIP)"| PORT_UOW
+    ADAPT_RD -.->|"Implementa (DIP)"| PORT_TMR
 
     ADAPT_PG -->|"TCP / SQL"| PG
     ADAPT_RD -->|"TCP / RESP"| RD
@@ -131,6 +141,8 @@ flowchart TD
 ---
 
 ## 3. Dirección de Dependencias y Flujo de una Solicitud
+
+**Convención gráfica**: una invocación en tiempo de ejecución no es lo mismo que una dependencia de código. En las vistas exportadas, la realización de interfaces se representa con línea discontinua y triángulo hueco hacia el contrato de aplicación.
 
 ### 3.1. Regla de Dirección de Dependencias
 - **De Afuera hacia Adentro**:  
