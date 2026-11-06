@@ -17,6 +17,10 @@ Este documento establece las reglas operativas, arquitectónicas y de gobernanza
 
 ## 2. Política de Idioma (Innegociable)
 
+### Preferencia visual del usuario (2026-11-06)
+
+Para ilustraciones académicas de arquitectura, usar como referencia el estilo de la imagen AFORO compartida por el usuario: fondo claro, paneles delimitados, colores suaves por módulo, iconos y títulos legibles. Mantener la precisión del monolito modular y la arquitectura hexagonal; la preferencia visual no implica aprobar todas las relaciones de la imagen.
+
 1. **Español (Obligatorio)**:
    - Toda la documentación académica y técnica ([`docs/`](docs/)).
    - Especificaciones funcionales y requisitos ([`specs/`](specs/)).
@@ -78,7 +82,7 @@ El repositorio utiliza **GitHub Spec Kit** como metodología oficial de desarrol
 
 ## 6. Seguridad de Git y Gobernanza del Código
 
-1. **Ramas**: No trabajar directamente sobre `main`. Todo cambio funcional o refactorización debe realizarse en ramas semánticas (`feat/*`, `fix/*`, `chore/*`).
+1. **Ramas**: Por instrucción explícita del usuario del 2026-11-06, trabajar y subir cambios únicamente en la rama existente `dev`. No crear ramas adicionales ni trabajar directamente sobre `main`, salvo nueva instrucción explícita del usuario. Esta regla sustituye la convención anterior de ramas semánticas por tarea.
 2. **No Destructividad**: Prohibido el uso de `git reset --hard`, `git clean -fd` o cualquier comando que elimine trabajo sin confirmación explícita del usuario.
 3. **Commits y Pushes**: No realizar commits ni pushes remotos sin la debida revisión y autorización del usuario.
 4. **Protección de la Documentación**: La estructura de carpetas de [`docs/`](docs/) es oficial e inmutable. No renombrar carpetas ni alterar la jerarquía de los 4 niveles C4 ni de los documentos académicos.
