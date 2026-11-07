@@ -31,7 +31,7 @@ Este componente ha sido seleccionado como representativo de todo el backend debi
 
 El siguiente diagrama modela la estructura de clases, interfaces, tipos de datos, visibilidad y relaciones en el **Módulo de Reservas e Inventario** siguiendo los principios de la **Arquitectura Hexagonal (Puertos y Adaptadores)**:
 
-![Diagrama C4 — Clases e Interfaces del Módulo Reservations](../diagramas-exportados/C4-clases.svg)
+![Diagrama C4 — Clases e Interfaces del Módulo Reservations](../diagramas-exportados/C4-clases.png)
 
 > **Formatos exportados disponibles**: [SVG Vectorial (`C4-clases.svg`)](../diagramas-exportados/C4-clases.svg) | [PNG Alta Resolución (`C4-clases.png`)](../diagramas-exportados/C4-clases.png)
 
@@ -333,7 +333,7 @@ classDiagram
 
 Para garantizar consistencia estricta y eliminar cualquier condición de carrera (*race condition*), el diseño establece que **todas las operaciones de reserva ocurren dentro de una misma transacción PostgreSQL**:
 
-![Diagrama C4 — Secuencia de Reserva Transaccional Única](../diagramas-exportados/C4-secuencia.svg)
+![Diagrama C4 — Secuencia de Reserva Transaccional Única](../diagramas-exportados/C4-secuencia.png)
 
 > **Formatos exportados disponibles**: [SVG Vectorial (`C4-secuencia.svg`)](../diagramas-exportados/C4-secuencia.svg) | [PNG Alta Resolución (`C4-secuencia.png`)](../diagramas-exportados/C4-secuencia.png)
 

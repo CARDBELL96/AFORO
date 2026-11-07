@@ -31,7 +31,7 @@ La vista principal responde cómo se divide API Core. La vista complementaria ut
 
 ### 2.1 Vista C3-A: Módulos y relaciones
 
-![C3: módulos pares dentro de API Core](../diagramas-exportados/C3-modulos.svg)
+![C3: módulos pares dentro de API Core](../diagramas-exportados/C3-modulos.png)
 
 [PNG para exposición](../diagramas-exportados/C3-modulos.png). Composición vectorial reproducible en [render-architecture.mjs](../../scripts/render-architecture.mjs).
 
@@ -68,7 +68,7 @@ flowchart LR
 
 ### 2.2 Vista C3-B: Enfoque hexagonal del módulo Reservations
 
-![Vista representativa de puertos, aplicación, dominio y adaptadores](../diagramas-exportados/C3-hexagonal.svg)
+![Vista representativa de puertos, aplicación, dominio y adaptadores](../diagramas-exportados/C3-hexagonal.png)
 
 [PNG para exposición](../diagramas-exportados/C3-hexagonal.png). Esta vista complementa C3; no sustituye el diagrama de clases de C4 ni pretende detallar los seis módulos a la vez.
 

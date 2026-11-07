@@ -21,7 +21,7 @@ El **Diagrama de Contexto del Sistema (C1)** presenta la vista de más alto nive
 
 ## 2. Diagrama de Contexto del Sistema (C1)
 
-![Diagrama C1 — Contexto del Sistema AFORO](../diagramas-exportados/C1-contexto.svg)
+![Diagrama C1 — Contexto del Sistema AFORO](../diagramas-exportados/C1-contexto.png)
 
 > **Formatos exportados disponibles**: [SVG Vectorial (`C1-contexto.svg`)](../diagramas-exportados/C1-contexto.svg) | [PNG Alta Resolución (`C1-contexto.png`)](../diagramas-exportados/C1-contexto.png)
 >

@@ -23,7 +23,7 @@ El **Diagrama de Contenedores (C2)** realiza una descomposición del sistema AFO
 
 ### 2.1. Vista Principal C2: Contenedores Ejecutables y Almacenes de Servidor
 
-![Diagrama C2 — Contenedores del Sistema AFORO](../diagramas-exportados/C2-contenedores.svg)
+![Diagrama C2 — Contenedores del Sistema AFORO](../diagramas-exportados/C2-contenedores.png)
 
 > **Formatos exportados disponibles**: [SVG Vectorial (`C2-contenedores.svg`)](../diagramas-exportados/C2-contenedores.svg) | [PNG Alta Resolución (`C2-contenedores.png`)](../diagramas-exportados/C2-contenedores.png)
 >
@@ -107,7 +107,7 @@ flowchart TD
 
 Dado que `IndexedDB` reside en el *sandbox* del navegador del dispositivo móvil del operador y **no es un servidor de base de datos central**, su estructura interna para operación fuera de línea ([ADR-006](../complementos/adrs/ADR-006-persistencia-operacion-offline-access.md)) se desglosa en esta vista específica del contenedor `AFORO Access (PWA)`:
 
-![Diagrama C2-Offline — Contingencia Offline en AFORO Access PWA](../diagramas-exportados/C2-offline.svg)
+![Diagrama C2-Offline — Contingencia Offline en AFORO Access PWA](../diagramas-exportados/C2-offline.png)
 
 > **Formatos exportados disponibles**: [SVG Vectorial (`C2-offline.svg`)](../diagramas-exportados/C2-offline.svg) | [PNG Alta Resolución (`C2-offline.png`)](../diagramas-exportados/C2-offline.png)
 
