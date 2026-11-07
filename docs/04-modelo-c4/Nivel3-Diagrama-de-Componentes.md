@@ -35,7 +35,7 @@ La vista principal responde cómo se divide API Core. La vista complementaria ut
 
 [PNG para exposición](../diagramas-exportados/C3-modulos.png). Composición vectorial reproducible en [render-architecture.mjs](../../scripts/render-architecture.mjs).
 
-Las relaciones de infraestructura se resumen para evitar cruces visuales: cada módulo utiliza sus propios adaptadores y tablas. La persistencia compartida no autoriza acceso a las tablas de otro módulo.
+Esta vista contiene únicamente los seis módulos de negocio dentro de API Core. OutboxProcessor se omite del gráfico; su funcionamiento auxiliar se conserva en la sección 3.3. Las relaciones de infraestructura se resumen para evitar cruces visuales: cada módulo utiliza sus propios adaptadores y tablas. La persistencia compartida no autoriza acceso a las tablas de otro módulo.
 
 <details>
 <summary>Relaciones editables en Mermaid</summary>
@@ -49,18 +49,15 @@ flowchart LR
         TCK["Tickets · Emisión y firma QR"]
         ACC["Access · Validación y auditoría"]
         IDN["Identity · JWT y RBAC transversal"]
-        WORKER["OutboxProcessor · Worker interno"]
         RES -->|ICatalogModuleFacade| CAT
         PAY -->|IReservationsModuleFacade| RES
         ACC -->|ITicketsModuleFacade| TCK
-        WORKER -->|TicketIssuanceListener| TCK
     end
     PG[("PostgreSQL 16 · Tablas privadas por módulo")]
     RD[("Redis 7 · Caché y señal TTL auxiliar")]
     GW["Pasarela de pago"]
     MAIL["Correo"]
     PAY -->|"Pago y evento en la misma transacción"| PG
-    WORKER -->|"Recupera y reclama eventos persistidos"| PG
     CAT & RES & TCK & ACC & IDN -->|"Adaptadores de cada módulo"| PG
     CAT & RES -->|"Caché / señal de expiración"| RD
     PAY <-->|"Cobros y webhooks"| GW
