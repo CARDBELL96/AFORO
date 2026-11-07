@@ -8,6 +8,8 @@
 
 ---
 
+> **Aplicaciones cliente especializadas**: Web, Studio y Access comparten API Core; no se ha definido una composición de microfrontends. La [matriz frontend–módulos de C3](Nivel3-Diagrama-de-Componentes.md#211-frontends-y-módulos-que-consumen) especifica sus interacciones directas e indirectas, todas propuestas para la integración futura.
+
 ## 1. Propósito y Alcance del Diagrama C2
 
 El **Diagrama de Contenedores (C2)** realiza una descomposición del sistema AFORO en sus unidades ejecutables de alto nivel (aplicaciones cliente, servicios de servidor y almacenes de datos). Muestra la topología global de software, las responsabilidades de cada contenedor y los protocolos de comunicación utilizados.

@@ -47,29 +47,29 @@ async function save(name) {
   console.log(name);
 }
 
-start('AFORO | Componentes de API Core', 'C3 · Monolito modular · DISEÑO PROPUESTO — BACKEND NO IMPLEMENTADO', 1100);
-box(45, 110, 330, 110, 'AFORO Web', ['Consulta, reserva y compra', 'Frontend implementado / compra DEMO']);
-box(635, 110, 330, 110, 'AFORO Studio', ['Gestión de eventos', 'Diseño propuesto']);
-box(1225, 110, 330, 110, 'AFORO Access', ['Validación y reconciliación', 'Diseño propuesto']);
-panel(45, 280, 1515, 555, 'API Core · Un proceso y un despliegue · Seis módulos pares');
-box(115, 360, 345, 150, 'Catalog', ['Eventos, recintos y sectores', 'ICatalogModuleFacade'], 'blue');
-box(625, 360, 345, 150, 'Reservations', ['Hold 600 s · cuota máxima 4', 'IReservationsModuleFacade'], 'pink');
-box(1135, 360, 345, 150, 'Payments', ['Cobros y webhooks idempotentes', 'Pago + evento en la misma TX'], 'yellow');
-box(115, 620, 345, 150, 'Identity', ['Autenticación y permisos', 'IIdentityModuleFacade'], 'purple');
-box(625, 620, 345, 150, 'Access', ['Ingreso online y auditoría', 'Reconciliación offline'], 'green');
-box(1135, 620, 345, 150, 'Tickets', ['Emisión y firma Ed25519', 'ITicketsModuleFacade'], 'purple');
-arrow('625,435 460,435', 'consulta', 542, 422);
-arrow('1135,435 970,435', 'confirma', 1052, 422);
-arrow('970,695 1135,695', 'consume', 1052, 681);
-arrow('210,220 210,280', 'HTTPS / JSON', 285, 255);
-arrow('800,220 800,280', 'HTTPS / JSON', 880, 255);
-arrow('1390,220 1390,250 1220,250 1220,280', 'HTTPS / JSON', 1400, 240);
-text(675, 552, ['Relaciones entre módulos: contratos públicos en memoria.', 'Identity presta verificación transversal a los adaptadores de entrada.'], 18);
-text(800, 875, ['Cada módulo accede exclusivamente a sus tablas mediante sus adaptadores.', 'Esta vista muestra módulos de negocio; los mecanismos auxiliares se detallan en el documento.'], 18);
-box(45, 930, 350, 115, 'PostgreSQL 16', ['Única fuente de verdad', 'Persistencia por módulo'], 'gray');
-box(435, 930, 350, 115, 'Redis 7 · auxiliar', ['Caché y señales de expiración', 'No decide disponibilidad'], 'green');
-box(825, 930, 350, 115, 'Pasarelas de pago', ['Culqi / Niubiz / Stripe', 'Integración exclusiva de Payments'], 'yellow');
-box(1215, 930, 340, 115, 'Servicio de correo', ['Envío de entradas', 'Integración de Tickets'], 'purple');
+start('AFORO | Componentes de API Core', 'C3 · Monolito modular · DISEÑO PROPUESTO — BACKEND NO IMPLEMENTADO', 1200);
+box(45, 110, 330, 200, 'AFORO Web', ['Catalog · Reservations · Payments', 'Tickets · Identity', 'Consulta, reserva y compra', 'Frontend implementado / compra DEMO']);
+box(635, 110, 330, 200, 'AFORO Studio', ['Catalog · Reservations', 'Payments · Identity', 'Gestión y tablero de taquilla', 'Diseño propuesto']);
+box(1225, 110, 330, 200, 'AFORO Access', ['Access · Identity', 'Tickets a través de Access', 'Validación y reconciliación', 'Diseño propuesto']);
+panel(45, 380, 1515, 555, 'API Core · Un proceso y un despliegue · Seis módulos pares');
+box(115, 460, 345, 150, 'Catalog', ['Eventos, recintos y sectores', 'ICatalogModuleFacade'], 'blue');
+box(625, 460, 345, 150, 'Reservations', ['Hold 600 s · cuota máxima 4', 'IReservationsModuleFacade'], 'pink');
+box(1135, 460, 345, 150, 'Payments', ['Cobros y webhooks idempotentes', 'Pago + evento en la misma TX'], 'yellow');
+box(115, 720, 345, 150, 'Identity', ['Autenticación y permisos', 'IIdentityModuleFacade'], 'purple');
+box(625, 720, 345, 150, 'Access', ['Ingreso online y auditoría', 'Reconciliación offline'], 'green');
+box(1135, 720, 345, 150, 'Tickets', ['Emisión y firma Ed25519', 'ITicketsModuleFacade'], 'purple');
+arrow('625,535 460,535', 'consulta', 542, 522);
+arrow('1135,535 970,535', 'confirma', 1052, 522);
+arrow('970,795 1135,795', 'consume', 1052, 781);
+arrow('210,310 210,380', 'HTTPS / JSON', 285, 355);
+arrow('800,310 800,380', 'HTTPS / JSON', 880, 355);
+arrow('1390,310 1390,350 1220,350 1220,380', 'HTTPS / JSON', 1400, 340);
+text(675, 652, ['Relaciones entre módulos: contratos públicos en memoria.', 'Identity presta verificación transversal a los adaptadores de entrada.'], 18);
+text(800, 975, ['Cada módulo accede exclusivamente a sus tablas mediante sus adaptadores.', 'Esta vista muestra módulos de negocio; los mecanismos auxiliares se detallan en el documento.'], 18);
+box(45, 1030, 350, 115, 'PostgreSQL 16', ['Única fuente de verdad', 'Persistencia por módulo'], 'gray');
+box(435, 1030, 350, 115, 'Redis 7 · auxiliar', ['Caché y señales de expiración', 'No decide disponibilidad'], 'green');
+box(825, 1030, 350, 115, 'Pasarelas de pago', ['Culqi / Niubiz / Stripe', 'Integración exclusiva de Payments'], 'yellow');
+box(1215, 1030, 340, 115, 'Servicio de correo', ['Envío de entradas', 'Integración de Tickets'], 'purple');
 await save('C3-modulos');
 
 function reservations(name, title) {

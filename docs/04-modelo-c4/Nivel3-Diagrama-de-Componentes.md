@@ -66,6 +66,20 @@ flowchart LR
 
 </details>
 
+### 2.1.1 Frontends y módulos que consumen
+
+Las siguientes interacciones son **diseño propuesto**: se realizarán mediante los controladores REST de API Core (HTTPS/JSON), nunca accediendo a tablas o invocando fachadas TypeScript desde el navegador. Actualmente AFORO Web usa datos locales y simula la compra.
+
+| Frontend | Módulos consumidos mediante API Core | Operaciones y trazabilidad |
+|---|---|---|
+| **AFORO Web** | **Catalog, Reservations, Payments, Tickets e Identity** | Catalog: cartelera, detalle y sectores (RF-WEB-01, RF-WEB-05, RF-WEB-06). Reservations: disponibilidad, hold y estado de reserva. Payments: iniciar compra y consultar su resultado. Tickets: consultar las entradas del comprador. Identity: sesión e identidad para operaciones protegidas. Los flujos transaccionales se detallan en RF-COR y RN-01 a RN-07. |
+| **AFORO Studio** | **Catalog, Reservations, Payments e Identity** | Catalog: eventos, recintos, sectores, fases y cierre comercial (RF-STU-02 a RF-STU-04 y RF-STU-06). Reservations: reservas vigentes, disponibilidad y ventas para el tablero. Payments: recaudación y liquidación (RF-STU-05, RF-STU-06). Identity: autenticación y permisos de promotor (RF-STU-01). Las consultas del tablero requieren contratos de lectura propios de cada módulo; no se introduce un séptimo módulo de reportes. |
+| **AFORO Access** | **Access e Identity** | Identity: autenticar al operador y la terminal (RF-ACC-01). Access: precarga de padrón y clave pública, validación online y reconciliación (RF-ACC-02, RF-ACC-05, RF-ACC-06). La captura QR y la verificación offline ocurren localmente en la PWA (RF-ACC-03, RF-ACC-04). |
+
+**Interacciones indirectas**: Access consulta y consume entradas mediante ITicketsModuleFacade dentro del backend; AFORO Access no llama directamente a Tickets. Reservations consulta Catalog; Payments confirma la reserva con Reservations y la emisión se despacha hacia Tickets mediante Outbox. Esas colaboraciones no se convierten en llamadas adicionales del navegador.
+
+**Clasificación del frontend**: la arquitectura documentada contempla tres aplicaciones cliente especializadas (dos SPA y una PWA), que comparten API Core. No se ha definido su composición como microfrontends. Ese enfoque implica piezas de frontend entregables de forma independiente y compuestas en una experiencia mayor; tener aplicaciones separadas para compradores, promotores y operadores no demuestra por sí solo esa composición. Referencia conceptual: [Micro Frontends, Cam Jackson](https://martinfowler.com/articles/micro-frontends.html). El backend conserva el monolito modular aprobado.
+
 ### 2.2 Vista C3-B: Enfoque hexagonal del módulo Reservations
 
 ![Vista representativa de puertos, aplicación, dominio y adaptadores](../diagramas-exportados/C3-hexagonal.png)
