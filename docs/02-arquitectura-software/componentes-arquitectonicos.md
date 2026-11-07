@@ -3,9 +3,9 @@
 **Sistema**: Plataforma de Descubrimiento, Venta y Validación de Entradas para Eventos y Conciertos en Vivo  
 **Contenedor**: `API Core Backend` (Monolito Modular)  
 **Documento**: `docs/02-arquitectura-software/componentes-arquitectonicos.md`  
-**Versión**: `1.2.0` | **Actualización**: `2026-11-06`
+**Versión**: `1.2.1` | **Actualización**: `2026-11-06`
 
-**Cambios de esta revisión**: vista principal clara y persistencia Outbox explícita. La versión anterior se conserva en Git.
+**Cambios de esta revisión**: vista principal y Mermaid limitados a los seis módulos; se omite el despachador auxiliar del gráfico. La versión anterior se conserva en Git.
 **Referencia Metodológica**: Guía 04 de Arquitectura de Software & C4 Model Nivel 3  
 **Alineación**: Conforme a [ADR-001](../complementos/adrs/ADR-001-seleccion-estilo-monolito-modular.md), [ADR-002](../complementos/adrs/ADR-002-adopcion-arquitectura-hexagonal.md) y [Nivel 3 (Componentes)](../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md)  
 **Estado de Implementación**: **`[DISEÑO PROPUESTO — NO IMPLEMENTADO]`**
@@ -16,9 +16,9 @@
 
 El backend central de AFORO se estructura como un **Monolito Modular** organizado en seis módulos de dominio cohesivos, interconectados exclusivamente mediante **fachadas públicas en memoria** y un despachador recuperable basado en el patrón **Transactional Outbox**:
 
-![Componentes de API Core: monolito modular](../diagramas-exportados/C3-modulos.svg)
+![Componentes de API Core: únicamente los seis módulos](../diagramas-exportados/C3-modulos.png)
 
-La vista principal presenta módulos pares. El enfoque hexagonal interno se explica en [enfoque arquitectónico](enfoque-aquitectonico.md) y el detalle de contratos en [C3](../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md).
+La vista principal presenta únicamente los seis módulos pares. OutboxProcessor es un mecanismo auxiliar, no un módulo, y se omite de esta vista. El enfoque hexagonal interno se explica en [enfoque arquitectónico](enfoque-aquitectonico.md) y el detalle de contratos en [C3](../04-modelo-c4/Nivel3-Diagrama-de-Componentes.md).
 
 <details>
 <summary>Relaciones complementarias en Mermaid</summary>
@@ -29,7 +29,6 @@ flowchart TD
         M1["<b>1. Modulo Catalog</b><br/>Cartelera, eventos, recintos y sectores<br/>Fachada: <code>ICatalogModuleFacade</code>"]
         M2["<b>2. Modulo Reservations</b><br/>Aforo (S + H &lt;= C), TTL 600s y cuota &lt;= 4<br/>Fachada: <code>IReservationsModuleFacade</code>"]
         M3["<b>3. Modulo Payments</b><br/>Idempotencia de cobros, pasarelas y Outbox"]
-        OUTBOX["<b>OutboxProcessor Worker</b><br/>Despacho recuperable at-least-once con lease"]
         M4["<b>4. Modulo Tickets</b><br/>Emision idempotente, firma Ed25519 y correo<br/>Fachada: <code>ITicketsModuleFacade</code>"]
         M5["<b>5. Modulo Access</b><br/>Validacion atomica online (ACTIVE a USED)<br/>y reconciliacion de lotes offline"]
         M6["<b>6. Modulo Identity</b><br/>Autenticacion JWT y control de roles RBAC<br/>Fachada: <code>IIdentityModuleFacade</code>"]
@@ -39,16 +38,15 @@ flowchart TD
     M3 -.->|"2. Confirma venta en misma TX (txContext)"| M2
     PG[("PostgreSQL · outbox_events bajo custodia de Payments")]
     M3 -->|"3. Persiste pago y evento en misma TX"| PG
-    OUTBOX -->|"Reclama eventos persistidos"| PG
-    OUTBOX ==>|"4. Entrega evento recuperable"| M4
     M5 -.->|"5. Consume ticket en misma TX (txContext)"| M4
     M1 & M2 & M3 & M4 & M5 -.->|"6. Verifica sesion y rol RBAC"| M6
 
     classDef app fill:#f0eaff,stroke:#7852b7,stroke-width:2px,color:#18243b;
     classDef infra fill:#f0f4f8,stroke:#64748b,stroke-width:2px,color:#18243b;
     class M1,M2,M3,M4,M5,M6 app;
-    class OUTBOX infra;
 ```
+
+</details>
 
 ---
 
