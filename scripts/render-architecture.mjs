@@ -49,8 +49,12 @@ async function save(name) {
 
 start('AFORO | Componentes de API Core', 'C3 · Monolito modular · DISEÑO PROPUESTO — BACKEND NO IMPLEMENTADO', 1200);
 box(45, 110, 330, 200, 'AFORO Web', ['Catalog · Reservations · Payments', 'Tickets · Identity', 'Consulta, reserva y compra', 'Frontend implementado / compra DEMO']);
-box(635, 110, 330, 200, 'AFORO Studio', ['Catalog · Reservations', 'Payments · Identity', 'Gestión y tablero de taquilla', 'Diseño propuesto']);
-box(1225, 110, 330, 200, 'AFORO Access', ['Access · Identity', 'Tickets a través de Access', 'Validación y reconciliación', 'Diseño propuesto']);
+box(635, 110, 330, 200, 'AFORO Studio', ['Catalog · Reservations', 'Payments · Identity', 'Gestión y tablero de taquilla', 'Diseño propuesto'], '#fff0df');
+box(1225, 110, 330, 200, 'AFORO Access', ['Access · Identity', 'Tickets a través de Access', 'Validación y reconciliación', 'Diseño propuesto'], 'green');
+const consumerColors = { Web: '#2563eb', Studio: '#c65b08', Access: '#15803d' };
+for (const [x, name] of [[45, 'Web'], [635, 'Studio'], [1225, 'Access']]) {
+  parts.push(`<rect x="${x}" y="110" width="330" height="200" rx="16" fill="none" stroke="${consumerColors[name]}" stroke-width="3"/>`);
+}
 panel(45, 380, 1515, 555, 'API Core · Un proceso y un despliegue · Seis módulos pares');
 box(115, 460, 345, 150, 'Catalog', ['Eventos, recintos y sectores', 'ICatalogModuleFacade'], 'blue');
 box(625, 460, 345, 150, 'Reservations', ['Hold 600 s · cuota máxima 4', 'IReservationsModuleFacade'], 'pink');
@@ -58,13 +62,29 @@ box(1135, 460, 345, 150, 'Payments', ['Cobros y webhooks idempotentes', 'Pago + 
 box(115, 720, 345, 150, 'Identity', ['Autenticación y permisos', 'IIdentityModuleFacade'], 'purple');
 box(625, 720, 345, 150, 'Access', ['Ingreso online y auditoría', 'Reconciliación offline'], 'green');
 box(1135, 720, 345, 150, 'Tickets', ['Emisión y firma Ed25519', 'ITicketsModuleFacade'], 'purple');
+function consumers(x, y, names) {
+  names.forEach((name, i) => {
+    const color = consumerColors[name.replace('*', '')];
+    const left = x + 18 + i * 101;
+    parts.push(`<rect x="${left}" y="${y + 113}" width="94" height="27" rx="10" fill="white" stroke="${color}" stroke-width="2" ${name.endsWith('*') ? 'stroke-dasharray="4 3"' : ''}/>`);
+    text(left + 47, y + 132, [name], 15, 'middle', 700, color);
+  });
+}
+consumers(115, 460, ['Web', 'Studio']);
+consumers(625, 460, ['Web', 'Studio']);
+consumers(1135, 460, ['Web', 'Studio']);
+consumers(115, 720, ['Web', 'Studio', 'Access']);
+consumers(625, 720, ['Access']);
+consumers(1135, 720, ['Web', 'Access*']);
 arrow('625,535 460,535', 'consulta', 542, 522);
 arrow('1135,535 970,535', 'confirma', 1052, 522);
 arrow('970,795 1135,795', 'consume', 1052, 781);
-arrow('210,310 210,380', 'HTTPS / JSON', 285, 355);
-arrow('800,310 800,380', 'HTTPS / JSON', 880, 355);
-arrow('1390,310 1390,350 1220,350 1220,380', 'HTTPS / JSON', 1400, 340);
-text(675, 652, ['Relaciones entre módulos: contratos públicos en memoria.', 'Identity presta verificación transversal a los adaptadores de entrada.'], 18);
+for (const [name, points, x, y] of [['Web', '210,310 210,380', 285, 355], ['Studio', '800,310 800,380', 880, 355], ['Access', '1390,310 1390,350 1220,350 1220,380', 1400, 340]]) {
+  const color = consumerColors[name];
+  parts.push(`<defs><marker id="entry-${name}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="${color}"/></marker></defs><polyline points="${points}" fill="none" stroke="${color}" stroke-width="3" marker-end="url(#entry-${name})"/>`);
+  text(x, y, ['HTTPS / JSON'], 15, 'middle', 700, color);
+}
+text(800, 652, ['Consumidores: Web = azul · Studio = naranja · Access = verde.', 'Marca continua = consumo directo por API · Access* = indirecto mediante Access.'], 18);
 text(800, 975, ['Cada módulo accede exclusivamente a sus tablas mediante sus adaptadores.', 'Esta vista muestra módulos de negocio; los mecanismos auxiliares se detallan en el documento.'], 18);
 box(45, 1030, 350, 115, 'PostgreSQL 16', ['Única fuente de verdad', 'Persistencia por módulo'], 'gray');
 box(435, 1030, 350, 115, 'Redis 7 · auxiliar', ['Caché y señales de expiración', 'No decide disponibilidad'], 'green');

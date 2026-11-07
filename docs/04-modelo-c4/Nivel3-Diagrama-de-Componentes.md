@@ -66,6 +66,8 @@ flowchart LR
 
 </details>
 
+**Colores de consumidores**: Web en azul, Studio en naranja y Access en verde. Las marcas de cada módulo identifican qué frontend lo consume. Access* con borde discontinuo indica consumo indirecto de Tickets mediante Access. Un módulo puede ser compartido por varios frontends.
+
 ### 2.1.1 Frontends y módulos que consumen
 
 Las siguientes interacciones son **diseño propuesto**: se realizarán mediante los controladores REST de API Core (HTTPS/JSON), nunca accediendo a tablas o invocando fachadas TypeScript desde el navegador. Actualmente AFORO Web usa datos locales y simula la compra.

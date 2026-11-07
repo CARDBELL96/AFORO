@@ -4,12 +4,15 @@
 <rect x="45" y="110" width="330" height="200" rx="16" fill="#e8f2ff" stroke="#8b9ab2" stroke-width="1.5"/>
 <text x="210" y="141" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18243b"><tspan x="210" dy="0">AFORO Web</tspan></text>
 <text x="210" y="172" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#18243b"><tspan x="210" dy="0">Catalog · Reservations · Payments</tspan><tspan x="210" dy="23.799999999999997">Tickets · Identity</tspan><tspan x="210" dy="23.799999999999997">Consulta, reserva y compra</tspan><tspan x="210" dy="23.799999999999997">Frontend implementado / compra DEMO</tspan></text>
-<rect x="635" y="110" width="330" height="200" rx="16" fill="#e8f2ff" stroke="#8b9ab2" stroke-width="1.5"/>
+<rect x="635" y="110" width="330" height="200" rx="16" fill="#fff0df" stroke="#8b9ab2" stroke-width="1.5"/>
 <text x="800" y="141" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18243b"><tspan x="800" dy="0">AFORO Studio</tspan></text>
 <text x="800" y="172" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#18243b"><tspan x="800" dy="0">Catalog · Reservations</tspan><tspan x="800" dy="23.799999999999997">Payments · Identity</tspan><tspan x="800" dy="23.799999999999997">Gestión y tablero de taquilla</tspan><tspan x="800" dy="23.799999999999997">Diseño propuesto</tspan></text>
-<rect x="1225" y="110" width="330" height="200" rx="16" fill="#e8f2ff" stroke="#8b9ab2" stroke-width="1.5"/>
+<rect x="1225" y="110" width="330" height="200" rx="16" fill="#e6f5ed" stroke="#8b9ab2" stroke-width="1.5"/>
 <text x="1390" y="141" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18243b"><tspan x="1390" dy="0">AFORO Access</tspan></text>
 <text x="1390" y="172" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#18243b"><tspan x="1390" dy="0">Access · Identity</tspan><tspan x="1390" dy="23.799999999999997">Tickets a través de Access</tspan><tspan x="1390" dy="23.799999999999997">Validación y reconciliación</tspan><tspan x="1390" dy="23.799999999999997">Diseño propuesto</tspan></text>
+<rect x="45" y="110" width="330" height="200" rx="16" fill="none" stroke="#2563eb" stroke-width="3"/>
+<rect x="635" y="110" width="330" height="200" rx="16" fill="none" stroke="#c65b08" stroke-width="3"/>
+<rect x="1225" y="110" width="330" height="200" rx="16" fill="none" stroke="#15803d" stroke-width="3"/>
 <rect x="45" y="380" width="1515" height="555" rx="22" fill="#faf8ff" stroke="#7852b7" stroke-width="2"/>
 <text x="802.5" y="413" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#18243b"><tspan x="802.5" dy="0">API Core · Un proceso y un despliegue · Seis módulos pares</tspan></text>
 <rect x="115" y="460" width="345" height="150" rx="16" fill="#e8f2ff" stroke="#8b9ab2" stroke-width="1.5"/>
@@ -30,6 +33,30 @@
 <rect x="1135" y="720" width="345" height="150" rx="16" fill="#f0eaff" stroke="#8b9ab2" stroke-width="1.5"/>
 <text x="1307.5" y="751" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18243b"><tspan x="1307.5" dy="0">Tickets</tspan></text>
 <text x="1307.5" y="782" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#18243b"><tspan x="1307.5" dy="0">Emisión y firma Ed25519</tspan><tspan x="1307.5" dy="23.799999999999997">ITicketsModuleFacade</tspan></text>
+<rect x="133" y="573" width="94" height="27" rx="10" fill="white" stroke="#2563eb" stroke-width="2" />
+<text x="180" y="592" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#2563eb"><tspan x="180" dy="0">Web</tspan></text>
+<rect x="234" y="573" width="94" height="27" rx="10" fill="white" stroke="#c65b08" stroke-width="2" />
+<text x="281" y="592" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#c65b08"><tspan x="281" dy="0">Studio</tspan></text>
+<rect x="643" y="573" width="94" height="27" rx="10" fill="white" stroke="#2563eb" stroke-width="2" />
+<text x="690" y="592" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#2563eb"><tspan x="690" dy="0">Web</tspan></text>
+<rect x="744" y="573" width="94" height="27" rx="10" fill="white" stroke="#c65b08" stroke-width="2" />
+<text x="791" y="592" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#c65b08"><tspan x="791" dy="0">Studio</tspan></text>
+<rect x="1153" y="573" width="94" height="27" rx="10" fill="white" stroke="#2563eb" stroke-width="2" />
+<text x="1200" y="592" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#2563eb"><tspan x="1200" dy="0">Web</tspan></text>
+<rect x="1254" y="573" width="94" height="27" rx="10" fill="white" stroke="#c65b08" stroke-width="2" />
+<text x="1301" y="592" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#c65b08"><tspan x="1301" dy="0">Studio</tspan></text>
+<rect x="133" y="833" width="94" height="27" rx="10" fill="white" stroke="#2563eb" stroke-width="2" />
+<text x="180" y="852" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#2563eb"><tspan x="180" dy="0">Web</tspan></text>
+<rect x="234" y="833" width="94" height="27" rx="10" fill="white" stroke="#c65b08" stroke-width="2" />
+<text x="281" y="852" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#c65b08"><tspan x="281" dy="0">Studio</tspan></text>
+<rect x="335" y="833" width="94" height="27" rx="10" fill="white" stroke="#15803d" stroke-width="2" />
+<text x="382" y="852" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#15803d"><tspan x="382" dy="0">Access</tspan></text>
+<rect x="643" y="833" width="94" height="27" rx="10" fill="white" stroke="#15803d" stroke-width="2" />
+<text x="690" y="852" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#15803d"><tspan x="690" dy="0">Access</tspan></text>
+<rect x="1153" y="833" width="94" height="27" rx="10" fill="white" stroke="#2563eb" stroke-width="2" />
+<text x="1200" y="852" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#2563eb"><tspan x="1200" dy="0">Web</tspan></text>
+<rect x="1254" y="833" width="94" height="27" rx="10" fill="white" stroke="#15803d" stroke-width="2" stroke-dasharray="4 3"/>
+<text x="1301" y="852" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#15803d"><tspan x="1301" dy="0">Access*</tspan></text>
 <polyline points="625,535 460,535" fill="none" stroke="#405576" stroke-width="2"  marker-end="url(#arrow)"/>
 <rect x="501" y="504" width="82" height="25" rx="5" fill="white"/>
 <text x="542" y="522" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="400" fill="#18243b"><tspan x="542" dy="0">consulta</tspan></text>
@@ -39,16 +66,13 @@
 <polyline points="970,795 1135,795" fill="none" stroke="#405576" stroke-width="2"  marker-end="url(#arrow)"/>
 <rect x="1015" y="763" width="74" height="25" rx="5" fill="white"/>
 <text x="1052" y="781" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="400" fill="#18243b"><tspan x="1052" dy="0">consume</tspan></text>
-<polyline points="210,310 210,380" fill="none" stroke="#405576" stroke-width="2"  marker-end="url(#arrow)"/>
-<rect x="228" y="337" width="114" height="25" rx="5" fill="white"/>
-<text x="285" y="355" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="400" fill="#18243b"><tspan x="285" dy="0">HTTPS / JSON</tspan></text>
-<polyline points="800,310 800,380" fill="none" stroke="#405576" stroke-width="2"  marker-end="url(#arrow)"/>
-<rect x="823" y="337" width="114" height="25" rx="5" fill="white"/>
-<text x="880" y="355" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="400" fill="#18243b"><tspan x="880" dy="0">HTTPS / JSON</tspan></text>
-<polyline points="1390,310 1390,350 1220,350 1220,380" fill="none" stroke="#405576" stroke-width="2"  marker-end="url(#arrow)"/>
-<rect x="1343" y="322" width="114" height="25" rx="5" fill="white"/>
-<text x="1400" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="400" fill="#18243b"><tspan x="1400" dy="0">HTTPS / JSON</tspan></text>
-<text x="675" y="652" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18243b"><tspan x="675" dy="0">Relaciones entre módulos: contratos públicos en memoria.</tspan><tspan x="675" dy="25.2">Identity presta verificación transversal a los adaptadores de entrada.</tspan></text>
+<defs><marker id="entry-Web" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#2563eb"/></marker></defs><polyline points="210,310 210,380" fill="none" stroke="#2563eb" stroke-width="3" marker-end="url(#entry-Web)"/>
+<text x="285" y="355" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#2563eb"><tspan x="285" dy="0">HTTPS / JSON</tspan></text>
+<defs><marker id="entry-Studio" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#c65b08"/></marker></defs><polyline points="800,310 800,380" fill="none" stroke="#c65b08" stroke-width="3" marker-end="url(#entry-Studio)"/>
+<text x="880" y="355" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#c65b08"><tspan x="880" dy="0">HTTPS / JSON</tspan></text>
+<defs><marker id="entry-Access" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#15803d"/></marker></defs><polyline points="1390,310 1390,350 1220,350 1220,380" fill="none" stroke="#15803d" stroke-width="3" marker-end="url(#entry-Access)"/>
+<text x="1400" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#15803d"><tspan x="1400" dy="0">HTTPS / JSON</tspan></text>
+<text x="800" y="652" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18243b"><tspan x="800" dy="0">Consumidores: Web = azul · Studio = naranja · Access = verde.</tspan><tspan x="800" dy="25.2">Marca continua = consumo directo por API · Access* = indirecto mediante Access.</tspan></text>
 <text x="800" y="975" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18243b"><tspan x="800" dy="0">Cada módulo accede exclusivamente a sus tablas mediante sus adaptadores.</tspan><tspan x="800" dy="25.2">Esta vista muestra módulos de negocio; los mecanismos auxiliares se detallan en el documento.</tspan></text>
 <rect x="45" y="1030" width="350" height="115" rx="16" fill="#f0f4f8" stroke="#8b9ab2" stroke-width="1.5"/>
 <text x="220" y="1061" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18243b"><tspan x="220" dy="0">PostgreSQL 16</tspan></text>
